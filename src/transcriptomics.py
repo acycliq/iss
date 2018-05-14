@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 
+def getNames():
+    fName = "./data/yob2017.txt"
+    df = pd.read_csv(fName,  names=["Name", "Sex", "Counts"])
+
 
 class Geneset:
     def __init__(self, filename, nheader_lines):
