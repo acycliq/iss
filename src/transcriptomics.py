@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
 
-def getNames():
+def getNames(n):
     fName = "./data/yob2017.txt"
     df = pd.read_csv(fName,  names=["Name", "Sex", "Counts"])
+    return np.random.permutation(df.Counts)[:n]
 
 
 class Geneset:
