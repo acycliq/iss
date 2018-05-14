@@ -15,15 +15,3 @@ class Geneset:
     @property
     def nGenes(self):
         return self._nGenes
-
-    @property
-    def groupby(self):
-        return self._groupby
-
-    @property
-    def cluster_map(self):
-        return self._cluster_map
-
-    @property
-    def par(self):
-        return self._par
