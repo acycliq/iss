@@ -32,7 +32,7 @@ class Iss:
         exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
         all_gene_names = self.GeneNames[self.SpotCodeNo]
         cond_1 = ~np.isin(all_gene_names, exclude_genes)
-        cond_2 =
+        cond_2 = utils.inpolygon(self.SpotGlobalYX[:, 0], self.SpotGlobalYX[:, 1], self.CellCallRegionYX[:, 0], self.CellCallRegionYX[:, 1])
 
     def call_cells(self):
         print("todo")
