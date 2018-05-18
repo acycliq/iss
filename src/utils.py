@@ -1,6 +1,7 @@
 import numpy as np
 import scipy.io as spio
 import os
+from shapely.geometry import Point, Polygon
 
 def parse_mat_array(name):
 # TODO
@@ -59,3 +60,28 @@ def _todict(matobj):
         else:
             dict[strg] = elem
     return dict
+
+
+def inpolygon(xq, yq, xv, yv):
+    '''
+    :param xq:
+    :param yq:
+    :param xv:
+    :param yv:
+    :return:
+    '''
+
+    # create the polygon
+    coords = list(zip(xv, yv))
+    poly = Polygon(coords)
+
+    # create a list of Points
+    pts = [Point(p) for p in zip(xq, yq)]
+
+    # check if point is inside or on the edge
+    isInside = [pt.within(poly) for pt in pts]
+    isOn = [pt.touches(poly) for pt in pts]
+
+    out = np.array(isInside) | np.array(isOn)
+    return out
+
