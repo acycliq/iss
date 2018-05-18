@@ -1,6 +1,5 @@
-import json
+import numpy as np
 import os
-import glob
 import src.utils as utils
 import logging
 
@@ -11,26 +10,29 @@ logging.basicConfig(
     format="%(asctime)s:%(levelname)s:%(message)s"
     )
 
-my_path = os.path.abspath(os.path.dirname(__file__))
 
+class Iss:
+    def __init__(self):
+        my_path = os.path.abspath(os.path.dirname(__file__))
+        self._populate(os.path.join(my_path, "../data/iss.mat"))
+        self._load_cellMapFile()
+        print(self.cell_map)
 
-def populate():
-    config_file = os.path.join(my_path, "../data/json/iss_config.json")
-    with open(config_file) as f:
-        out = json.load(f)
+    def _populate(self, path_str):
+        mat = utils.loadmat(path_str)
+        dictionary = mat["iss"]
+        for key in mat["iss"]:
+            setattr(self, key, dictionary[key])
 
-    mat_folder = os.path.join(my_path, "../data/mat")
-    for file in os.listdir(mat_folder):
-        if file.endswith(".mat"):
-            path_str = os.path.join(mat_folder, file)
-            key = os.path.splitext(file)[0]
-            temp = utils.loadmat(path_str)
-            msg = " Populating %s" % key
-            logger.info(msg)
-            out[key] = temp[key]
+    def _load_cellMapFile(self):
+        mat = utils.loadmat(self.CellMapFile)
+        self.cell_map = mat["CellMap"]
 
-    # utils.loadmat(filename)
-    # out["TileFiles"] = utils.parse_mat_array("TileFiles")
-    # out["cSpotColors"] = utils.parse_mat_array("cSpotColors")
+    def clean_data(self):
+        exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
+        all_gene_names = self.GeneNames[self.SpotCodeNo]
+        cond_1 = ~np.isin(all_gene_names, exclude_genes)
+        cond_2 =
 
-    return out
+    def call_cells(self):
+        print("todo")
