@@ -1,7 +1,7 @@
 import numpy as np
 import scipy.io as spio
 import os
-from shapely.geometry import Point, Polygon
+from shapely.geometry import Point, MultiPoint, Polygon
 
 def parse_mat_array(name):
 # TODO
@@ -76,7 +76,7 @@ def inpolygon(xq, yq, xv, yv):
     poly = Polygon(coords)
 
     # create a list of Points
-    pts = [Point(p) for p in zip(xq, yq)]
+    pts = MultiPoint(list(zip(xq, yq)))
 
     # check if point is inside or on the edge
     isInside = [pt.within(poly) for pt in pts]
