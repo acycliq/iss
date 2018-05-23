@@ -85,3 +85,17 @@ def inpolygon(xq, yq, xv, yv):
     out = np.array(isInside) | np.array(isOn)
     return out
 
+
+
+def ismember(a, b):
+    '''
+    From https://stackoverflow.com/questions/15864082/python-equivalent-of-matlabs-ismember-function
+    :param a:
+    :param b:
+    :return:
+    '''
+    bind = {}
+    for i, elt in enumerate(b):
+        if elt not in bind:
+            bind[elt] = i
+    return [bind.get(itm, None) for itm in a]
