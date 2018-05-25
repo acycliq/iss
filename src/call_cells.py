@@ -81,8 +81,9 @@ class Call_cells:
     def preprocess(self):
         (self._SpotYX, self._SpotGeneName) = self._filter_spots()
         (self._CellYX, self._MeanCellRadius, self._RelCellRadius) = self._cell_info()
-        (self._GeneNames, self._SpotGeneNo, self._TotGeneSpots, self._ClassNames) = self._init()
+        (self._GeneNames, self._SpotGeneNo, self._TotGeneSpots, self._ClassNames) = self._initialise()
 
+    @utils.cached('filter_spots_cache.pickle')
     def _filter_spots(self):
         exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
         all_gene_names = self.iss.GeneNames[self.iss.SpotCodeNo-1] # -1 is needed because Matlab is 1-based
@@ -117,8 +118,7 @@ class Call_cells:
 
         return qual_ok
 
-
-
+    @utils.cached('cell_info_cache.pickle')
     def _cell_info(self):
         '''
         Read image and calc some statistics
@@ -139,7 +139,7 @@ class Call_cells:
 
         return CellYX, MeanCellRadius, RelCellRadius
 
-    def _init(self):
+    def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
         ClassNames = np.append(pd.unique(self.gSet.Class), 'Zero')
 
@@ -152,9 +152,9 @@ class Call_cells:
         ClassPrior = np.append([.5 * np.ones(nK - 1) / nK], 0.5);
 
         MeanClassExp = np.nan * np.ones([nK, nG])
-        gSub = self.gSet.GeneSubSet(GeneNames)
+        gSub = self.gSet.GeneSubset(GeneNames)
         for k in range(nK-1):
-            MeanClassExp[k, :] = self.iss.Inefficiency * np.mean(gSub.ScaleCell[0].CellSubset(ClassNames[k]).GeneExp, 2).T;
+            MeanClassExp[k, :] = self.iss.Inefficiency * np.mean(gSub.ScaleCell(0).CellSubset(ClassNames[k]).GeneExp, 2);
 
         return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
 
