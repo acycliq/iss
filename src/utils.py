@@ -1,7 +1,16 @@
 import numpy as np
 import scipy.io as spio
 import os
+import pickle
 from shapely.geometry import Point, MultiPoint, Polygon
+import logging
+
+
+logger = logging.getLogger()
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="%(asctime)s:%(levelname)s:%(message)s"
+    )
 
 def parse_mat_array(name):
 # TODO
@@ -99,3 +108,42 @@ def ismember(a, b):
         if elt not in bind:
             bind[elt] = i
     return [bind.get(itm, None) for itm in a]
+
+
+class IterMixin(object):
+    def __iter__(self):
+        for attr, value in self.__dict__.items():
+            yield attr, value
+
+
+
+def cached(cachefile):
+    """
+    A function that creates a decorator which will use "cachefile" for caching the results of the decorated function "fn".
+    From: https://datascience.blog.wzb.eu/2016/08/12/a-tip-for-the-impatient-simple-caching-with-python-pickle-and-decorators/
+    """
+    def decorator(fn):  # define a decorator for a function "fn"
+        def wrapped(*args, **kwargs):   # define a wrapper that will finally call "fn" with all arguments
+            # if cache exists -> load it and return its content
+            if os.path.exists(cachefile):
+                    with open(cachefile, 'rb') as cachehandle:
+                        logger.info("reading cached result from '%s' ..." % cachefile)
+                        pkl = pickle.load(cachehandle)
+                        logger.info("...finished")
+                        return pkl
+
+            # execute the function with all arguments passed
+            res = fn(*args, **kwargs)
+
+            # write to cache file
+            with open(cachefile, 'wb') as cachehandle:
+                logger.info("saving result to cache '%s'" % cachefile)
+                pickle.dump(res, cachehandle)
+
+            return res
+
+        return wrapped
+
+    return decorator   # return this "customized" decorator that uses "cachefile"
+
+
