@@ -152,9 +152,12 @@ class Call_cells:
         ClassPrior = np.append([.5 * np.ones(nK - 1) / nK], 0.5);
 
         MeanClassExp = np.nan * np.ones([nK, nG])
-        gSub = self.gSet.GeneSubset(GeneNames)
+        temp = self.gSet.GeneSubset(GeneNames).ScaleCell(0)
         for k in range(nK-1):
-            MeanClassExp[k, :] = self.iss.Inefficiency * np.mean(gSub.ScaleCell(0).CellSubset(ClassNames[k]).GeneExp, 2);
+            print(k)
+            print(ClassNames[k])
+            val = self.iss.Inefficiency * np.mean(temp.CellSubset(ClassNames[k]).GeneExp, 1);
+            MeanClassExp[k, :] = val
 
         return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
 
