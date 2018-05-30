@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 import src.utils as utils
 import src.common
-import copy
+import sys
 import logging
 
 
@@ -78,7 +78,11 @@ class GeneSet(src.common.Base):
         return self._carve_out(IDs, 'Genes')
 
     def CellSubset(self, IDs):
-        return self._carve_out(IDs, 'Cells')
+        out = self._carve_out(IDs, 'Cells')
+        mask = self.GeneExp_df.columns.isin(out.GeneExp_df.columns)
+        if ~mask.all():
+            update(out, mask)
+        return out
 
     # def CellSubset(self, cells):
     #     if np.issubdtype(cells.dtype, np.number):
@@ -102,8 +106,24 @@ class GeneSet(src.common.Base):
         h._GeneExp = h._GeneExp * scale_fac
         return h
 
+
+def update(obj, mask):
+    if np.issubdtype(np.array(mask).dtype, np.str_):
+        mask = obj.Class == mask
+
+    if obj._tSNE.size:
+        obj._tSNE = obj.tSNE[mask]
+
+    if not obj._CellInfo:
+        obj._CellInfo = dict((k, np.array(v)[mask]) for k, v in obj.CellInfo.items())
+
+    if obj._Class.size:
+        obj._Class = obj.Class[mask]
+
+
 if __name__ == "__main__":
     g = GeneSet()
     GeneNames = ['3110035E14Rik',	'6330403K07Rik',	'Adgrl2',	'Aldoc',	'Arpp21',	'Bcl11b',	'Cadps2',	'Calb1',	'Calb2',	'Cck',	'Cdh13',	'Chodl',	'Chrm2',	'Cnr1',	'Col25a1',	'Cort',	'Cox6a2',	'Cplx2',	'Cpne5',	'Crh',	'Crhbp',	'Cryab',	'Crym',	'Cux2',	'Cxcl14',	'Enc1',	'Enpp2',	'Fam19a1',	'Fos',	'Gabrd',	'Gad1',	'Gda',	'Grin3a',	'Hapln1',	'Htr3a',	'Id2',	'Kcnk2',	'Kctd12',	'Kit',	'Lamp5',	'Lhx6',	'Ndnf',	'Neurod6',	'Nos1',	'Nov',	'Npy',	'Npy2r',	'Nr4a2',	'Nrn1',	'Nrsn1',	'Ntng1',	'Pax6',	'Pcp4',	'Pde1a',	'Penk',	'Plcxd2',	'Plp1',	'Pnoc',	'Prkca',	'Pthlh',	'Pvalb',	'Pvrl3',	'Qrfpr',	'Rab3c',	'Rasgrf2',	'Rbp4',	'Reln',	'Rgs10',	'Rgs12',	'Rgs4',	'Rorb',	'Rprm',	'Satb1',	'Scg2',	'Sema3c',	'Serpini1',	'Slc17a8',	'Slc6a1',	'Snca',	'Sncg',	'Sst',	'Sulf2',	'Synpr',	'Tac1',	'Tac2',	'Th',	'Thsd7a',	'Trp53i11',	'Vip',	'Wfs1',	'Yjefn3',	'Zcchc12']
-    gSub = g.GeneSubSet(GeneNames)
-    gSub.ScaleCell(0)
+    gSub = g.GeneSubset(GeneNames)
+    temp = gSub.ScaleCell(0)
+    temp.CellSubset('Sst.Nos1')
