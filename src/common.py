@@ -15,18 +15,16 @@ class Base(object):
         return [a for a in dir(self) if not a.startswith('__') and not callable(getattr(self, a))]
 
     def _carve_out(self, IDs, flag):
-        a = self.get_attr()
-        dc = copy.deepcopy(self)
         if flag == 'Genes':
-            self._carve_out_genes(dc, IDs)
+            self._carve_out_genes(IDs)
         elif flag == 'Cells':
-            self._carve_out_cells(dc, IDs)
+            self._carve_out_cells(IDs)
         else:
             print('I shouldnt be here')
-        return dc
+        return self
 
-    def _carve_out_genes(self, dc, IDs):
-        dc.GeneExp_df = dc.GeneExp_df.loc[IDs, :]
+    def _carve_out_genes(self, IDs):
+        self.GeneExp_df = self.GeneExp_df.loc[IDs, :]
         id_matched = np.isin(IDs, self.GeneName)
         if ~id_matched.all():
             unmatched = IDs[~id_matched]
@@ -35,11 +33,18 @@ class Base(object):
             else:
                 msg = "These IDs: %s are missing from GeneNames" % unmatched
             logger.info(msg)
+        return self
 
-    def _carve_out_cells(self, dc, IDs):
+    def _carve_out_cells(self, IDs):
+        mask = None
         if np.issubdtype(np.array(IDs).dtype, np.number):
-            dc._GeneExp = dc.GeneExp_df.iloc[:, IDs].values
-        elif np.issubdtype(np.array(IDs).dtype, np.bool):
-            dc._GeneExp = dc.GeneExp_df.iloc[:, IDs].values
-        else:
-            dc._GeneExp = dc.GeneExp_df[IDs].values
+            self.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
+        elif np.issubdtype(np.array(IDs).dtype, np.bool_):
+            self.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
+        elif np.issubdtype(np.array(IDs).dtype, np.str_):
+            mask = self.Class == IDs
+            if np.issubdtype(np.array(mask).dtype, np.bool_):
+                self.GeneExp_df = self.GeneExp_df.loc[:, mask]
+            else:
+                self.GeneExp_df = self.GeneExp_df[IDs]
+        return self, mask
