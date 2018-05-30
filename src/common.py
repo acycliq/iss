@@ -2,7 +2,7 @@ import copy
 import numpy as np
 import pandas as pd
 import logging
-
+import copy
 
 logger = logging.getLogger()
 logging.basicConfig(
@@ -16,15 +16,16 @@ class Base(object):
 
     def _carve_out(self, IDs, flag):
         if flag == 'Genes':
-            self._carve_out_genes(IDs)
+            out = self._carve_out_genes(IDs)
         elif flag == 'Cells':
-            self._carve_out_cells(IDs)
+            out = self._carve_out_cells(IDs)
         else:
             print('I shouldnt be here')
-        return self
+        return out
 
     def _carve_out_genes(self, IDs):
-        self.GeneExp_df = self.GeneExp_df.loc[IDs, :]
+        dc = copy.deepcopy(self)
+        dc.GeneExp_df = self.GeneExp_df.loc[IDs, :]
         id_matched = np.isin(IDs, self.GeneName)
         if ~id_matched.all():
             unmatched = IDs[~id_matched]
@@ -33,18 +34,21 @@ class Base(object):
             else:
                 msg = "These IDs: %s are missing from GeneNames" % unmatched
             logger.info(msg)
-        return self
+        return dc
 
     def _carve_out_cells(self, IDs):
+        dc = copy.deepcopy(self)
         mask = None
         if np.issubdtype(np.array(IDs).dtype, np.number):
-            self.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
+            dc.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
         elif np.issubdtype(np.array(IDs).dtype, np.bool_):
-            self.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
+            dc.GeneExp_df = self.GeneExp_df.iloc[:, IDs]
         elif np.issubdtype(np.array(IDs).dtype, np.str_):
             mask = self.Class == IDs
             if np.issubdtype(np.array(mask).dtype, np.bool_):
-                self.GeneExp_df = self.GeneExp_df.loc[:, mask]
+                print(self.GeneExp.shape)
+                print(mask.shape)
+                dc.GeneExp_df = self.GeneExp_df.loc[:, mask]
             else:
-                self.GeneExp_df = self.GeneExp_df[IDs]
-        return self, mask
+                dc.GeneExp_df = self.GeneExp_df[IDs]
+        return dc
