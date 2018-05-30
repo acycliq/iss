@@ -18,11 +18,30 @@ class GeneSet(src.common.Base):
     def __init__(self):
         my_path = os.path.abspath(os.path.dirname(__file__))
         self._populate(os.path.join(my_path, "../data/GeneSet.mat"))
-        self.GeneExp_df = pd.DataFrame(self._GeneExp, columns=self._CellName, index=self._GeneName)
+        self._GeneExp_df = pd.DataFrame(self._GeneExp, columns=self._CellName, index=self._GeneName)
 
     @property
     def GeneExp(self):
-        return self.GeneExp_df.values
+        return self._GeneExp_df.values
+
+    # No setter for GeneExp. The only legit way to change GeneExp is
+    # by setting the dataframe GeneExp_df
+
+    @property
+    def GeneExp_df(self):
+        return self._GeneExp_df
+
+    @GeneExp_df.setter
+    def GeneExp_df(self, val):
+        if isinstance(val, tuple):
+            print("TODO")
+        elif isinstance(val, pd.DataFrame):
+            self._GeneExp_df = val
+            self._GeneExp = val.values
+        else:
+            raise Exception
+            logger.exception(e)
+            exit('Could not complete request.')
 
     @property
     def GeneName(self):
