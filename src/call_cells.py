@@ -5,6 +5,7 @@ import src.utils as utils
 from src.iss import Iss
 from src.geneset import GeneSet
 from skimage.measure import regionprops
+from sklearn.neighbors import NearestNeighbors
 import logging
 
 
@@ -158,6 +159,10 @@ class Call_cells:
             print(ClassNames[k])
             val = self.iss.Inefficiency * np.mean(temp.CellSubset(ClassNames[k]).GeneExp, 1);
             MeanClassExp[k, :] = val
+
+        lMeanClassExp = np.log(MeanClassExp + self.iss.SpotReg)
+        nbrs = NearestNeighbors(n_neighbors=nK, algorithm='ball_tree').fit(self.CellYX)
+        distances, indices = nbrs.kneighbors(self.SpotYX)
 
         return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
 
