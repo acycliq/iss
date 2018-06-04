@@ -147,3 +147,21 @@ def cached(cachefile):
     return decorator   # return this "customized" decorator that uses "cachefile"
 
 
+def IndexArrayNan(a, idx):
+    assert isinstance(idx[0], np.ndarray), "Array 'idx' must be an array of arrays."
+    idx = idx.astype(np.int64)
+    out = np.array([])
+    dim = np.ones(idx.shape[0], dtype=int)
+    dim[:len(a.shape)] = a.shape
+    for i in idx.T:
+        print(i)
+        try:
+            flat_idx = np.ravel_multi_index(i, dims=dim, order='C')
+            out = np.append(out, a.ravel()[flat_idx])
+        except ValueError as err:
+            if str(err) != "invalid entry in coordinates array":
+                raise
+            else:
+                out = np.append(out, np.nan)
+
+    return out
