@@ -153,15 +153,19 @@ def IndexArrayNan(a, idx):
     out = np.array([])
     dim = np.ones(idx.shape[0], dtype=int)
     dim[:len(a.shape)] = a.shape
-    for i in idx.T:
-        print(i)
-        try:
-            flat_idx = np.ravel_multi_index(i, dims=dim, order='C')
-            out = np.append(out, a.ravel()[flat_idx])
-        except ValueError as err:
-            if str(err) != "invalid entry in coordinates array":
-                raise
-            else:
-                out = np.append(out, np.nan)
+
+    # output array
+    out = np.nan * np.ones(idx.shape[1])
+
+    # find the ones that are out of bounds:
+    is_within = np.all(idx.T <= dim-1, axis=1)
+
+    # drop is value is negative
+    is_positive = np.all(idx.T > 0, axis=1)
+
+    # filter array`
+    arr = idx[:, is_within & is_positive]
+    flat_idx = np.ravel_multi_index(arr, dims=dim, order='C')
+    out[is_within & is_positive] = a.ravel()[flat_idx]
 
     return out
