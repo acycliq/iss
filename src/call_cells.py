@@ -138,6 +138,8 @@ class Call_cells:
         RelCellRadius = np.sqrt(CellArea0 / np.pi) / MeanCellRadius
         np.append(RelCellRadius, 1)
 
+        logger.info("Rebasing CellYX to match the zero-based Matlab object. ")
+        CellYX = CellYX + 1
         return CellYX, MeanCellRadius, RelCellRadius
 
     def _initialise(self):
@@ -152,17 +154,26 @@ class Call_cells:
 
         ClassPrior = np.append([.5 * np.ones(nK - 1) / nK], 0.5);
 
-        MeanClassExp = np.nan * np.ones([nK, nG])
+        MeanClassExp = np.zeros([nK, nG])
         temp = self.gSet.GeneSubset(GeneNames).ScaleCell(0)
         for k in range(nK-1):
-            print(k)
-            print(ClassNames[k])
             val = self.iss.Inefficiency * np.mean(temp.CellSubset(ClassNames[k]).GeneExp, 1);
             MeanClassExp[k, :] = val
 
         lMeanClassExp = np.log(MeanClassExp + self.iss.SpotReg)
-        nbrs = NearestNeighbors(n_neighbors=nK, algorithm='ball_tree').fit(self.CellYX)
-        distances, indices = nbrs.kneighbors(self.SpotYX)
+        nbrs = NearestNeighbors(n_neighbors=nN, algorithm='ball_tree').fit(self.CellYX)
+        Dist, Neighbors = nbrs.kneighbors(self.SpotYX)
+        Neighbors[:, -1] = nC
+
+        D = -Dist**2 / (2 * self.MeanCellRadius**2) - np.log(2*np.pi*self.MeanCellRadius**2)
+        D[:, -1] = np.log(self.iss.MisreadDensity)
+
+        y0 = self.iss.CellCallRegionYX[:, 0].min()
+        x0 = self.iss.CellCallRegionYX[:, 1].min()
+        idx = self.SpotYX - [y0, x0]
+        spot_in_cell = utils.IndexArrayNan_fast(self.iss.cell_map, idx.T-1)
+        spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
+
 
         return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
 
