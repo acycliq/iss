@@ -42,47 +42,67 @@ class Call_cells:
 
     @property
     def SpotGeneName(self):
-        return self._SpotGeneName
+        return self._spots["SpotGeneName"]
 
     @property
     def SpotYX(self):
-        return self._SpotYX
+        return self._spots["SpotYX"]
 
     @property
     def CellYX(self):
-        return self._CellYX
+        return self._cellinfo["CellYX"]
 
     @property
     def MeanCellRadius(self):
-        return self._MeanCellRadius
+        return self._cellinfo["MeanCellRadius"]
 
     @property
     def RelCellRadius(self):
-        return self._RelCellRadius
+        return self._cellinfo["RelCellRadius"]
 
     @property
     def GeneNames(self):
-        return self._GeneNames
+        return self._ini["GeneNames"]
 
     @property
     def SpotGeneNo(self):
-        return self._SpotGeneNo
+        return self._ini["SpotGeneNo"]
 
     @property
     def TotGeneSpots(self):
-        return self._TotGeneSpots
+        return self._ini["TotGeneSpots"]
 
     @property
     def ClassNames(self):
-        return self._ClassNames
+        return self._ini["ClassNames"]
+
+    @property
+    def lMeanClassExp(self):
+        return self._ini["lMeanClassExp"]
+
+    @property
+    def Neighbors(self):
+        return self._ini["Neighbors"]
+
+    @property
+    def D(self):
+        return self._ini["D"]
+
+    @property
+    def LogClassPrior(self):
+        return self._ini["LogClassPrior"]
+
+    @property
+    def CellAreaFactor(self):
+        return self._ini["CellAreaFactor"]
 
     def run(self):
         self.preprocess()
 
     def preprocess(self):
-        (self._SpotYX, self._SpotGeneName) = self._filter_spots()
-        (self._CellYX, self._MeanCellRadius, self._RelCellRadius) = self._cell_info()
-        (self._GeneNames, self._SpotGeneNo, self._TotGeneSpots, self._ClassNames) = self._initialise()
+        self._spots = self._filter_spots()
+        self._cellinfo = self._cell_info()
+        self._ini = self._initialise()
 
     @utils.cached('filter_spots_cache.pickle')
     def _filter_spots(self):
@@ -96,7 +116,10 @@ class Call_cells:
         SpotYX = self.iss.SpotGlobalYX[include_spot, :].round()
         SpotGeneName = all_gene_names[include_spot]
 
-        return SpotYX, SpotGeneName
+        out = dict()
+        out["SpotYX"] = SpotYX
+        out["SpotGeneName"] = SpotGeneName
+        return out
 
     def _quality_threshold(self):
         qual_ok = self.iss.SpotCombi & (self.iss.SpotScore > self.iss.CombiQualThresh) & (self.iss.SpotIntensity > self.iss.CombiIntensityThresh);
@@ -136,11 +159,16 @@ class Call_cells:
         MeanCellRadius = np.mean(np.sqrt(CellArea0 / np.pi)) * 0.5;
 
         RelCellRadius = np.sqrt(CellArea0 / np.pi) / MeanCellRadius
-        np.append(RelCellRadius, 1)
+        RelCellRadius = np.append(RelCellRadius, 1)
 
         logger.info("Rebasing CellYX to match the zero-based Matlab object. ")
         CellYX = CellYX + 1
-        return CellYX, MeanCellRadius, RelCellRadius
+
+        out = dict()
+        out["CellYX"] = CellYX
+        out["MeanCellRadius"] = MeanCellRadius
+        out["RelCellRadius"] = RelCellRadius
+        return out
 
     def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
@@ -171,14 +199,29 @@ class Call_cells:
         y0 = self.iss.CellCallRegionYX[:, 0].min()
         x0 = self.iss.CellCallRegionYX[:, 1].min()
         logger.info("Rebasing SpotYX to match the zero-based Matlab object.")
-        SpotYX = self.SpotYX - 1
-        idx = SpotYX - [y0, x0]
+        spotyx = self.SpotYX - 1
+        idx = spotyx - [y0, x0]
         spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
-        # spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
+        sanity_check = Neighbors[spot_in_cell > 0, 0] + 1 == spot_in_cell[spot_in_cell > 0]
+        assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
+        D[spot_in_cell > 0, 0] = D[spot_in_cell > 0, 0] + self.iss.InsideCellBonus;
+        LogClassPrior = np.log(ClassPrior)
+        nom = np.exp(-self.RelCellRadius**2/2) * ( 1 - np.exp(self.iss.InsideCellBonus) ) + np.exp(self.iss.InsideCellBonus)
+        denom = np.exp(-0.5) * (1 - np.exp(self.iss.InsideCellBonus)) + np.exp(self.iss.InsideCellBonus)
+        CellAreaFactor = nom / denom
 
-        return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
-
+        out = dict()
+        out["GeneNames"] = GeneNames
+        out["SpotGeneNo"] = SpotGeneNo
+        out["TotGeneSpots"] = TotGeneSpots
+        out["ClassNames"] = ClassNames
+        out["lMeanClassExp"] = lMeanClassExp
+        out["Neighbors"] = Neighbors
+        out["D"] = D
+        out["LogClassPrior"] = LogClassPrior
+        out["CellAreaFactor"] = CellAreaFactor
+        return out
 
 
 
