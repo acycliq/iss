@@ -157,11 +157,11 @@ def IndexArrayNan(a, idx):
     # output array
     out = np.nan * np.ones(idx.shape[1])
 
-    # find the ones that are out of bounds:
+    # find the ones within bounds:
     is_within = np.all(idx.T <= dim-1, axis=1)
 
-    # drop is value is negative
-    is_positive = np.all(idx.T > 0, axis=1)
+    # also keep only non-negative ones
+    is_positive = np.all(idx.T >= 0, axis=1)
 
     # filter array`
     arr = idx[:, is_within & is_positive]
