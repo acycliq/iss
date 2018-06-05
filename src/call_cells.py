@@ -1,6 +1,7 @@
 import numpy as np
 import pandas as pd
 import os
+import scipy
 import src.utils as utils
 from src.iss import Iss
 from src.geneset import GeneSet
@@ -29,7 +30,7 @@ class Call_cells:
         self._GeneNames = None
         self._SpotGeneNo = None
         self._TotGeneSpots = None
-        self._ClassNames  = None
+        self._ClassNames = None
 
 
     @property
@@ -96,8 +97,13 @@ class Call_cells:
     def CellAreaFactor(self):
         return self._ini["CellAreaFactor"]
 
+    @property
+    def SpotInCell(self):
+        return self._ini["SpotInCell"]
+
     def run(self):
         self.preprocess()
+        self.calc()
 
     def preprocess(self):
         self._spots = self._filter_spots()
@@ -201,11 +207,11 @@ class Call_cells:
         logger.info("Rebasing SpotYX to match the zero-based Matlab object.")
         spotyx = self.SpotYX - 1
         idx = spotyx - [y0, x0]
-        spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
-        sanity_check = Neighbors[spot_in_cell > 0, 0] + 1 == spot_in_cell[spot_in_cell > 0]
+        SpotInCell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
+        sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
-        D[spot_in_cell > 0, 0] = D[spot_in_cell > 0, 0] + self.iss.InsideCellBonus;
+        D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + self.iss.InsideCellBonus;
         LogClassPrior = np.log(ClassPrior)
         nom = np.exp(-self.RelCellRadius**2/2) * ( 1 - np.exp(self.iss.InsideCellBonus) ) + np.exp(self.iss.InsideCellBonus)
         denom = np.exp(-0.5) * (1 - np.exp(self.iss.InsideCellBonus)) + np.exp(self.iss.InsideCellBonus)
@@ -221,8 +227,28 @@ class Call_cells:
         out["D"] = D
         out["LogClassPrior"] = LogClassPrior
         out["CellAreaFactor"] = CellAreaFactor
+        out["SpotInCell"] = SpotInCell
         return out
 
+def _calc(self):
+    nG = self.GeneNames.shape[0]
+    nK = self.ClassNames.shape[0]
+    nC = self.CellYX.shape[0] + 1
+    nS = self.SpotYX.shape[0]
+    nN = self.iss.nNeighbors + 1
+
+    pSpotNeighb = np.zeros([nS, nN])
+    pCellClass = np.zeros([nC, nK])
+
+    pSpotNeighb[self.Neighbors == self.SpotInCell] = 1
+    pSpotNeighb[self.SpotInCell == 0, -1] = 1
+
+    eSpotGamma = np.ones([nC, nK, nG]);
+    elSpotGamma = np.ones(nC, nK, nG) * scipy.special.psi(1)
+
+    eGeneGamma = np.ones(nG)
+
+    pSpotNeighbOld = np.zeros([nS, nN])
 
 
 
