@@ -1,4 +1,5 @@
 import numpy as np
+import numpy_groupies as npg
 import pandas as pd
 import os
 import scipy
@@ -103,7 +104,7 @@ class Call_cells:
 
     def run(self):
         self.preprocess()
-        self.calc()
+        self._calc()
 
     def preprocess(self):
         self._spots = self._filter_spots()
@@ -230,25 +231,33 @@ class Call_cells:
         out["SpotInCell"] = SpotInCell
         return out
 
-def _calc(self):
-    nG = self.GeneNames.shape[0]
-    nK = self.ClassNames.shape[0]
-    nC = self.CellYX.shape[0] + 1
-    nS = self.SpotYX.shape[0]
-    nN = self.iss.nNeighbors + 1
+    def _calc(self):
+        nG = self.GeneNames.shape[0]
+        nK = self.ClassNames.shape[0]
+        nC = self.CellYX.shape[0] + 1
+        nS = self.SpotYX.shape[0]
+        nN = self.iss.nNeighbors + 1
 
-    pSpotNeighb = np.zeros([nS, nN])
-    pCellClass = np.zeros([nC, nK])
+        pSpotNeighb = np.zeros([nS, nN])
+        pCellClass = np.zeros([nC, nK])
 
-    pSpotNeighb[self.Neighbors == self.SpotInCell] = 1
-    pSpotNeighb[self.SpotInCell == 0, -1] = 1
+        pSpotNeighb[self.Neighbors == self.SpotInCell] = 1
+        pSpotNeighb[self.SpotInCell == 0, -1] = 1
 
-    eSpotGamma = np.ones([nC, nK, nG]);
-    elSpotGamma = np.ones(nC, nK, nG) * scipy.special.psi(1)
+        eSpotGamma = np.ones([nC, nK, nG]);
+        elSpotGamma = np.ones([nC, nK, nG]) * scipy.special.psi(1)
 
-    eGeneGamma = np.ones(nG)
+        eGeneGamma = np.ones(nG)
 
-    pSpotNeighbOld = np.zeros([nS, nN])
+        pSpotNeighbOld = np.zeros([nS, nN])
+
+        for i in range(self.iss.CellCallMaxIter):
+            for n in range(nN-2):
+                c = self.Neighbors[:, n]
+                group_idx = np.hstack((c[:, None], self.SpotGeneNo[:, None]))
+                a = pSpotNeighb[:, n]
+                accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
+                #([c, SpotGeneNo], pSpotNeighb(:,n), [nC,nG]);
 
 
 
