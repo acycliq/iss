@@ -170,9 +170,11 @@ class Call_cells:
 
         y0 = self.iss.CellCallRegionYX[:, 0].min()
         x0 = self.iss.CellCallRegionYX[:, 1].min()
-        idx = self.SpotYX - [y0, x0]
-        spot_in_cell = utils.IndexArrayNan_fast(self.iss.cell_map, idx.T-1)
+        logger.info("Rebasing SpotYX to match the zero-based Matlab object.")
+        SpotYX = self.SpotYX - 1
+        idx = SpotYX - [y0, x0]
         spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
+        # spot_in_cell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
 
 
         return GeneNames, SpotGeneNo, TotGeneSpots, ClassNames
