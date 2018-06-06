@@ -79,6 +79,10 @@ class Call_cells:
         return self._ini["ClassNames"]
 
     @property
+    def MeanClassExp(self):
+        return self._ini["MeanClassExp"]
+
+    @property
     def lMeanClassExp(self):
         return self._ini["lMeanClassExp"]
 
@@ -209,6 +213,7 @@ class Call_cells:
         spotyx = self.SpotYX - 1
         idx = spotyx - [y0, x0]
         SpotInCell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
+        logger.info("Rebasing Neighbors to match the zero-based Matlab object.")
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
@@ -223,6 +228,7 @@ class Call_cells:
         out["SpotGeneNo"] = SpotGeneNo
         out["TotGeneSpots"] = TotGeneSpots
         out["ClassNames"] = ClassNames
+        out["MeanClassExp"] = MeanClassExp
         out["lMeanClassExp"] = lMeanClassExp
         out["Neighbors"] = Neighbors
         out["D"] = D
@@ -241,7 +247,7 @@ class Call_cells:
         pSpotNeighb = np.zeros([nS, nN])
         pCellClass = np.zeros([nC, nK])
 
-        pSpotNeighb[self.Neighbors == self.SpotInCell] = 1
+        pSpotNeighb[self.Neighbors + 1 == self.SpotInCell[:, None]] = 1
         pSpotNeighb[self.SpotInCell == 0, -1] = 1
 
         eSpotGamma = np.ones([nC, nK, nG]);
@@ -252,12 +258,21 @@ class Call_cells:
         pSpotNeighbOld = np.zeros([nS, nN])
 
         for i in range(self.iss.CellCallMaxIter):
-            for n in range(nN-2):
+
+            CellGeneCount = np.zeros([nC, nG]);
+            for n in range(nN-1):
                 c = self.Neighbors[:, n]
-                group_idx = np.hstack((c[:, None], self.SpotGeneNo[:, None]))
+                group_idx = np.vstack((c[None, :], self.SpotGeneNo[None, :]))
                 a = pSpotNeighb[:, n]
                 accumarray = npg.aggregate(group_idx, a, func="sum", size=(nC, nG))
-                #([c, SpotGeneNo], pSpotNeighb(:,n), [nC,nG]);
+                CellGeneCount = CellGeneCount + accumarray
+
+            ScaledMean = np.transpose(np.dstack([self.MeanClassExp.T] * len(self.CellAreaFactor)) * self.CellAreaFactor, (2, 1, 0))
+            eSpotGamma = (self.iss.rSpot + np.reshape(CellGeneCount, (nC, 1, nG), order='F') ) / (self.iss.rSpot + ScaledMean)
+            elSpotGamma = scipy.special.psi(self.iss.rSpot + np.reshape(CellGeneCount, (nC, 1, nG))) - np.log(self.iss.rSpot + ScaledMean)
+
+
+
 
 
 
