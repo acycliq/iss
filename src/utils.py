@@ -173,7 +173,7 @@ def IndexArrayNan(a, idx):
 def LogLtoP(L):
     L1 = L - np.max(L, axis=1)[:, None]
     eL = np.exp(L1)
-    p = eL / np.sum(eL, axis=1)
+    p = eL / np.sum(eL, axis=1)[:, None]
     return p
 
 
