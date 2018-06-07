@@ -280,6 +280,8 @@ class Call_cells:
 
             pCellClass = utils.LogLtoP(wCellClass)
 
+            utils.bi(elSpotGamma, c, np.arange(nK+1), self.SpotGeneNo)
+
             print("Sucess!!")
 
 
