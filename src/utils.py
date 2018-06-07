@@ -175,3 +175,15 @@ def LogLtoP(L):
     eL = np.exp(L1)
     p = eL / np.sum(eL, axis=1)
     return p
+
+
+def bi(X, *args):
+    out = []
+    ZeroIndexArray = 0
+    for i in range(len(args)):
+        ZeroIndexArray = ZeroIndexArray * args[i]
+
+    for i in range(len(args)):
+        out.append(ZeroIndexArray + args[i])
+
+    return np.array(out)
