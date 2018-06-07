@@ -181,6 +181,7 @@ class Call_cells:
         out["RelCellRadius"] = RelCellRadius
         return out
 
+    @utils.cached('ini_cache.pickle')
     def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
         ClassNames = np.append(pd.unique(self.gSet.Class), 'Zero')
@@ -271,6 +272,15 @@ class Call_cells:
             eSpotGamma = (self.iss.rSpot + np.reshape(CellGeneCount, (nC, 1, nG), order='F') ) / (self.iss.rSpot + ScaledMean)
             elSpotGamma = scipy.special.psi(self.iss.rSpot + np.reshape(CellGeneCount, (nC, 1, nG))) - np.log(self.iss.rSpot + ScaledMean)
 
+            ScaledExp = np.reshape(self.MeanClassExp, (1, nK, nG)) * np.reshape(eGeneGamma, (1, 1, nG)) * self.CellAreaFactor[..., None, None] + self.iss.SpotReg
+
+            pNegBin = ScaledExp / (self.iss.rSpot + ScaledExp)
+
+            wCellClass = np.sum(np.reshape(CellGeneCount, (nC, 1, nG)) * np.log(pNegBin) + self.iss.rSpot * np.log(1 - pNegBin), axis = 2) + self.LogClassPrior
+
+            pCellClass = utils.LogLtoP(wCellClass)
+
+            print("Sucess!!")
 
 
 
