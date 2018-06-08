@@ -115,7 +115,7 @@ class Call_cells:
         self._cellinfo = self._cell_info()
         self._ini = self._initialise()
 
-    @utils.cached('filter_spots_cache.pickle')
+    # @utils.cached('filter_spots_cache.pickle')
     def _filter_spots(self):
         exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
         all_gene_names = self.iss.GeneNames[self.iss.SpotCodeNo-1] # -1 is needed because Matlab is 1-based
@@ -153,7 +153,7 @@ class Call_cells:
 
         return qual_ok
 
-    @utils.cached('cell_info_cache.pickle')
+    # @utils.cached('cell_info_cache.pickle')
     def _cell_info(self):
         '''
         Read image and calc some statistics
@@ -181,7 +181,7 @@ class Call_cells:
         out["RelCellRadius"] = RelCellRadius
         return out
 
-    @utils.cached('ini_cache.pickle')
+    # @utils.cached('ini_cache.pickle')
     def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
         ClassNames = np.append(pd.unique(self.gSet.Class), 'Zero')
@@ -273,16 +273,38 @@ class Call_cells:
             elSpotGamma = scipy.special.psi(self.iss.rSpot + np.reshape(CellGeneCount, (nC, 1, nG))) - np.log(self.iss.rSpot + ScaledMean)
 
             ScaledExp = np.reshape(self.MeanClassExp, (1, nK, nG)) * np.reshape(eGeneGamma, (1, 1, nG)) * self.CellAreaFactor[..., None, None] + self.iss.SpotReg
-
             pNegBin = ScaledExp / (self.iss.rSpot + ScaledExp)
-
             wCellClass = np.sum(np.reshape(CellGeneCount, (nC, 1, nG)) * np.log(pNegBin) + self.iss.rSpot * np.log(1 - pNegBin), axis = 2) + self.LogClassPrior
-
             pCellClass = utils.LogLtoP(wCellClass)
 
-            utils.bi(elSpotGamma, c, np.arange(nK+1), self.SpotGeneNo)
+            aSpotCell = np.zeros([nS, nN])
+            for n in range(nN-1):
+                c = self.Neighbors[:, n]
+                term_1 = np.sum(pCellClass[c, :] * self.lMeanClassExp[:, self.SpotGeneNo].T, axis=1)
+                temp = utils.bi(elSpotGamma, c[:, None], np.arange(0, nK), self.SpotGeneNo[:, None])
+                term_2 = np.sum(pCellClass[c, :] * temp, axis=1)
+                aSpotCell[:, n] = term_1 + term_2
+            wSpotCell = aSpotCell + self.D
 
-            print("Sucess!!")
+            pSpotNeighb = utils.LogLtoP(wSpotCell)
+            MeanProbChanged = np.max(np.abs(pSpotNeighb-pSpotNeighbOld))
+            logger.info('Iteration %d, mean prob change %f' % (i, MeanProbChanged))
+            Converged = (MeanProbChanged < self.iss.CellCallTolerance)
+            pSpotNeighbOld = pSpotNeighb
+
+            TotPredictedB = npg.aggregate(self.SpotGeneNo, pSpotNeighb[:, -1], func="sum", size=nG)
+            pCellZero = pCellClass[:, nK-1]
+            pSpotZero = np.sum(pSpotNeighb[:, 0: nN - 1] * pCellZero[self.Neighbors[:, 0: nN - 1]], axis=1)
+            TotPredictedZ = npg.aggregate(self.SpotGeneNo, pSpotZero)
+
+            temp = eSpotGamma * pCellClass[..., None] * self.CellAreaFactor[..., None, None]
+            ClassTotPredicted = np.squeeze(np.sum(temp, axis=0))*(self.MeanClassExp + self.iss.SpotReg)
+            TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
+            eGeneGamma = (self.iss.rGene + self.TotGeneSpots - TotPredictedB - TotPredictedZ) / (self.iss.rGene + TotPredicted)
+
+
+
+            print("Success!!")
 
 
 
