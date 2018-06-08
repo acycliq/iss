@@ -172,7 +172,7 @@ class Call_cells:
         RelCellRadius = np.sqrt(CellArea0 / np.pi) / MeanCellRadius
         RelCellRadius = np.append(RelCellRadius, 1)
 
-        logger.info("Rebasing CellYX to match the zero-based Matlab object. ")
+        logger.info("Rebasing CellYX to match the one-based indexed Matlab object. ")
         CellYX = CellYX + 1
 
         out = dict()
@@ -210,11 +210,11 @@ class Call_cells:
 
         y0 = self.iss.CellCallRegionYX[:, 0].min()
         x0 = self.iss.CellCallRegionYX[:, 1].min()
-        logger.info("Rebasing SpotYX to match the zero-based Matlab object.")
+        logger.info("Rebasing SpotYX to match the one-based indexed Matlab object.")
         spotyx = self.SpotYX - 1
         idx = spotyx - [y0, x0]
         SpotInCell = utils.IndexArrayNan(self.iss.cell_map, idx.T)
-        logger.info("Rebasing Neighbors to match the zero-based Matlab object.")
+        logger.info("Rebasing Neighbors to match the one-based indexed Matlab object.")
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
