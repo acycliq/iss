@@ -292,10 +292,10 @@ class Call_cells:
             Converged = (MeanProbChanged < self.iss.CellCallTolerance)
             pSpotNeighbOld = pSpotNeighb
 
-            TotPredictedB = npg.aggregate(self.SpotGeneNo, pSpotNeighb[:, -1], func="sum", size=nG)
+            TotPredictedB = np.bincount(self.SpotGeneNo, pSpotNeighb[:, -1])
             pCellZero = pCellClass[:, nK-1]
             pSpotZero = np.sum(pSpotNeighb[:, 0: nN - 1] * pCellZero[self.Neighbors[:, 0: nN - 1]], axis=1)
-            TotPredictedZ = npg.aggregate(self.SpotGeneNo, pSpotZero)
+            TotPredictedZ = np.bincount(self.SpotGeneNo, pSpotZero)
 
             temp = eSpotGamma * pCellClass[..., None] * self.CellAreaFactor[..., None, None]
             ClassTotPredicted = np.squeeze(np.sum(temp, axis=0))*(self.MeanClassExp + self.iss.SpotReg)
