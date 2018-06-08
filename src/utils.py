@@ -178,12 +178,15 @@ def LogLtoP(L):
 
 
 def bi(X, *args):
-    out = []
+    inds = []
     ZeroIndexArray = 0
     for i in range(len(args)):
         ZeroIndexArray = ZeroIndexArray * args[i]
 
     for i in range(len(args)):
-        out.append(ZeroIndexArray + args[i])
+        inds.append(ZeroIndexArray + args[i])
 
-    return np.array(out)
+    inds = np.ravel_multi_index(inds, X.shape, order='F')
+    out = X[np.unravel_index(inds, X.shape, order='F')]
+
+    return out
