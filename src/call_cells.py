@@ -115,7 +115,7 @@ class Call_cells:
         self._cellinfo = self._cell_info()
         self._ini = self._initialise()
 
-    # @utils.cached('filter_spots_cache.pickle')
+    @utils.cached('filter_spots_cache.pickle')
     def _filter_spots(self):
         exclude_genes = ['Vsnl1', 'Atp1b1', 'Slc24a2', 'Tmsb10', 'Calm2', 'Gap43', 'Fxyd6']
         all_gene_names = self.iss.GeneNames[self.iss.SpotCodeNo-1] # -1 is needed because Matlab is 1-based
@@ -153,7 +153,7 @@ class Call_cells:
 
         return qual_ok
 
-    # @utils.cached('cell_info_cache.pickle')
+    @utils.cached('cell_info_cache.pickle')
     def _cell_info(self):
         '''
         Read image and calc some statistics
@@ -181,7 +181,7 @@ class Call_cells:
         out["RelCellRadius"] = RelCellRadius
         return out
 
-    # @utils.cached('ini_cache.pickle')
+    @utils.cached('ini_cache.pickle')
     def _initialise(self):
         [GeneNames, SpotGeneNo, TotGeneSpots] = np.unique(self.SpotGeneName, return_inverse=True, return_counts=True)
         ClassNames = np.append(pd.unique(self.gSet.Class), 'Zero')
