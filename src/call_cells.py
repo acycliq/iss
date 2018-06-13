@@ -218,9 +218,9 @@ class Call_cells:
         sanity_check = Neighbors[SpotInCell > 0, 0] + 1 == SpotInCell[SpotInCell > 0]
         assert ~any(sanity_check), "a spot is in a cell not closest neighbor!"
 
-        D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + self.iss.InsideCellBonus;
+        D[SpotInCell > 0, 0] = D[SpotInCell > 0, 0] + self.iss.InsideCellBonus
         LogClassPrior = np.log(ClassPrior)
-        nom = np.exp(-self.RelCellRadius**2/2) * ( 1 - np.exp(self.iss.InsideCellBonus) ) + np.exp(self.iss.InsideCellBonus)
+        nom = np.exp(-self.RelCellRadius**2/2) * ( 1 - np.exp(self.iss.InsideCellBonus)) + np.exp(self.iss.InsideCellBonus)
         denom = np.exp(-0.5) * (1 - np.exp(self.iss.InsideCellBonus)) + np.exp(self.iss.InsideCellBonus)
         CellAreaFactor = nom / denom
 
