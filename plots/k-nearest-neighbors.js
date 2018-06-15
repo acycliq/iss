@@ -16,8 +16,7 @@ d3.kNearestNeighbors = function() {
     //       each call of findNearest()
 
     // Extract points from the data array
-    // points = data.map(function(d) { return [x(d), y(d)]; });
-    points = data
+    points = data.map(function(d) { return [x(d), y(d)]; });
 
     // Add quadtree info to the points
     nodes = quadtreeify(points);

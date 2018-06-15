@@ -64,21 +64,12 @@
           mousemove.call(this);
         });
 
-      var dataXXX = d3.range(5000)
+      var data = d3.range(10)
         .map(function(d) {
           return {
             x: d3.random.normal(width/2, width/8)(),
             y: Math.random() * height
           };
-        });
-
-      var data = d3.csv("./CellYX.csv", function(d)
-        {
-          return {
-            x: +d.X,
-            y: +d.Y
-          };
-          console.log(data.X)
         });
 
       var findNearest = d3.kNearestNeighbors()
