@@ -23,16 +23,6 @@ class Call_cells:
         #create iss and gSet objects and add them as propertie
         self._iss = Iss()
         self._gSet = GeneSet()
-        self._CellYX = None
-        self._MeanCellRadius = None
-        self._RelCellRadius = None
-        self._SpotYX = None
-        self._SpotGeneName = None
-        self._GeneNames = None
-        self._SpotGeneNo = None
-        self._TotGeneSpots = None
-        self._ClassNames = None
-
 
     @property
     def iss(self):
@@ -106,9 +96,25 @@ class Call_cells:
     def SpotInCell(self):
         return self._ini["SpotInCell"]
 
+    @property
+    def Converged(self):
+        return self._cal["Converged"]
+
+    @property
+    def pSpotNeighb(self):
+        return self._cal["pSpotNeighb"]
+
+    @property
+    def CellGeneCount(self):
+        return self._cal["CellGeneCount"]
+
+    @property
+    def pCellClass(self):
+        return self._cal["pCellClass"]
+
     def run(self):
         self.preprocess()
-        self._calc()
+        self._cal = self._calc()
 
     def preprocess(self):
         self._spots = self._filter_spots()
@@ -302,9 +308,16 @@ class Call_cells:
             TotPredicted = np.sum(ClassTotPredicted[np.arange(0, nK - 1), :], axis=0)
             eGeneGamma = (self.iss.rGene + self.TotGeneSpots - TotPredictedB - TotPredictedZ) / (self.iss.rGene + TotPredicted)
 
+            if Converged:
+                print("Success!!")
+                break
 
-
-            print("Success!!")
+        out = dict()
+        out["Converged"] = Converged
+        out["pSpotNeighb"] = pSpotNeighb
+        out["CellGeneCount"] = CellGeneCount
+        out["pCellClass"] = pCellClass
+        return out
 
 
 
