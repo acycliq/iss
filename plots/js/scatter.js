@@ -25,7 +25,7 @@ function initChart(data)
           y: d3.svg.axis().scale(scale.y).orient("left")
         };
 
-        var svg = d3.select(".container").append("svg")
+        var svg = d3.select(".chart").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
           .append("g")
