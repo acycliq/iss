@@ -46,16 +46,21 @@
           stroke-dasharray: 2, 6;
         }
       </style>
-  </head>
-  <body>
-    <div class="container">
-    </div>
-
     <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="./js/scatter.js"></script>
-    <script>
+    <script src="./js/scatter.js" charset="utf-8"></script>
+  </head>
+  <div id="charts">
+    <div id="scatter-chart" class="chart">
+      <div class="title">My Scatter Plot</div>
+    </div>
+  </div>
 
-      d3.json('./data/iss.json', function (data) {
+  <div id="lists">
+    <div id="data-list" class="list"></div>
+  </div>
+
+  <script>
+    d3.json('./data/iss.json', function (data) {
           data.forEach(function(d) {
           d.Cell_Num = +d.Cell_Num
           d.y = +d.Y
@@ -66,6 +71,6 @@
         console.log("Done!")
         });
 
-    </script>
+   </script>
   </body>
 </html>
