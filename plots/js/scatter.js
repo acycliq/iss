@@ -6,8 +6,8 @@ function initChart(data)
           height = 500 - margin.top - margin.bottom;
 
         var scale = {
-          x: d3.scaleLinear().range([0, width]).nice(),
-          y: d3.scaleLinear().range([height, 0]).nice()
+          x: d3.scale.linear().range([0, width]).nice(),
+          y: d3.scale.linear().range([height, 0]).nice()
         };
 
         var access = {
@@ -21,8 +21,8 @@ function initChart(data)
         };
 
         var axis = {
-          x: d3.axisBottom(scale.x),
-          y: d3.axisLeft(scale.y)
+          x: d3.svg.axis().scale(scale.x).orient("bottom"),
+          y: d3.svg.axis().scale(scale.y).orient("left")
         };
 
         var svg = d3.select(".chart").append("svg")
@@ -49,11 +49,11 @@ function initChart(data)
             .call(renderPoints, data);
         }
 
-        function renderVoronoi(selection, data) {  
-          var voronoi = d3.voronoi()
+        function renderVoronoi(selection, data) {
+          var voronoi = d3.geom.voronoi()
             .x(value.x)
             .y(value.y)
-            .extent([[0, 0], [width, height]]);
+            .clipExtent([[0, 0], [width, height]]);
 
           var polygons = selection.selectAll(".voronoi")
             .data(voronoi(data));
@@ -69,7 +69,7 @@ function initChart(data)
             });
 
           polygons
-            .attr("d", d3.line());
+            .attr("d", d3.svg.line());
 
           polygons.exit()
             .remove();
