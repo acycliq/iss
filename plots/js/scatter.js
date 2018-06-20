@@ -28,6 +28,9 @@ function initChart(data)
         var svg = d3.select(".chart").append("svg")
             .attr("width", width + margin.left + margin.right)
             .attr("height", height + margin.top + margin.bottom)
+            .call(d3.behavior.zoom().on("zoom", function () {
+    svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+  }))
           .append("g")
             .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -158,4 +161,5 @@ function initChart(data)
         scale.x.domain([extent.x[0] - 5, extent.x[1] + 5]);
         scale.y.domain([extent.y[0] - 5, extent.y[1] + 5]);
       }
+
     }
