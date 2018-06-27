@@ -3,54 +3,11 @@
   <head>
     <meta charset="utf-8">
     <title>Dashboard</title>
-    <style>
-        html {
-          font-size: 12px;
-          font-family: monospace;
-        }
-  
-        .refresh {
-          font-size: 12px;
-          font-family: monospace;
-          position: absolute;
-          top: 20px;
-          right: 160px;
-        }
-  
-        .show-voronoi {
-          position: absolute;
-          top: 20px;
-          right: 50px;
-        }
-  
-        .axis path {
-          fill: none;
-          stroke: #000;
-          stroke-width: 1px;
-        }
-  
-        .voronoi {
-          fill: white;
-          stroke: #000;
-          stroke-width: .5px;
-          opacity: 0;
-        }
-  
-        .voronoi.show {
-          opacity: .5;
-        }
-  
-        .crosshair.line {
-          stroke: #000;
-          stroke-width: .5px;
-          stroke-dasharray: 2, 6;
-        }
-      </style>
-    <script src="//d3js.org/d3.v3.min.js" charset="utf-8"></script>
+    <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
     <script src="./js/scatter.js" charset="utf-8"></script>
   </head>
   <div id="charts">
-    <div id="scatter-chart" class="chart">
+    <div id="vis-container">
       <div class="title">My Scatter Plot</div>
     </div>
   </div>

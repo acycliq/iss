@@ -1,162 +1,281 @@
 function initChart(data)
-      {
+{
 
-        var margin = { top: 10, left: 50, bottom: 30, right: 10 },
-          width = 960 - margin.left - margin.right,
-          height = 500 - margin.top - margin.bottom;
+// ----------------------------------------------------
+// Build a basic scatterplot
+// ----------------------------------------------------
 
-        var scale = {
-          x: d3.scale.linear().range([0, width]).nice(),
-          y: d3.scale.linear().range([height, 0]).nice()
-        };
+// outer svg dimensions
+//const width = 600;
+//const height = 400;
 
-        var access = {
-          x: function(d) { return d.x; },
-          y: function(d) { return d.y; }
-        };
+// padding around the chart where axes will go
+const padding =  { top: 10, left: 50, bottom: 30, right: 10 },
+width = 960 - padding.left - padding.right,
+height = 500 - padding.top - padding.bottom;
 
-        var value = {
-          x: function(d) { return scale.x(access.x(d)); },
-          y: function(d) { return scale.y(access.y(d)); }
-        };
+// inner chart dimensions, where the dots are plotted
+const plotAreaWidth = width - padding.left - padding.right;
+const plotAreaHeight = height - padding.top - padding.bottom;
 
-        var axis = {
-          x: d3.svg.axis().scale(scale.x).orient("bottom"),
-          y: d3.svg.axis().scale(scale.y).orient("left")
-        };
+// radius of points in the scatterplot
+const pointRadius = 2;
 
-        var svg = d3.select(".chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var extent = {
+    x: d3.extent(data, function(d) {return d.x}),
+    y: d3.extent(data, function(d) {return d.y})
+  };
 
-        svg.append("g").attr("class", "x axis");
-        svg.append("g").attr("class", "y axis");
+// initialize scales
+const xScale = d3.scaleLinear().domain([extent.x[0] - 100, extent.x[1] + 100]).range([0, plotAreaWidth]).nice();
+const yScale = d3.scaleLinear().domain([extent.y[0] - 100, extent.y[1] + 100]).range([plotAreaHeight, 0]).nice();
+const colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
 
-        svg.call(renderPlot, data);
+// select the root container where the chart will be added
+const container = d3.select('#scatter-plot');
 
-        function renderPlot(selection, data) {
-          updateScales(data);
+// initialize main SVG
+const svg = container.select('svg')
+    .attr("width", width + padding.left + padding.right)
+    .attr("height", height + padding.top + padding.bottom);
 
-          selection.select(".x.axis").call(axis.x)
-            .attr("transform", "translate(0," + height + ")");
+// the main <g> where all the chart content goes inside
+const g = svg.append('g')
+  .attr('transform', `translate(${padding.left} ${padding.top})`);
 
-          selection.select(".y.axis").call(axis.y);
+// add in axis groups
+const xAxisG = g.append('g').classed('x-axis', true)
+  .attr('transform', `translate(0 ${plotAreaHeight + pointRadius})`);
 
-          selection
-            .call(renderVoronoi, data)
-            .call(renderPoints, data);
-        }
+// x-axis label
+g.append('text')
+  .attr('transform', `translate(${plotAreaWidth / 2} ${plotAreaHeight + (padding.bottom)})`)
+  .attr('dy', +10) // adjust distance from the bottom edge
+  .attr('class', 'axis-label')
+  .attr('text-anchor', 'middle')
+  .text('X Axis');
 
-        function renderVoronoi(selection, data) {
-          var voronoi = d3.geom.voronoi()
-            .x(value.x)
-            .y(value.y)
-            .clipExtent([[0, 0], [width, height]]);
+const yAxisG = g.append('g').classed('y-axis', true)
+  .attr('transform', `translate(${-pointRadius} 0)`);
 
-          var polygons = selection.selectAll(".voronoi")
-            .data(voronoi(data));
+// y-axis label
+g.append('text')
+  .attr('transform', `rotate(270) translate(${-plotAreaHeight / 2} ${-padding.left})`)
+  .attr('dy', 12) // adjust distance from the left edge
+  .attr('class', 'axis-label')
+  .attr('text-anchor', 'middle')
+  .text('Y Axis');
 
-          polygons.enter().append("path")
-            .attr("class", "voronoi")
-            .on("mouseenter", function(d, i) {
-              var datum = selection.selectAll(".point").data()[i];
-              selection.call(renderCrosshair, datum);
-            })
-            .on("mouseleave", function(d, i) {
-              selection.selectAll(".crosshair").remove();
-            });
+// set up axis generating functions
+const xTicks = Math.round(plotAreaWidth / 50);
+const yTicks = Math.round(plotAreaHeight / 50);
 
-          polygons
-            .attr("d", d3.svg.line());
+const xAxis = d3.axisBottom(xScale)
+  .ticks(xTicks)
+  .tickSizeOuter(0);
 
-          polygons.exit()
-            .remove();
-        }
+const yAxis = d3.axisLeft(yScale)
+  .ticks(yTicks)
+  .tickSizeOuter(0);
 
-        function renderCrosshair(selection, datum) {
-          var lineData = [
-            // vertical line
-            [[value.x(datum), height],[value.x(datum), 0]],
-            // horizontal line
-            [[0, value.y(datum)],[width, value.y(datum)]]
-          ];
+// draw the axes
+yAxisG.call(yAxis);
+xAxisG.call(xAxis);
 
-          var crosshairs = selection.selectAll(".crosshair.line").data(lineData);
 
-          crosshairs.enter().append("path")
-            .attr("class", "crosshair line");
+// add in circles
+const circles = g.append('g').attr('class', 'circles');
+const binding = circles.selectAll('.data-point').data(data, d => d.id);
+binding.enter().append('circle')
+  .classed('data-point', true)
+  .attr('r', pointRadius)
+  .attr('cx', d => xScale(d.x))
+  .attr('cy', d => yScale(d.y))
+  .attr('fill', d => colorScale(d.y));
 
-          crosshairs
-            .attr("d", d3.svg.line());
+  binding.transition().duration(1000)
+  .attr("cx",  d => xScale(d.x))
+  .attr("cy",  d => xScale(d.y))
+  .attr("r", 2)
+  .style("opacity", 1);
 
-          crosshairs.exit()
-            .remove();
 
-          var labelData = [
-            {
-              x: -6,
-              y: value.y(datum) + 4,
-              text: Math.round(access.y(datum)),
-              orient: "left"
-            },
-            {
-              x: value.x(datum),
-              y: height + 16,
-              text: Math.round(access.x(datum)),
-              orient: "bottom"
-            }
-          ];
+// ----------------------------------------------------
+// Add in Voronoi interaction
+// ----------------------------------------------------
 
-          var labels = selection.selectAll(".crosshair.label").data(labelData);
+// add in interaction via voronoi
+// initialize text output for highlighted points
+const highlightOutput = d3.select('#id_position')
+  .attr('class', 'highlight-output')
+//  .style('padding-left', `${padding.left}px`)
+//  .style('min-height', '100px');
 
-          labels.enter().append("text")
-            .attr("class", "crosshair label");
+const highlightOutput2 = d3.select('#id_cellgenecount')
+  .attr('class', 'highlight-output')
+  .style('padding-left', `${10}px`)
+  .style('min-height', '100px');
 
-          labels
-            .attr("x", function(d) { return d.x; })
-            .attr("y", function(d) { return d.y; })
-            .style("text-anchor", function(d) {
-              return d.orient === "left" ? "end" : "middle";
-            })
-            .text(function(d) { return d.text; });
+const highlightOutput4 = d3.select('#id_genenames')
+  .attr('class', 'highlight-output')
+  .style('padding-left', `${10}px`)
+  .style('min-height', '100px');
 
-          labels.exit().remove();
-        }
+const highlightOutput3 = d3.select('#id_classname')
+  .attr('class', 'highlight-output')
+  .style('padding-left', `${10}px`)
+  .style('min-height', '100px');
 
-      function renderPoints(selection, data) {
-        var points = selection.selectAll(".point").data(data);
+const highlightOutput5 = d3.select('#id_prob')
+  .attr('class', 'highlight-output')
+  .style('padding-left', `${10}px`)
+  .style('min-height', '100px');
 
-        points.enter().append("circle")
-          .attr("class", "point")
-          .attr("cx", value.x)
-          .attr("cy", value.y)
-          .attr("r", 0)
-          .style("opacity", 0);
 
-        points
-          .transition().duration(1000)
-            .attr("cx", value.x)
-            .attr("cy", value.y)
-            .attr("r", 2)
-            .style("opacity", 1);
+// create a voronoi diagram based on the data and the scales
+const voronoiDiagram = d3.voronoi()
+  .x(d => xScale(d.x))
+  .y(d => yScale(d.y))
+  .size([plotAreaWidth, plotAreaHeight])(data);
 
-        points.exit()
-          .transition().duration(1000)
-            .attr("r", 0)
-            .style("opacity", 0)
-            .remove();
-      }
+// limit how far away the mouse can be from finding a voronoi site
+const voronoiRadius = plotAreaWidth / 10;
 
-      function updateScales(data) {
-        var extent = {
-          x: d3.extent(data, access.x),
-          y: d3.extent(data, access.y)
-        };
 
-        scale.x.domain([extent.x[0] - 5, extent.x[1] + 5]);
-        scale.y.domain([extent.y[0] - 5, extent.y[1] + 5]);
-      }
+// add a circle for indicating the highlighted point
+g.append('circle')
+  .attr('class', 'highlight-circle')
+  .attr('r', pointRadius + 2) // slightly larger than our points
+  .style('fill', 'none')
+  .style('display', 'none');
 
-    }
+// callback to highlight a point
+function highlight(d) {
+  // no point to highlight - hide the circle and clear the text
+  if (!d) {
+    d3.select('.highlight-circle').style('display', 'none');
+    highlightOutput.text('');
+    highlightOutput2.text('');
+
+  // otherwise, show the highlight circle at the correct position
+  } else {
+    d3.select('.highlight-circle')
+      .style('display', '')
+      .style('stroke', colorScale(d.y))
+      .attr('cx', xScale(d.x))
+      .attr('cy', yScale(d.y));
+
+    // format the highlighted data point for inspection
+    highlightOutput.html("<strong>Cell Num: </strong>" + JSON.stringify(d.Cell_Num) + "<br> <strong>X </strong> = " + d.x  + "<br> <strong>Y </strong> = " + d.y);
+
+    highlightOutput2.html(JSON.stringify(d.CellGeneCount)
+      .replace(/]|[[]/g, '')
+      .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+      .replace(/,/g, '<br>'));
+     //document.getElementById('id_1').innerHTML = JSON.stringify("Some text to enterrr")
+
+    highlightOutput4.html(JSON.stringify(d.ClassName)
+      .replace(/]|[[]/g, '')
+      .replace(/\"/g, "")
+      .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+      .replace(/,/g, '<br>'));
+
+    highlightOutput3.html(JSON.stringify(d.Genenames)
+      .replace(/]|[[]/g, '')
+      .replace(/\"/g, "")
+      .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+      .replace(/,/g, '<br>'));
+
+    highlightOutput5.html(JSON.stringify(d.Prob)
+      .replace(/]|[[]/g, '')
+      .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+      .replace(/,/g, '<br>'));
+  }
+}
+
+// callback for when the mouse moves across the overlay
+function mouseMoveHandler() {
+  // get the current mouse position
+  const [mx, my] = d3.mouse(this);
+
+  // use the new diagram.find() function to find the voronoi site closest to
+  // the mouse, limited by max distance defined by voronoiRadius
+  //const site = voronoiDiagram.find(mx, my, voronoiRadius);
+  const site = voronoiDiagram.find(mx, my);
+
+  // highlight the point if we found one, otherwise hide the highlight circle
+  highlight(site && site.data);
+}
+
+// add the overlay on top of everything to take the mouse events
+g.append('rect')
+  .attr('class', 'overlay')
+  .attr('width', plotAreaWidth)
+  .attr('height', plotAreaHeight)
+  .style('fill', 'red')
+  .style('opacity', 0)
+  .on('click', mouseMoveHandler)
+  .on('mouseleave', () => {
+    // hide the highlight circle when the mouse leaves the chart
+    //highlight(null);
+  });
+
+
+// ----------------------------------------------------
+// Add a fun click handler to reveal the details of what is happening
+// ----------------------------------------------------
+
+/**
+ * Add/remove a visible voronoi diagram and a circle indicating the radius used
+ * in the voronoi find function
+ */
+function toggleVoronoiDebug() {
+  // remove if there
+  if (!g.select('.voronoi-polygons').empty()) {
+    g.select('.voronoi-polygons').remove();
+    g.select('.voronoi-radius-circle').remove();
+    g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
+  // otherwise, add the polygons in
+  } else {
+    // add a circle to follow the mouse to draw the voronoi radius
+    g.append('circle')
+      .attr('class', 'voronoi-radius-circle')
+      .attr('r', voronoiRadius)
+      .style('fill', 'none')
+      .style('stroke', 'tomato')
+      .style('stroke-dasharray', '3,2')
+      .style('display', 'none');
+
+
+    // move the voronoi radius mouse circle with the mouse
+    g.select('.overlay')
+      .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
+        const [mx, my] = d3.mouse(this);
+        d3.select('.voronoi-radius-circle')
+          .style('display', '')
+          .attr('cx', mx)
+          .attr('cy', my);
+      })
+      .on('mouseleave.voronoi', () => {
+        d3.select('.voronoi-radius-circle').style('display', 'none');
+      });
+
+
+    // draw the polygons
+    const voronoiPolygons = g.append('g')
+      .attr('class', 'voronoi-polygons')
+      .style('pointer-events', 'none');
+
+    const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
+    binding.enter().append('path')
+      .style('stroke', 'tomato')
+      .style('fill', 'none')
+      .style('opacity', 0.15)
+      .attr('d', d => `M${d.join('L')}Z`);
+  }
+}
+
+// turn on and off voronoi debugging with click
+//svg.on('click', toggleVoronoiDebug);
+
+}
