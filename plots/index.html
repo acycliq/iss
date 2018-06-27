@@ -3,18 +3,78 @@
   <head>
     <meta charset="utf-8">
     <title>Dashboard</title>
-    <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
-    <script src="./js/scatter.js" charset="utf-8"></script>
-  </head>
-  <div id="charts">
-    <div id="vis-container">
-      <div class="title">My Scatter Plot</div>
-    </div>
-  </div>
+      <style type="text/css">
+        <!--#Cell_Num {-->
+        <!--float: left;-->
+        <!--width: 120px;-->
+        <!--border: 1px solid red;}-->
 
-  <div id="lists">
-    <div id="data-list" class="list"></div>
+        <!--#CellGeneCount {-->
+        <!--float: left-->
+        <!--width: 150px;-->
+        <!--border: 1px solid green;-->
+        <!--&lt;!&ndash;margin: 0 0 0 302px;&ndash;&gt;-->
+        <!--}-->
+      </style>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+      <script src="//d3js.org/d3.v4.min.js" charset="utf-8"></script>
+      <script src="./js/scatter.js" charset="utf-8"></script>
+  </head>
+  <!--<div id="charts">-->
+    <!--<div id="vis-container1" class="chart">-->
+      <!--<div class="title">My Scatter Plot</div>-->
+    <!--</div>-->
+  <!--</div>-->
+
+  <!--<div id="lists">-->
+    <!--<div id="data-list" class="list"></div>-->
+  <!--</div>-->
+
+  <!--<div id="container">-->
+      <!--<div id="Cell_Nums"></div>-->
+      <!--<div id="CellGeneCounts"></div>-->
+      <!--<div id="ClassName"></div>-->
+      <!--<div id="GeneNames"></div>-->
+      <!--<div id="Prob"></div>-->
+  <!--</div>-->
+
+  <!--<div class="container">-->
+        <!--<div class="row">-->
+            <!--<div id="vis-container" class="span12" style="background-color:lavender;"> this is the svg-->
+          <!--<svg>-->
+          <!--</svg>-->
+          <!--<div class="row">-->
+              <!--<div id="Cell_Num" class="span3" style="background-color:lightcyan;">.col-sm-3.1</div>-->
+              <!--<div id = "CellGeneCount" class="span3" style="background-color:lightgray;">.col-sm-3.2</div>-->
+              <!--&lt;!&ndash;<div id = "ClassName" class="span4" style="background-color:lightcyan;">.col-sm-3.3</div>&ndash;&gt;-->
+              <!--&lt;!&ndash;<div class="col-sm-3" style="background-color:lightgray;">.col-sm-3.14</div>&ndash;&gt;-->
+          <!--</div>-->
+            <!--</div>-->
+  <!--</div>-->
+  <!--</div>-->
+
+<div class="container-fluid">
+  <h1>Dashboard</h1>
+  <p>Resize the browser window to see the effect.</p>
+  <div class="row">
+    <div id="vis-container" class="col-sm-8" style="background-color:lavender;">.col-md-8
+        <svg></svg>
+      <div class="row">
+        <div id="id_2" class="col-sm-6" style="background-color:lightcyan;">.col-sm-6</div>
+        <div id="id_3" class="col-sm-6" style="background-color:lightgray;">.col-sm-6</div>
+      </div>
+    </div>
+    <div id="id_4" class="col-sm-4" style="background-color:lavenderblush;">.col-sm-4</div>
   </div>
+</div>
+
+
+
+
+
+
+
 
   <script>
     d3.json('./data/iss.json', function (data) {
