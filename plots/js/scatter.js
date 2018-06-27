@@ -190,6 +190,22 @@ function highlight(d) {
       .replace(/]|[[]/g, '')
       .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
       .replace(/,/g, '<br>'));
+
+    var x = d3.scaleLinear()
+    .domain([0, d3.max(data)])
+    .range([0, 420]);
+
+    var bars = d3.select('#dc-pie-graph').append('svg')
+    .append('g')
+    .data(d.Prob)
+
+    bars.enter().append("rect")
+    .attr("class", "bar")
+    .attr("height", function(d) { return x(d) + "px"; })
+    .text(function(d) { return d; });
+
+    bars.exit().remove()
+
   }
 }
 
@@ -277,5 +293,15 @@ function toggleVoronoiDebug() {
 
 // turn on and off voronoi debugging with click
 //svg.on('click', toggleVoronoiDebug);
+
+function onDoubleClick(){
+    d3.select('.highlight-circle').style('display', 'none');
+    highlightOutput.text('');
+    highlightOutput2.text('');
+    highlightOutput3.text('');
+    highlightOutput4.text('');
+    highlightOutput5.text('');
+}
+svg.on('dblclick', onDoubleClick);
 
 }
