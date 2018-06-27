@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+<meta charset='utf-8'>
+
+<script src='javascripts/d3.js' type='text/javascript'></script>
+<script src='javascripts/crossfilter.js' type='text/javascript'></script>
+<script src='javascripts/dc.js' type='text/javascript'></script>
+<script src='javascripts/jquery-1.9.1.min.js' type='text/javascript'></script>
+<script src='javascripts/bootstrap.min.js' type='text/javascript'></script>
+
+<link href='stylesheets/bootstrap.min.css' rel='stylesheet' type='text/css'>
+<link href='stylesheets/dc.css' rel='stylesheet' type='text/css'>
+
+<script src='javascripts/simple_vis.js' type='text/javascript'></script>
+</head>
+
+
+<body>
+    <div class='container' id='main-container'>
+        <div class='content'>
+            <div class='container' style='font: 10px sans-serif;'>
+                <h3>Visualisation of <a href="http://www.kaggle.com/c/yelp-recruiting">Kaggle Yelp Test Business Data</a> set (using <a href="http://nickqizhu.github.io/dc.js/">dc.js</a>)</h3>
+                <h4>Demo for the <a href="http://www.meetup.com/Dublin-Data-Visualisation/">Dublin Data Visualisation Meetup Group</a></h4>
+                <div class='row-fluid'>
+                    <div class='remaining-graphs span8'>
+                        <div class='row-fluid'>
+                            <div class='bubble-graph span12' id='dc-bubble-graph'>
+                                <h4>Average Rating (x-axis), Average Number of Reviews (y-axis), Number of Business' (Size)</h4>
+                            </div>
+                        </div>
+                        <div class='row-fluid'>
+                            <div class='pie-graph span4' id='dc-pie-graph'>
+                                <h4>Average Rating in Stars (Pie)</h4>
+                            </div>
+                            <div class='pie-graph span4' id='dc-volume-chart'>
+                                <h4>Average Rating in Stars / Number of Reviews (Bar)</h4>
+                            </div>
+                            <div class='pie-graph span4' id='dc-line-chart'>
+                                <h4>Average Rating in Stars / Number of Reviews (Line)</h4>
+                            </div>
+                        </div>
+                        <!-- /other little graphs go here -->
+                        <div class='row-fluid'>
+                            <div class='span12 table-graph'>
+                                <h4>Data Table for Filtered Businesses</h4>
+                                <table class='table table-hover dc-data-table' id='dc-table-graph'>
+                                    <thead>
+                                        <tr class='header'>
+                                            <th>Name</th>
+                                            <th>City</th>
+                                            <th>Review Score (in Stars)</th>
+                                            <th>Total Reviews</th>
+                                            <th>Location</th>
+                                        </tr>
+                                    </thead>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class='remaining-graphs span4'>
+                        <div class='row-fluid'>
+                            <div class='row-graph span12' id='dc-row-graph' style='color:black;'>
+                                <h4>Reviews Per City</h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
