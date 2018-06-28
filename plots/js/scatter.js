@@ -191,20 +191,56 @@ function highlight(d) {
       .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
       .replace(/,/g, '<br>'));
 
-    var x = d3.scaleLinear()
-    .domain([0, d3.max(data)])
-    .range([0, 420]);
 
-    var bars = d3.select('#dc-pie-graph').append('svg')
-    .append('g')
-    .data(d.Prob)
 
-    bars.enter().append("rect")
-    .attr("class", "bar")
-    .attr("height", function(d) { return x(d) + "px"; })
-    .text(function(d) { return d; });
 
-    bars.exit().remove()
+    var myData = d
+    svg2width = width + padding.right + padding.left
+    svg2height = height + padding.top + padding.bottom
+
+    // set the ranges
+    var x = d3.scaleBand()
+        .range([0, svg2width])
+        .padding(0.1);
+    var y = d3.scaleLinear()
+        .range([svg2height, 0])
+
+    x.domain(data.map(function(d,i) { return i; }));
+    y.domain([0, d3.max(d, function(dd){return dd.Prob;})]);
+
+    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
+    svg2 = d3.select('#dc-pie-graph').select('svg')
+        .attr("width", width + padding.right + padding.left)
+        .attr("height", height + padding.top + padding.bottom)
+        .append("g")
+       .attr("transform",
+          "translate(" + padding.left + "," + padding.top + ")");;
+
+//    svg2.append("rect")
+//    .attr("width", "33%")
+//    .attr("height", "33%")
+//    .attr("fill", "pink")
+//    .append("g")
+//    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+    var mybars = svg2.selectAll("rect").data([50,300,60,200,50,300,60,200])
+    var barPadding = 5;
+    var barWidth = (svg2width / d.Prob.length);
+
+    mybars.enter().append("rect")
+    .attr("y", function(d){return y(d.Prob);})
+    .attr("height", function(d) { return height - d.Prob; })
+    .attr("width", barWidth - barPadding)
+
+    mybars.exit().remove()
+
+//    svg2.append("g")
+//      .attr("transform", "translate(0," + height + ")")
+//      .call(d3.axisBottom(x));
+//
+//  // add the y Axis
+//      svg2.append("g")
+//          .call(d3.axisLeft(y));
 
   }
 }
@@ -301,6 +337,10 @@ function onDoubleClick(){
     highlightOutput3.text('');
     highlightOutput4.text('');
     highlightOutput5.text('');
+
+    svg2.selectAll("*").remove()
+
+
 }
 svg.on('dblclick', onDoubleClick);
 
