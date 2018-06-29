@@ -193,54 +193,39 @@ function highlight(d) {
 
 
 
-
-    var myData = d
-    svg2width = width + padding.right + padding.left
-    svg2height = height + padding.top + padding.bottom
-
-    // set the ranges
-    var x = d3.scaleBand()
-        .range([0, svg2width])
-        .padding(0.1);
-    var y = d3.scaleLinear()
-        .range([svg2height, 0])
-
-    x.domain(data.map(function(d,i) { return i; }));
-    y.domain([0, d3.max(d, function(dd){return dd.Prob;})]);
-
-    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
-    svg2 = d3.select('#dc-pie-graph').select('svg')
-        .attr("width", width + padding.right + padding.left)
-        .attr("height", height + padding.top + padding.bottom)
-        .append("g")
-       .attr("transform",
-          "translate(" + padding.left + "," + padding.top + ")");;
-
-//    svg2.append("rect")
-//    .attr("width", "33%")
-//    .attr("height", "33%")
-//    .attr("fill", "pink")
-//    .append("g")
-//    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-
-    var mybars = svg2.selectAll("rect").data([50,300,60,200,50,300,60,200])
-    var barPadding = 5;
-    var barWidth = (svg2width / d.Prob.length);
-
-    mybars.enter().append("rect")
-    .attr("y", function(d){return y(d.Prob);})
-    .attr("height", function(d) { return height - d.Prob; })
-    .attr("width", barWidth - barPadding)
-
-    mybars.exit().remove()
-
-//    svg2.append("g")
-//      .attr("transform", "translate(0," + height + ")")
-//      .call(d3.axisBottom(x));
+    barchart(d)
+//    svg2width = width + padding.right + padding.left
+//    svg2height = height + padding.top + padding.bottom
 //
-//  // add the y Axis
-//      svg2.append("g")
-//          .call(d3.axisLeft(y));
+//    // set the ranges
+//    var x = d3.scaleBand()
+//        .range([0, svg2width])
+//        .padding(0.1);
+//    var y = d3.scaleLinear()
+//        .range([svg2height, 0])
+//
+//    x.domain(data.map(function(d,i) { return i; }));
+//    y.domain([0, d3.max(d, function(d){return d.Prob;})]);
+//
+//    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
+//    svg2 = d3.select('#dc-pie-graph').select('svg')
+//        .attr("width", width + padding.right + padding.left)
+//        .attr("height", height + padding.top + padding.bottom)
+//        .append("g")
+//       .attr("transform",
+//          "translate(" + padding.left + "," + padding.top + ")");;
+//
+//    var mybars = svg2.selectAll("rect").data(d)
+//    var barPadding = 5;
+//    var barWidth = (svg2width / d.Prob.length);
+//
+//    mybars.enter().append("rect")
+//    .attr("y", function(d){return y(d.Prob);})
+//    .attr("height", function(d) { return height - d.Prob; })
+//    .attr("width", barWidth - barPadding)
+//
+//    mybars.exit().remove()
+
 
   }
 }
