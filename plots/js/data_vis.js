@@ -7,5 +7,15 @@
           console.log(d.Prob)
           });
         initChart(data);
-        console.log("Done!")
+        console.log("Done!!")
+        });
+
+      d3.json('./data/geneEfficiencies.json', function (data) {
+          data.forEach(function(d) {
+          d.Prob = +d.GeneEfficiencies
+          d.labels = d.GeneNames
+          console.log(d.GeneEfficiencies)
+          });
+        barchart(data);
+        console.log("Done again!")
         });

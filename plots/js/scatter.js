@@ -193,7 +193,9 @@ function highlight(d) {
 
 
 
-    barchart(d)
+    //barchart(d)
+
+
 //    svg2width = width + padding.right + padding.left
 //    svg2height = height + padding.top + padding.bottom
 //
