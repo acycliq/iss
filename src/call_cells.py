@@ -112,6 +112,11 @@ class Call_cells:
     def pCellClass(self):
         return self._cal["pCellClass"]
 
+    @property
+    def eGeneGamma(self):
+        return self._cal["eGeneGamma"]
+
+
     def run(self):
         self.preprocess()
         self._cal = self._calc()
@@ -317,6 +322,7 @@ class Call_cells:
         out["pSpotNeighb"] = pSpotNeighb
         out["CellGeneCount"] = CellGeneCount
         out["pCellClass"] = pCellClass
+        out["eGeneGamma"] = eGeneGamma
         return out
 
 
