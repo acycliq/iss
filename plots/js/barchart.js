@@ -18,6 +18,141 @@
 //barchart(data)
 
 function barchart(data)
+{
+
+ordinals = data.map(function(d) { return d.labels; })
+    margin = {top: 20, right: 20, bottom: 30, left: 40},
+    width = 320 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+    height2 = 40,
+    radius = (Math.min(width, height) / 2) - 10
+
+//let margin = {
+//      top: 50,
+//      right: 100,
+//      bottom: 50,
+//      left: 100
+//    },
+//    width = 1000 - margin.left - margin.right,
+//    height = 700 - margin.top - margin.bottom - 80,
+//    height2 = 40,
+//    radius = (Math.min(width, height) / 2) - 10,
+//    node
+
+//const svg = d3.select('body')
+//              .append('svg')
+//              .attr('width', 960)
+//              .attr('height', 700)
+
+const svg = d3.select("#dc-pie-graph")
+              .select("svg")
+              .attr('width', 960)
+              .attr('height', 700)
+
+const focus = svg.append('g')
+              .attr('class', 'focus')
+              .attr('transform', `translate(${margin.left}, ${margin.top})`)
+
+const context = svg.append('g')
+                   .attr('class', 'context')
+                   .attr('transform', `translate(${margin.left}, ${margin.top + 550})`)
+
+// the scale
+let x = d3.scaleLinear().range([0, width])
+let x2 = d3.scaleLinear().range([0, width])
+let y = d3.scaleLinear().range([height, 0])
+let y2 = d3.scaleLinear().range([height2, 0])
+
+let xBand = d3.scaleBand().domain(d3.range(-1, ordinals.length)).range([0, width])
+
+let xAxis = d3.axisBottom(x).tickFormat((d, e) => ordinals[d])
+let xAxis2 = d3.axisBottom(x2)
+let yAxis = d3.axisLeft(y)
+let yAxis2 = d3.axisLeft(y2)
+
+let brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on('brush', brushed)
+
+x.domain([-1, ordinals.length])
+y.domain([0, d3.max(data, d => d.Prob)])
+x2.domain(x.domain())
+y2.domain([0, d3.max(data, d => d.Prob)])
+
+focus.append('g')
+     .attr('clip-path','url(#my-clip-path)')
+     .selectAll('.bar')
+     .data(data)
+     .enter()
+     .append('rect')
+     .attr('class', 'bar')
+     .attr('x', (d, i) => {
+      return x(i) - xBand.bandwidth()*0.9/2
+     })
+     .attr('y', (d, i) => {
+      return y(d.Prob)
+     })
+     .attr('width', xBand.bandwidth()*0.9)
+     .attr('height', d => {
+      return height - y(d.Prob)
+     })
+
+focus.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(0,${height})`)
+      .call(xAxis)
+
+focus.append('g')
+      .attr('class', 'axis axis--y')
+      .call(yAxis)
+
+let defs = focus.append('defs')
+
+// use clipPath
+defs.append('clipPath')
+    .attr('id', 'my-clip-path')
+    .append('rect')
+    .attr('width', width)
+    .attr('height', height)
+
+context.selectAll('.bar')
+     .data(data)
+     .enter()
+     .append('rect')
+     .attr('class', 'bar')
+     .attr('x', (d, i) => {
+      return x2(i) - xBand.bandwidth()*0.9/2
+     })
+     .attr('y', (d, i) => y2(d.Prob))
+     .attr('width', xBand.bandwidth()*0.9)
+     .attr('height', d => {
+      return height2 - y2(d.Prob)
+     })
+
+context.append('g')
+      .attr('class', 'axis2')
+      .attr('transform', `translate(0,${height2})`)
+      .call(xAxis)
+
+context.append('g')
+      .attr('class', 'brush')
+      .call(brush)
+      .call(brush.move, x.range())
+
+function brushed() {
+  var s = d3.event.selection || x2.range()
+  x.domain(s.map(x2.invert, x2))
+  focus.select('.axis').call(xAxis)
+  focus.selectAll('.bar')
+       .attr('x', (d, i) => {
+        return x(i) - xBand.bandwidth()*0.9/2
+       })
+}
+
+
+}
+
+function barchart2(data)
     {
 
 //    var data = [
@@ -70,4 +205,6 @@ function barchart(data)
   // add the y Axis
   svg2.append("g")
       .call(d3.axisLeft(y));
+
+
     }
