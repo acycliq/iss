@@ -1,184 +1,178 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 <style>
-
-.subBar {
-  fill: steelblue;
-}
-
-.bar {
-  fill: steelblue;
-  clip-path: url(#clip);
-}
-
-.zoom {
-  cursor: move;
-  fill: none;
-  pointer-events: all;
-}
-
+  .bar {
+    fill: steelblue;
+  }
 </style>
-<svg width="960" height="500"></svg>
-<script src="https://d3js.org/d3.v4.min.js"></script>
+<body>
+<script src="//d3js.org/d3.v4.min.js"></script>
 <script>
-
-var svg = d3.select("svg"),
-    margin = {top: 20, right: 20, bottom: 110, left: 40},
-    margin2 = {top: 430, right: 20, bottom: 30, left: 40},
-    width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom,
-    height2 = +svg.attr("height") - margin2.top - margin2.bottom;
-
-var parseDate = d3.timeParse("%Y-%m");
-
-var x = d3.scaleTime().range([0, width]),
-    x2 = d3.scaleTime().range([0, width]),
-    y = d3.scaleLinear().range([height, 0]),
-    y2 = d3.scaleLinear().range([height2, 0]);
-
-var xAxis = d3.axisBottom(x),
-    xAxis2 = d3.axisBottom(x2),
-    yAxis = d3.axisLeft(y);
-
-var brush = d3.brushX()
-    .extent([[0, 0], [width, height2]])
-    .on("brush end", brushed);
-
-<!--var area = d3.area()-->
-    <!--&lt;!&ndash;.curve(d3.curveMonotoneX)&ndash;&gt;-->
-    <!--.x(function(d) { return x(d.Date); })-->
-    <!--.y0(height)-->
-    <!--.y1(function(d) { return y(d.Total); });-->
-
-<!--var area2 = d3.area()-->
-    <!--&lt;!&ndash;.curve(d3.curveMonotoneX)&ndash;&gt;-->
-    <!--.x(function(d) { return x2(d.Date); })-->
-    <!--.y0(height2)-->
-    <!--.y1(function(d) { return y2(d.Total); });-->
-
-<!--svg.append("defs").append("clipPath")-->
-    <!--.attr("id", "clip")-->
-  <!--.append("rect")-->
-    <!--.attr("width", width)-->
-    <!--.attr("height", height);-->
-
-var focus = svg.append("g")
-    .attr("class", "focus")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var context = svg.append("g")
-    .attr("class", "context")
-    .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
-
 var data = [
-{"Date":"2012-04","Total":0},
-{"Date":"2012-05","Total":10},
-{"Date":"2012-06","Total":20},
-{"Date":"2012-07","Total":30},
-{"Date":"2012-08","Total":40},
-{"Date":"2012-09","Total":50},
-{"Date":"2012-10","Total":60},
-{"Date":"2012-11","Total":70},
-{"Date":"2012-12","Total":80},
-{"Date":"2013-01","Total":90},
-{"Date":"2013-02","Total":100},
-{"Date":"2013-03","Total":110},
-{"Date":"2013-04","Total":120},
-{"Date":"2013-05","Total":130},
-{"Date":"2013-06","Total":140},
-{"Date":"2013-07","Total":150},
-{"Date":"2013-08","Total":160},
-{"Date":"2013-09","Total":170},
-{"Date":"2013-10","Total":180},
-{"Date":"2013-11","Total":190},
-{"Date":"2013-12","Total":200},
-{"Date":"2014-01","Total":210},
-{"Date":"2014-02","Total":220},
-{"Date":"2014-03","Total":230},
-{"Date":"2014-04","Total":240},
-{"Date":"2014-05","Total":250},
-{"Date":"2014-06","Total":260},
-{"Date":"2014-07","Total":270},
-{"Date":"2014-08","Total":280},
-{"Date":"2014-09","Total":290},
-{"Date":"2014-10","Total":300},
-{"Date":"2014-11","Total":310},
-{"Date":"2014-12","Total":320},
-{"Date":"2015-01","Total":330},
-{"Date":"2015-02","Total":340},
-{"Date":"2015-03","Total":350},
-{"Date":"2015-04","Total":360},
-{"Date":"2015-05","Total":370},
-{"Date":"2015-06","Total":380},
-{"Date":"2015-07","Total":390},
-{"Date":"2015-08","Total":400},
-{"Date":"2015-09","Total":410},
-{"Date":"2015-10","Total":420},
-{"Date":"2015-11","Total":430},
-{"Date":"2015-12","Total":440},
-{"Date":"2016-01","Total":450}
+{"city":"2012-04","value":0},
+{"city":"2012-05","value":10},
+{"city":"2012-06","value":20},
+{"city":"2012-07","value":30},
+{"city":"2012-08","value":40},
+{"city":"2012-09","value":50},
+{"city":"2012-10","value":60},
+{"city":"2012-11","value":70},
+{"city":"2012-12","value":80},
+{"city":"2013-01","value":90},
+{"city":"2013-02","value":100},
+{"city":"2013-03","value":110},
+{"city":"2013-04","value":120},
+{"city":"2013-05","value":130},
+{"city":"2013-06","value":140},
+{"city":"2013-07","value":150},
+{"city":"2013-08","value":160},
+{"city":"2013-09","value":170},
+{"city":"2013-10","value":180},
+{"city":"2013-11","value":190},
+{"city":"2013-12","value":200},
+{"city":"2014-01","value":210},
+{"city":"2014-02","value":220},
+{"city":"2014-03","value":230},
+{"city":"2014-04","value":240},
+{"city":"2014-05","value":250},
+{"city":"2014-06","value":260},
+{"city":"2014-07","value":270},
+{"city":"2014-08","value":280},
+{"city":"2014-09","value":290},
+{"city":"2014-10","value":300},
+{"city":"2014-11","value":310},
+{"city":"2014-12","value":320},
+{"city":"2015-01","value":330},
+{"city":"2015-02","value":340},
+{"city":"2015-03","value":350},
+{"city":"2015-04","value":360},
+{"city":"2015-05","value":370},
+{"city":"2015-06","value":380},
+{"city":"2015-07","value":390},
+{"city":"2015-08","value":400},
+{"city":"2015-09","value":410},
+{"city":"2015-10","value":420},
+{"city":"2015-11","value":430},
+{"city":"2015-12","value":440},
+{"city":"2016-01","value":450}
 ]
+ordinals = data.map(function(d) { return d.city; })
 
-data.forEach(function(d) {d.Date = parseDate(d.Date);});
-<!--data.forEach(function(d) {d.Date = d.labels;});-->
-<!--data.forEach(function(d) {d.Total = +d.Prob;});-->
+let margin = {
+      top: 50,
+      right: 100,
+      bottom: 50,
+      left: 100
+    },
+    width = 1000 - margin.left - margin.right,
+    height = 700 - margin.top - margin.bottom - 80,
+    height2 = 40,
+    radius = (Math.min(width, height) / 2) - 10,
+    node
 
-  x.domain(d3.extent(data, function(d) { return d.Date; }));
-  y.domain([0, d3.max(data, function(d) { return d.Total; })]);
-  x2.domain(x.domain());
-  y2.domain(y.domain());
+const svg = d3.select('body')
+              .append('svg')
+              .attr('width', 960)
+              .attr('height', 700)
 
-  focus.selectAll(".bar")
-    .data(data)
-    .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", function(d) { return x(d.Date); })
-      .attr("y", function(d) { return y(d.Total); })
-      .attr("width", width / data.length - 2)
-      .attr("height", function(d) { return height - y(d.Total); });
+const focus = svg.append('g')
+              .attr('class', 'focus')
+              .attr('transform', `translate(${margin.left}, ${margin.top})`)
 
-  focus.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height + ")")
-      .call(xAxis);
+const context = svg.append('g')
+                   .attr('class', 'context')
+                   .attr('transform', `translate(${margin.left}, ${margin.top + 550})`)
 
-  focus.append("g")
-      .attr("class", "axis axis--y")
-      .call(yAxis);
+// the scale
+let x = d3.scaleLinear().range([0, width])
+let x2 = d3.scaleLinear().range([0, width])
+let y = d3.scaleLinear().range([height, 0])
+let y2 = d3.scaleLinear().range([height2, 0])
 
-  <!--context.append("path")-->
-      <!--.datum(data)-->
-      <!--.attr("class", "area")-->
-      <!--.attr("d", area2);-->
+let xBand = d3.scaleBand().domain(d3.range(-1, ordinals.length)).range([0, width])
 
-  var subBars = context.selectAll('.subBar')
-                                  	.data(data)
+let xAxis = d3.axisBottom(x).tickFormat((d, e) => ordinals[d])
+let xAxis2 = d3.axisBottom(x2)
+let yAxis = d3.axisLeft(y)
+let yAxis2 = d3.axisLeft(y2)
 
-  subBars.enter().append("rect")
-		  .classed('subBar', true)
-		  .attr("height", function (d){return height2 - y2(d.Total);})
-          .attr("width", width/data.length - 2)
-          .attr("x", function(d) {return x2(d.Date);})
-          .attr("y", function(d) {return y2(d.Total);})
+let brush = d3.brushX()
+    .extent([[0, 0], [width, height2]])
+    .on('brush', brushed)
 
-  context.append("g")
-      .attr("class", "axis axis--x")
-      .attr("transform", "translate(0," + height2 + ")")
-      .call(xAxis2);
+x.domain([-1, ordinals.length])
+y.domain([0, d3.max(data, d => d.value)])
+x2.domain(x.domain())
+y2.domain([0, d3.max(data, d => d.value)])
 
-  context.append("g")
-      .attr("class", "brush")
+focus.append('g')
+     .attr('clip-path','url(#my-clip-path)')
+     .selectAll('.bar')
+     .data(data)
+     .enter()
+     .append('rect')
+     .attr('class', 'bar')
+     .attr('x', (d, i) => {
+      return x(i) - xBand.bandwidth()*0.9/2
+     })
+     .attr('y', (d, i) => {
+      return y(d.value)
+     })
+     .attr('width', xBand.bandwidth()*0.9)
+     .attr('height', d => {
+      return height - y(d.value)
+     })
+
+focus.append('g')
+      .attr('class', 'axis')
+      .attr('transform', `translate(0,${height})`)
+      .call(xAxis)
+
+focus.append('g')
+      .attr('class', 'axis axis--y')
+      .call(yAxis)
+
+let defs = focus.append('defs')
+
+// use clipPath
+defs.append('clipPath')
+    .attr('id', 'my-clip-path')
+    .append('rect')
+    .attr('width', width)
+    .attr('height', height)
+
+context.selectAll('.bar')
+     .data(data)
+     .enter()
+     .append('rect')
+     .attr('class', 'bar')
+     .attr('x', (d, i) => {
+      return x2(i) - xBand.bandwidth()*0.9/2
+     })
+     .attr('y', (d, i) => y2(d.value))
+     .attr('width', xBand.bandwidth()*0.9)
+     .attr('height', d => {
+      return height2 - y2(d.value)
+     })
+
+context.append('g')
+      .attr('class', 'axis2')
+      .attr('transform', `translate(0,${height2})`)
+      .call(xAxis)
+
+context.append('g')
+      .attr('class', 'brush')
       .call(brush)
-      .call(brush.move, x.range());
+      .call(brush.move, x.range())
 
 function brushed() {
-  var s = d3.event.selection || x2.range();
-  x.domain(s.map(x2.invert, x2));
-  <!--focus.select(".area").attr("d", area);-->
-  focus.select(".axis--x").call(xAxis);
-  focus.selectAll(".bar")
-    .attr("x", function(d) { return x(d.Date); });
+  var s = d3.event.selection || x2.range()
+  x.domain(s.map(x2.invert, x2))
+  focus.select('.axis').call(xAxis)
+  focus.selectAll('.bar')
+       .attr('x', (d, i) => {
+        return x(i) - xBand.bandwidth()*0.9/2
+       })
 }
-
-
 </script>
+</html>
