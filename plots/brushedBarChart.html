@@ -141,7 +141,7 @@ function brushed() {
 				end = data.length;
       }
 
-    var updatedData = data.slice(start, end);
+    var updatedData = data.slice(d3.event.selection[0], d3.event.selection[1]);
 
     update(updatedData);
     enter(updatedData);
