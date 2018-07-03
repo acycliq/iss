@@ -26,6 +26,8 @@ margin = {top: 20, right: 50, bottom: 30, left: 50}
 const svg = d3.select("#dc-pie-graph")
               .select("svg")
 
+//clear the contents if any
+svg.select("svg > *").remove()
 margin = {top: 20, right: 20, bottom: 0.3*svg.attr("height"), left: 40},
 width = +svg.attr("width") - margin.left - margin.right,
 height = +svg.attr("height") - margin.top - margin.bottom,
