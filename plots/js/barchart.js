@@ -21,41 +21,24 @@ function barchart(data)
 {
 
 ordinals = data.map(function(d) { return d.labels; })
-    margin = {top: 20, right: 20, bottom: 30, left: 40},
-    width = 320 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
-    height2 = 40,
-    radius = (Math.min(width, height) / 2) - 10
 
-//let margin = {
-//      top: 50,
-//      right: 100,
-//      bottom: 50,
-//      left: 100
-//    },
-//    width = 1000 - margin.left - margin.right,
-//    height = 700 - margin.top - margin.bottom - 80,
-//    height2 = 40,
-//    radius = (Math.min(width, height) / 2) - 10,
-//    node
-
-//const svg = d3.select('body')
-//              .append('svg')
-//              .attr('width', 960)
-//              .attr('height', 700)
-
+margin = {top: 20, right: 50, bottom: 30, left: 50}
 const svg = d3.select("#dc-pie-graph")
               .select("svg")
-              .attr('width', 960)
-              .attr('height', 700)
+
+margin = {top: 20, right: 20, bottom: 0.3*svg.attr("height"), left: 40},
+width = +svg.attr("width") - margin.left - margin.right,
+height = +svg.attr("height") - margin.top - margin.bottom,
+margin2 = {top: 20+margin.top+height, right: 20, bottom: 30, left: 40},
+height2 = height/5;
 
 const focus = svg.append('g')
               .attr('class', 'focus')
-              .attr('transform', `translate(${margin.left}, ${margin.top})`)
+              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 const context = svg.append('g')
                    .attr('class', 'context')
-                   .attr('transform', `translate(${margin.left}, ${margin.top + 550})`)
+                   .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 // the scale
 let x = d3.scaleLinear().range([0, width])
@@ -120,14 +103,10 @@ context.selectAll('.bar')
      .enter()
      .append('rect')
      .attr('class', 'bar')
-     .attr('x', (d, i) => {
-      return x2(i) - xBand.bandwidth()*0.9/2
-     })
+     .attr('x', (d, i) => {return x2(i) - xBand.bandwidth()*0.9/2})
      .attr('y', (d, i) => y2(d.Prob))
      .attr('width', xBand.bandwidth()*0.9)
-     .attr('height', d => {
-      return height2 - y2(d.Prob)
-     })
+     .attr('height', d => {return height2 - y2(d.Prob)})
 
 context.append('g')
       .attr('class', 'axis2')
@@ -144,9 +123,7 @@ function brushed() {
   x.domain(s.map(x2.invert, x2))
   focus.select('.axis').call(xAxis)
   focus.selectAll('.bar')
-       .attr('x', (d, i) => {
-        return x(i) - xBand.bandwidth()*0.9/2
-       })
+       .attr('x', (d, i) => {return x(i) - xBand.bandwidth()*0.9/2})
 }
 
 
