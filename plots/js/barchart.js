@@ -20,49 +20,77 @@
 function barchart(data)
 {
 
-ordinals = data.map(function(d) { return d.labels; })
-
-margin = {top: 20, right: 50, bottom: 30, left: 50}
-const svg = d3.select("#dc-pie-graph")
-              .select("svg")
+var ordinals = data.map(function(d) { return d.labels; });
+var svg = d3.select("#dc-pie-graph")
+              .select("svg");
 
 //clear the contents if any
-svg.select("svg > *").remove()
-margin = {top: 20, right: 20, bottom: 0.3*svg.attr("height"), left: 40},
+var margin = {top: 20, right: 20, bottom: 0.3*svg.attr("height"), left: 40},
 width = +svg.attr("width") - margin.left - margin.right,
 height = +svg.attr("height") - margin.top - margin.bottom,
 margin2 = {top: 20+margin.top+height, right: 20, bottom: 30, left: 40},
 height2 = height/5;
 
-const focus = svg.append('g')
-              .attr('class', 'focus')
-              .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-const context = svg.append('g')
-                   .attr('class', 'context')
-                   .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 // the scale
-let x = d3.scaleLinear().range([0, width])
-let x2 = d3.scaleLinear().range([0, width])
-let y = d3.scaleLinear().range([height, 0])
-let y2 = d3.scaleLinear().range([height2, 0])
+var scale = {
+  x: d3.scaleLinear().range([0, width]).nice(),
+  y: d3.scaleLinear().range([height, 0]).nice(),
+  x2: d3.scaleLinear().range([0, width]).nice(),
+  y2: d3.scaleLinear().range([height2, 0]).nice()
+};
 
-let xBand = d3.scaleBand().domain(d3.range(-1, ordinals.length)).range([0, width])
+var xBand = d3.scaleBand().domain(d3.range(-1, ordinals.length)).range([0, width])
 
-let xAxis = d3.axisBottom(x).tickFormat((d, e) => ordinals[d])
-let xAxis2 = d3.axisBottom(x2)
-let yAxis = d3.axisLeft(y)
-let yAxis2 = d3.axisLeft(y2)
+var axis = {
+    xAxis: d3.axisBottom(scale.x).tickFormat((d, e) => ordinals[d]),
+    xAxis2: d3.axisBottom(scale.x2),
+    yAxis: d3.axisLeft(scale.y),
+    yAxis2: d3.axisLeft(scale.y2)
+};
+
+var context = svg.append('g')
+                   .attr('class', 'context')
+                   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    context.append("g").attr("class", "x axis");
+    context.append("g").attr("class", "y axis");
+
+var focus = svg.append('g')
+              .attr('class', 'focus')
+              .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
+    focus.append("g").attr("class", "x2 axis");
+    focus.append("g").attr("class", "y2 axis");
+
+svg.call(renderPlot, data)
+
+function renderPlot(selection, data){
+    updateScales(data);
+    selection
+        .select(".focus")
+        .select(".x.axis").call(axis.xAxis)
+        .attr("transform", "translate(0," + height + ")");
+
+    selection
+        .select(".focus")
+        .select(".y.axis").call(axis.yAxis);
+
+}
+
+function updateScales(data){
+    scale.x.domain([-1, ordinals.length]);
+    scale.y.domain([0, d3.max(data, d => d.Prob)]);
+    scale.x2.domain(scale.x.domain());
+    scale.y2.domain([0, d3.max(data, d => d.Prob)]);
+}
 
 let brush = d3.brushX()
     .extent([[0, 0], [width, height2]])
     .on('brush', brushed)
 
-x.domain([-1, ordinals.length])
-y.domain([0, d3.max(data, d => d.Prob)])
-x2.domain(x.domain())
-y2.domain([0, d3.max(data, d => d.Prob)])
+//scale.x.domain([-1, ordinals.length])
+//scale.y.domain([0, d3.max(data, d => d.Prob)])
+//scale.x2.domain(scale.x.domain())
+//scale.y2.domain([0, d3.max(data, d => d.Prob)])
 
 focus.append('g')
      .attr('clip-path','url(#my-clip-path)')
@@ -72,24 +100,24 @@ focus.append('g')
      .append('rect')
      .attr('class', 'bar')
      .attr('x', (d, i) => {
-      return x(i) - xBand.bandwidth()*0.9/2
+      return scale.x(i) - xBand.bandwidth()*0.9/2
      })
      .attr('y', (d, i) => {
-      return y(d.Prob)
+      return scale.y(d.Prob)
      })
      .attr('width', xBand.bandwidth()*0.9)
      .attr('height', d => {
-      return height - y(d.Prob)
+      return height - scale.y(d.Prob)
      })
 
 focus.append('g')
       .attr('class', 'axis')
       .attr('transform', `translate(0,${height})`)
-      .call(xAxis)
+      .call(axis.xAxis2)
 
 focus.append('g')
       .attr('class', 'axis axis--y')
-      .call(yAxis)
+      .call(axis.yAxis2)
 
 let defs = focus.append('defs')
 
@@ -105,27 +133,29 @@ context.selectAll('.bar')
      .enter()
      .append('rect')
      .attr('class', 'bar')
-     .attr('x', (d, i) => {return x2(i) - xBand.bandwidth()*0.9/2})
-     .attr('y', (d, i) => y2(d.Prob))
+     .attr('x', (d, i) => {return scale.x2(i) - xBand.bandwidth()*0.9/2})
+     .attr('y', (d, i) => scale.y2(d.Prob))
      .attr('width', xBand.bandwidth()*0.9)
-     .attr('height', d => {return height2 - y2(d.Prob)})
+     .attr('height', d => {return height2 - scale.y2(d.Prob)})
 
 context.append('g')
       .attr('class', 'axis2')
       .attr('transform', `translate(0,${height2})`)
-      .call(xAxis)
+      .call(axis.xAxis)
 
 context.append('g')
       .attr('class', 'brush')
       .call(brush)
-      .call(brush.move, x.range())
+      .call(brush.move, scale.x.range())
+
+
 
 function brushed() {
-  var s = d3.event.selection || x2.range()
-  x.domain(s.map(x2.invert, x2))
-  focus.select('.axis').call(xAxis)
+  var s = d3.event.selection || scale.x2.range()
+  scale.x.domain(s.map(scale.x2.invert, scale.x2))
+  focus.select('.axis').call(axis.xAxis)
   focus.selectAll('.bar')
-       .attr('x', (d, i) => {return x(i) - xBand.bandwidth()*0.9/2})
+       .attr('x', (d, i) => {return scale.x(i) - xBand.bandwidth()*0.9/2})
 }
 
 

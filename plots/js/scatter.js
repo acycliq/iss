@@ -191,15 +191,7 @@ function highlight(d) {
       .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
       .replace(/,/g, '<br>'));
 
-  let barData = []
-  for(let i = 0;i < 100; i++){
-  barData.push({
-    Prob: Math.random()*10,
-    labels: 'test' + i
-  })
-  }
 
-    barchart(barData)
 
 
 //    svg2width = width + padding.right + padding.left
@@ -250,6 +242,16 @@ function mouseMoveHandler() {
 
   // highlight the point if we found one, otherwise hide the highlight circle
   highlight(site && site.data);
+
+    let barData = []
+  for(let i = 0;i < 100; i++){
+  barData.push({
+    Prob: Math.random()*10,
+    labels: 'test' + i
+  })
+  }
+
+    barchart(barData)
 }
 
 // add the overlay on top of everything to take the mouse events
