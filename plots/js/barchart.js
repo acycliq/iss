@@ -37,7 +37,7 @@ var scale = {
     x2: d3.scaleLinear().range([0, width]).nice(),
     y: d3.scaleLinear().range([height, 0]).nice(),
     y2: d3.scaleLinear().range([height2, 0]).nice()
-};
+            };
 
 let xBand = d3.scaleBand().domain(d3.range(-1, ordinals.length)).range([0, width])
 
