@@ -35,9 +35,7 @@ function barchart(data) {
 
     var axis = {
         x: d3.axisBottom(scale.x).tickFormat((d, e) => ordinals[d]),
-        //x2: d3.axisBottom(scale.x2),
-        y: d3.axisLeft(scale.y),
-        //y2: d3.axisLeft(scale.y2)
+        y: d3.axisLeft(scale.y)
     };
 
     var brush = d3.brushX()
@@ -49,30 +47,19 @@ function barchart(data) {
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     focus.select(".axis").attr("transform", "translate(0," + height +")");
-    //focus.append('g').attr('class', 'axis axis--y')
 
     var context = svg.select('.context')
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 
-//    context.append('g')
-//        .attr('class', 'axis2')
-//
-//    context.append('g')
-//        .attr('class', 'brush')
-
-
     var defs = focus.append('defs');
 
-//    // define clipPath
-//    defs.append('clipPath')
-//        .attr('id', 'my-clip-path')
-//        .append('rect')
-//        .attr('width', width)
-//        .attr('height', height);
-    defs.select('#my-clip-path').select('rect')
-            .attr('width', width)
-            .attr('height', height);
+    // use clipPath
+    defs.append('clipPath')
+        .attr('id', 'my-clip-path')
+        .append('rect')
+        .attr('width', width)
+        .attr('height', height);
 
     function updateScales(data) {
         scale.x.domain([-1, ordinals.length])
@@ -101,24 +88,13 @@ function barchart(data) {
 
         selection
             .call(renderPoints, data);
-
-        //    selection.select(".context").select(".brush')
-        //      .call(brush)
-        //      .call(brush.move, scale.x.range())
     }
-    //var context = svg.append('g')
-    //                   .attr('class', 'context')
-    //                   .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
-
-    //context.append('g')
-    //      .attr('class', 'axis2')
-    //      .attr('transform', `translate(0,${height2})`)
 
     function renderPoints(selection, data) {
+        
         var points = selection.select('.focus')
-        .attr('clip-path','url(#my-clip-path)')
-        .selectAll('.bar').data(data);
+          	.selectAll('.bar').data(data);
 
         var newPoints = points.enter().append('rect')
             .attr('class', 'bar')
@@ -131,7 +107,8 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height - scale.y(d.Prob)
-            });
+            })
+            .attr("clip-path","url(#my-clip-path)");
 
         points.merge(newPoints)
             .transition().duration(1000)
@@ -144,7 +121,8 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height - scale.y(d.Prob)
-            });
+            })
+            
 
         points.exit()
             .transition().duration(1000)
@@ -182,6 +160,7 @@ function barchart(data) {
 
 
     }
+
 
     function brushed() {
         var s = d3.event.selection || scale.x2.range()
