@@ -243,15 +243,15 @@ function mouseMoveHandler() {
   // highlight the point if we found one, otherwise hide the highlight circle
   highlight(site && site.data);
 
-    let barData = []
-  for(let i = 0;i < 100; i++){
-  barData.push({
-    Prob: Math.random()*10,
-    labels: 'test' + i
-  })
-  }
+//    let barData = []
+//  for(let i = 0;i < 100; i++){
+//  barData.push({
+//    Prob: Math.random()*10,
+//    labels: 'test' + i
+//  })
+//  }
 
-    barchart(barData)
+    barchart(site && site.data)
 }
 
 // add the overlay on top of everything to take the mouse events

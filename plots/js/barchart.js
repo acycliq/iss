@@ -1,10 +1,26 @@
 
 function barchart(data) {
 
-    var ordinals = data.map(function (d) {
-        return d.labels;
-    });
+    try{
+        var ordinals = data.map(function (d) {
+            return d.labels;
+        });
+    }
+    catch(TypeError)
+    {
+        let barData = []
+        for(let i = 0;i < data.Prob.length; i++){
+            barData.push({
+                Prob: data.Prob[i],
+                labels: data.ClassName[i]
+            })
+        }
+        data = barData
+    }
 
+    var ordinals = data.map(function (d) {
+            return d.labels;
+        });
 
     var svg = d3.select("#dc-pie-graph").select("svg");
     var margin = {
