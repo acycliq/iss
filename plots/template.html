@@ -1,35 +1,44 @@
 <!DOCTYPE html>
 <html lang='en'>
+
 <head>
-<meta charset='utf-8'>
+    <meta charset='utf-8'>
     <style type="text/css">
-      body .container {
+        body .container {
             min-width: 90%;
             padding: 0 15px;
             margin: 0 -15px;
-          }
+        }
 
-        html { min-height: 101%;}
-        .bar { fill: steelblue; }
+        html {
+            min-height: 101%;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
     </style>
 
-<script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
-<script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js' type='text/javascript'></script>
+    <script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/js/bootstrap.min.js' type='text/javascript'></script>
 
-<link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
-<!-- <link href='https://cdnjs.cloudflare.com/ajax/libs/dc/3.0.4/dc.min.css' rel='stylesheet' type='text/css'> -->
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/2.3.2/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+    <!-- <link href='https://cdnjs.cloudflare.com/ajax/libs/dc/3.0.4/dc.min.css' rel='stylesheet' type='text/css'> -->
 
-<script src='js/data_vis.js' type='text/javascript'></script>
-<script src='js/scatter.js' type='text/javascript'></script>
-<script src='js/barchart.js' type='text/javascript'></script>
+    <script src='js/data_vis.js' type='text/javascript'></script>
+    <script src='js/scatter.js' type='text/javascript'></script>
+    <script src='js/barchart.js' type='text/javascript'></script>
 
 </head>
+
 <body>
     <div class='container' id='main-container'>
         <div class='content'>
             <div class='container' style='font: 10px sans-serif;'>
                 <h3>Dashboard with d3.js (This is h3)</h3>
-                <h4>Demo (This is h4)</a></h4>
+                <h4>Demo (This is h4)</a>
+                </h4>
                 <div class='row-fluid'>
                     <div class='remaining-graphs col-xs-12 col-md-12'>
                         <div class='row-fluid'>
@@ -41,6 +50,12 @@
                         <div class='row-fluid' style="background-color:Honeydew">
                             <div class='chart span4' id='dc-pie-graph'>
                                 <svg width="900" height="300">
+                                    <!-- Add a clip path -->
+                                 <defs>
+                                   <clipPath id="my-clip-path">
+                                       <rect></rect>
+                                   </clipPath> 
+                                 </defs>
                                 <g class="focus">
                                     <g class="axis"></g>
                                     <g class="axis axis--y"></g>
@@ -59,7 +74,7 @@
                                 <h4>Plot 3 goes here</h4>
                             </div>
                         </div>
-                         /other little graphs go here
+                        /other little graphs go here
                         <div class='row-fluid'>
                             <div class='span12 table-graph'>
                                 <!--<h4>Data Table</h4>-->
@@ -86,11 +101,11 @@
                         </div>
                     </div>
                     <!--<div class='remaining-graphs span4'>-->
-                        <!--<div class='row-fluid'>-->
-                            <!--<div class='row-graph span12' id='dc-row-graph' style='color:black;'>-->
-                                <!--<h4>Reviews Per City</h4>-->
-                            <!--</div>-->
-                        <!--</div>-->
+                    <!--<div class='row-fluid'>-->
+                    <!--<div class='row-graph span12' id='dc-row-graph' style='color:black;'>-->
+                    <!--<h4>Reviews Per City</h4>-->
+                    <!--</div>-->
+                    <!--</div>-->
                     <!--</div>-->
                 </div>
             </div>
@@ -98,19 +113,20 @@
         </div>
     </div>
 
-  <script>
-    <!--d3.json('./data/iss.json', function (data) {-->
-          <!--data.forEach(function(d) {-->
-          <!--d.Cell_Num = +d.Cell_Num-->
-          <!--d.y = +d.Y-->
-          <!--d.x = +d.X-->
-          <!--console.log(d.Prob)-->
-          <!--});-->
+    <script>
+        <!--d3.json('./data/iss.json', function (data) {-->
+        <!--data.forEach(function(d) {-->
+        <!--d.Cell_Num = +d.Cell_Num-->
+        <!--d.y = +d.Y-->
+        <!--d.x = +d.X-->
+        <!--console.log(d.Prob)-->
+        <!--});-->
         <!--vis(data);-->
         <!--console.log("Done!")-->
         <!--});-->
 
-   </script>
+    </script>
 
 </body>
+
 </html>

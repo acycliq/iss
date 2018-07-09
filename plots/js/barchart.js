@@ -52,14 +52,10 @@ function barchart(data) {
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 
-    var defs = focus.append('defs');
-
-    // use clipPath
-    defs.append('clipPath')
-        .attr('id', 'my-clip-path')
-        .append('rect')
-        .attr('width', width)
-        .attr('height', height);
+       /* Adjust width / height of clip path */
+    d3.select("#my-clip-path").select("rect")
+      .attr("width",width)
+      .attr("height",height)
 
     function updateScales(data) {
         scale.x.domain([-1, ordinals.length])
