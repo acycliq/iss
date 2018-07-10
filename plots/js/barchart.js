@@ -5,7 +5,11 @@ function barchart(data) {
             return d.labels;
         });
 
+    // Standard transition for our visualization
+    var t = d3.transition().duration(750);
+
     var svg = d3.select("#bar-chart").select("svg");
+
     var margin = {
             top: 20,
             right: 20,
@@ -78,8 +82,8 @@ function barchart(data) {
         selection.select(".axis2")
             .attr("transform", "translate(0," + height2 +")");
 
-        selection.select(".focus").select(".axis").call(axis.x);
-        selection.select(".focus").select(".axis.axis--y").call(axis.y);
+        selection.select(".focus").select(".axis").transition(t).call(axis.x);
+        selection.select(".focus").select(".axis.axis--y").transition(t).call(axis.y);
 
         selection
             .call(renderPoints, data);
@@ -92,6 +96,7 @@ function barchart(data) {
           	.selectAll('.bar').data(data);
 
         var newPoints = points.enter().append('rect')
+            //.transition(t)
             .attr('class', 'bar')
             .attr('x', (d, i) => {
                 return scale.x(i) - xBand.bandwidth() * 0.9 / 2
@@ -106,7 +111,7 @@ function barchart(data) {
             .attr("clip-path","url(#my-clip-path)");
 
         points.merge(newPoints)
-            .transition().duration(1000)
+            .transition(t)
             .attr('x', (d, i) => {
                 return scale.x(i) - xBand.bandwidth() * 0.9 / 2
             })
@@ -120,7 +125,7 @@ function barchart(data) {
             
 
         points.exit()
-            .transition().duration(1000)
+            .transition(t)
             .remove();
 
 
