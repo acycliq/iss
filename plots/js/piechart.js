@@ -28,25 +28,37 @@ function piechart(data)
             .append("g")
             .attr("transform", "translate(" + width/2 + "," + height/2 +")"); // Moving the center point
 
-    svg.call(renderChart, pie)
+    svg.call(renderPlot, pie)
+    
+    function renderPlot(selection, data){
+        selection.call(renderChart, data);
+    }
 
     function renderChart(selection, data)
     {
-        var g = selection.selectAll("arc")
-            .data(pie)
-            .enter().append("g")
-            .attr("class", "arc");
-
-        g.append("path")
+        var points = selection.selectAll("arc")
+            .data(data);
+        
+        var newPoints = points.enter()
+            .append("path")
             .attr("d", arc)
             .style("fill", function(d) { return color(d.data.labels);})
-            .each(function(d) { this._current = d; }); // store the initial angles;
+        
+        points.merge(newPoints)
+            .attr("d", arc)
+            .style("fill", function(d) { return color(d.data.labels);})
+        
+         points.exit()
+            .select("path")
+            .remove();
+        
 
-        g.append("text")
-            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-            .text(function(d) { return d.data.labels;})
-            .style("fill", "#fff")
-            .each(function(d) { this._current = d; }); // store the initial angles;
+            
+
+//        g.append("text")
+//            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
+//            .text(function(d) { return d.data.labels;})
+//            .style("fill", "#fff")
 
     }
 
