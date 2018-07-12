@@ -7,6 +7,7 @@
           console.log(d.Prob)
           });
         initChart(data);
+        map(data)
         console.log("Done!!")
         });
 
