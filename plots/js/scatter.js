@@ -1,6 +1,7 @@
 function initChart(data)
 {
 
+
 // ----------------------------------------------------
 // Build a basic scatterplot
 // ----------------------------------------------------
@@ -11,8 +12,8 @@ function initChart(data)
 
 // padding around the chart where axes will go
 const padding =  { top: 10, left: 50, bottom: 30, right: 0 },
-width = 1100 - padding.left - padding.right,
-height = 650 - padding.top - padding.bottom;
+width = 920 - padding.left - padding.right,
+height = 480 - padding.top - padding.bottom;
 
 // inner chart dimensions, where the dots are plotted
 const plotAreaWidth = width - padding.left - padding.right;
@@ -253,7 +254,7 @@ function mouseMoveHandler() {
         }
     barchart(sdata)
     piechart(sdata)
-    map(sdata)
+    //map(sdata)
 }
 
 // add the overlay on top of everything to take the mouse events
