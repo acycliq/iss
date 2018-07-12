@@ -3,12 +3,12 @@ function piechart(data)
     //var data = [{"letter":"A","presses":2},{"letter":"B","presses":2},{"letter":"C","presses":1}];
     console.log(data);
 
-    var width = 300,
-        height = 300,
+    var width = 250,
+        height = 250,
         radius = Math.min(width, height) / 2;
 
-    var color = d3.scaleOrdinal()
-        .range(["#A07A19", "#AC30C0", "#EB9A72", "#BA86F5", "#EA22A8"]);
+    var color = d3.scaleOrdinal(d3.schemeCategory10)
+        //.range(["#A07A19", "#AC30C0", "#EB9A72", "#BA86F5", "#EA22A8"]);
 
     var arc = d3.arc()
         .outerRadius(radius - 10)
