@@ -21,7 +21,7 @@ function barchart(data) {
         margin2 = {
             top: 20 + margin.top + height,
             right: 20,
-            bottom: 30,
+            bottom: 0,
             left: 40
         },
         height2 = height / 5;
@@ -96,7 +96,7 @@ function barchart(data) {
           	.selectAll('.bar').data(data);
 
         var newPoints = points.enter().append('rect')
-            //.transition(t)
+            .transition(t)
             .attr('class', 'bar')
             .attr('x', (d, i) => {
                 return scale.x(i) - xBand.bandwidth() * 0.9 / 2
