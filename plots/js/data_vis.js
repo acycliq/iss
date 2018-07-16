@@ -7,7 +7,7 @@
           console.log(d.Prob)
           });
         initChart(data);
-        map(data)
+        dapi(data);
         console.log("Done!!")
         });
 
