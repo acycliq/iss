@@ -1,48 +1,45 @@
 <!DOCTYPE html>
-<html style="height: 100%; margin: 0;"
-<head>
-<title> Title goes here </title>
-<meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+<html style="height: 100%; margin: 0;">
 
- <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
-   integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
-   crossorigin=""/> 
- <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
-   integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
-   crossorigin=""></script>
+<head>
+    <title> Title goes here </title>
+    <meta name="viewpoint" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" ></script>
 
 </head>
+
 <body style="height:100%; margin:0;">
 
     <div id="map" style="width: 100%; height: 100%; background: #888888; margin:0;"></div>
-          <button id="fly1">Fly to 1</button>
-      <button id="fly2">Fly to 2</button>
+    <button id="fly1">Fly to 1</button>
+    <button id="fly2">Fly to 2</button>
 
-      <br />
+    <br />
 
-      <div id="container"></div>
-    
+    <div id="container"></div>
+
     <script>
-        
-            ////////////////////////////////////////////////////////////////////////////
-    // Conversion from (x, y) raster image coordinates to equivalent of latLng
-    // Taken from Leaflet tutorial "Non-geographical maps"
-    // http://leafletjs.com/examples/crs-simple/crs-simple.html
-    ////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////
+        // Conversion from (x, y) raster image coordinates to equivalent of latLng
+        // Taken from Leaflet tutorial "Non-geographical maps"
+        // http://leafletjs.com/examples/crs-simple/crs-simple.html
+        ////////////////////////////////////////////////////////////////////////////
         var yx = L.latLng;
 
         var xy = function(x, y) {
-          if (L.Util.isArray(x)) { // When doing xy([x, y]);
-            return yx(x[1], x[0]);
-          }
-          return yx(y, x); // When doing xy(x, y);
+            if (L.Util.isArray(x)) { // When doing xy([x, y]);
+                return yx(x[1], x[0]);
+            }
+            return yx(y, x); // When doing xy(x, y);
         };
-        
+
         var minZoom = 0;
         var maxZoom = 6;
         var img = [
-          16384, // original width of image `karta.jpg` => x / ~longitude (0 is left, 3831 is right)
-          16384 // original height of image => y / ~ reverse of latitude (0 is top, 3101 is bottom)
+            16384, // original width of image `karta.jpg` => x / ~longitude (0 is left, 3831 is right)
+            12288 // original height of image => y / ~ reverse of latitude (0 is top, 3101 is bottom)
         ];
 
         /**
@@ -53,26 +50,26 @@
          */
 
         L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
-          //                      coefficients: a      b    c     d
-          transformation: new L.Transformation(1 / 64, 0, 1 / 64, 0) // Compute a and c coefficients so that  tile 0/0/0 is from [0, 0] to [4096, 4096]
+            //                      coefficients: a      b    c     d
+            transformation: new L.Transformation(1/64, 0, 1/64, 64) // Compute a and c coefficients so that  tile 0/0/0 is from [0, 0] to [4096, 4096]
         });
 
         var bounds = L.latLngBounds([
-          xy(0, 0),
-          xy(img)
+            xy(0, 0),
+            xy(img)
         ]);
 
 
-//        var mapSW = [0, 16384],
-//            mapNE = [16384, 0];
+        //        var mapSW = [0, 16384],
+        //            mapNE = [16384, 0];
 
         var map = L.map('map', {
-                          crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
-                          maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
-                          minZoom: minZoom,
-                          maxZoom: maxZoom
-                        }).setView([0, 0], 1);
-        
+            crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
+            maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
+            minZoom: minZoom,
+            maxZoom: maxZoom
+        }).setView([0, 0], 1);
+
         L.tileLayer('dapi/{z}/{x}/{y}.png', {
             bounds: bounds,
             attribution: 'ESO/INAF-VST/OmegaCAM',
@@ -80,25 +77,32 @@
             noWrap: true
         }).addTo(map);
 
-//        map.setMaxBounds(new L.LatLngBounds(
-//            map.unproject(mapSW, map.getMaxZoom()),
-//            map.unproject(mapNE, map.getMaxZoom())
-//            ))
+        //        map.setMaxBounds(new L.LatLngBounds(
+        //            map.unproject(mapSW, map.getMaxZoom()),
+        //            map.unproject(mapNE, map.getMaxZoom())
+        //            ))
 
         //Markers and popups
         //LatLng
-        var marker = L.marker([0,0], {
+        var marker = L.marker([0, 0], {
             draggable: false,
         }).addTo(map);
         marker.bindPopup("");
-
-//        marker.on('dragend', function(e) {
-//            marker.getPopup().setContent('Clicked' + marker.getLatLng().toString() + '<br />'
-//                + 'Pixels ' + map.project(marker.getLatLng(), map.getMaxZoom().toString()))
-//            .openOn(map);
-//        });
         
-         ////////////////////////////////////////////////////////////////////////////
+        var m = {
+          x: 6702, // px coordinates on full sized image
+          y: 7404
+        }
+        
+        //var marker = L.circleMarker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
+
+        //        marker.on('dragend', function(e) {
+        //            marker.getPopup().setContent('Clicked' + marker.getLatLng().toString() + '<br />'
+        //                + 'Pixels ' + map.project(marker.getLatLng(), map.getMaxZoom().toString()))
+        //            .openOn(map);
+        //        });
+
+        ////////////////////////////////////////////////////////////////////////////
         // FlyTo
         ////////////////////////////////////////////////////////////////////////////
 
@@ -107,53 +111,54 @@
         var container = document.getElementById("container");
 
         fly1.addEventListener("click", function(event) {
-          event.preventDefault();
-          map.flyTo(xy(0, 0));
+            event.preventDefault();
+            map.flyTo(xy(0, 0));
         });
 
         fly2.addEventListener("click", function(event) {
-          event.preventDefault();
-          map.flyTo(xy(img));
+            event.preventDefault();
+            map.flyTo(xy(img));
         });
 
-        
-         // add layer control object
+
+        // add layer control object
         L.control.layers({}, {
-          //'Polygon': layerPolygon(map), // no longer need for rc, using xy conversion instead
-          //'Countries': layerCountries(map),
-          'Bounds': layerBounds(map, img),
-          //'Info': layerGeo(map)
+            //'Polygon': layerPolygon(map), // no longer need for rc, using xy conversion instead
+            //'Countries': layerCountries(map),
+            'Bounds': layerBounds(map, img),
+            //'Info': layerGeo(map)
         }, {
-          collapsed: false
+            collapsed: false
         }).addTo(map)
-        
-        
+
+
         /**
          * layer with markers
          */
         function layerBounds(map, img) {
-          // set marker at the image bound edges
-          var layerBounds = L.layerGroup([
-            L.marker(xy([0, 0])).bindPopup('[0,0]'), // Just use xy conversion instead of rc.unproject
-            L.marker(xy(img)).bindPopup(JSON.stringify(img)) // Just use xy conversion instead of rc.unproject
-          ])
-          map.addLayer(layerBounds)
+            // set marker at the image bound edges
+            var layerBounds = L.layerGroup([
+                L.marker(xy([0, 0])).bindPopup('[0,0]'), // Just use xy conversion instead of rc.unproject
+                L.marker(xy(img)).bindPopup(JSON.stringify(img)), // Just use xy conversion instead of rc.unproject
+                L.circleMarker(xy([16384/6472*(10818-4346), 0])).bindPopup(JSON.stringify(10000))
+            ])
+            map.addLayer(layerBounds)
 
-          // set markers on click events in the map
-          map.on('click', function(event) {
-            // to obtain raster coordinates from the map use `project` => no longer needed!
-            var coord = event.latlng;
-            // to set a marker, ... in raster coordinates in the map use `unproject` => no longer needed!
-            var marker = L.marker(coord)
-              .addTo(layerBounds)
-            marker.bindPopup(coord.toString() + "<br />x: " + coord.lng + "<br />y: " + coord.lat)
-              .openPopup()
-          })
+            // set markers on click events in the map
+            map.on('click', function(event) {
+                // to obtain raster coordinates from the map use `project` => no longer needed!
+                var coord = event.latlng;
+                // to set a marker, ... in raster coordinates in the map use `unproject` => no longer needed!
+                var marker = L.marker(coord)
+                    .addTo(layerBounds)
+                marker.bindPopup(coord.toString() + "<br />x: " + coord.lng + "<br />y: " + coord.lat)
+                    .openPopup()
+            })
 
-          return layerBounds
+            return layerBounds
         }
-
 
     </script>
 </body>
-</html
+
+</html>
