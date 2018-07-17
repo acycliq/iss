@@ -51,7 +51,7 @@
 
         L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
             //                      coefficients: a      b    c     d
-            transformation: new L.Transformation(1/64, 0, 1/64, 64) // Compute a and c coefficients so that  tile 0/0/0 is from [0, 0] to [4096, 4096]
+            transformation: new L.Transformation(1/64, 0, 1/64, 64) // Compute a and c coefficients so that  tile 0/0/0 is from [0, 0] to [16384, 12288]. For example, we calc c and d making sure that equation 256 = c*12288 + d holds. 256 is the tile size and 12288 the oiginal height of the image (in pixels)
         });
 
         var bounds = L.latLngBounds([
