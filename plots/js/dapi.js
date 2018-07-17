@@ -55,7 +55,7 @@ function dapi(data) {
         maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
         minZoom: minZoom,
         maxZoom: maxZoom
-    }).setView([0, 0], 4);
+    }).setView([img[1]/2, img[0]/2], 5);
 
     L.tileLayer('./data/img/dapi/{z}/{x}/{y}.png', {
         bounds: bounds,
