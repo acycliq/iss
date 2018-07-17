@@ -38,8 +38,8 @@
         var minZoom = 0;
         var maxZoom = 6;
         var img = [
-            16384, // original width of image `karta.jpg` => x / ~longitude (0 is left, 3831 is right)
-            12288 // original height of image => y / ~ reverse of latitude (0 is top, 3101 is bottom)
+            16384, // original width of image => x / ~longitude (0 is left, 16384 is right)
+            12288 // original height of image => y / ~ reverse of latitude (0 is top, 12288 is bottom)
         ];
 
         /**
@@ -89,10 +89,13 @@
         }).addTo(map);
         marker.bindPopup("");
         
-        var m = {
-          x: 6702, // px coordinates on full sized image
-          y: 7404
+        var grid = {
+          x0: 6150, // range of plot in Matlab
+          x1: 13751,
+          y0: 12987,
+          y1: 18457
         }
+        
         
         //var marker = L.circleMarker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
 
@@ -125,22 +128,32 @@
         L.control.layers({}, {
             //'Polygon': layerPolygon(map), // no longer need for rc, using xy conversion instead
             //'Countries': layerCountries(map),
-            'Bounds': layerBounds(map, img),
+            'Bounds': layerBounds(map, img, grid),
             //'Info': layerGeo(map)
         }, {
             collapsed: false
         }).addTo(map)
 
 
+        // project pixel p from image img on the a user-defined range
+        function project(p, img, grid){
+            var x = p[0],
+                y = p[1];
+            xx = img[0]/(grid.x1-grid.x0) * (x - grid.x0);
+            yy = img[1] - img[1]/(grid.y1-grid.y0) * (y - grid.y0);
+            
+            return [xx, yy]
+        }
         /**
          * layer with markers
          */
-        function layerBounds(map, img) {
+        function layerBounds(map, img, grid) {
+            var p = [10000, 18457];
             // set marker at the image bound edges
             var layerBounds = L.layerGroup([
                 L.marker(xy([0, 0])).bindPopup('[0,0]'), // Just use xy conversion instead of rc.unproject
                 L.marker(xy(img)).bindPopup(JSON.stringify(img)), // Just use xy conversion instead of rc.unproject
-                L.circleMarker(xy([16384/6472*(10818-4346), 0])).bindPopup(JSON.stringify(10000))
+                L.circleMarker(xy(project(p, img, grid))).bindPopup(JSON.stringify(p))
             ])
             map.addLayer(layerBounds)
 
