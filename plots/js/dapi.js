@@ -151,7 +151,7 @@ function dapi(data) {
             p = [data[i].x, data[i].y];
             marker = L.circleMarker(xy(project(p, img, grid)), {
                 renderer: myRenderer,
-                radius: 1
+                radius: 2
             }).bindPopup("Marker: " + i + " <br />x: " + data[i].x + "<br />y: " + data[i].y);
             //layerGroup.addLayer(marker).bindPopup('marker ' + i);
             var key = Math.floor(data[i].Expt / 10);
