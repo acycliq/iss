@@ -6,8 +6,10 @@
           d.x = +d.X
           console.log(d.Prob)
           });
-        initChart(data);
+        console.log("Starting DAPI")
         dapi(data);
+        console.log("Starting Scatter")
+        initChart(data);
         console.log("Done!!")
         });
 
