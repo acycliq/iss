@@ -199,6 +199,8 @@ function dapi() {
         }).setView([img[1] / 2, img[0] / 2], 5);
 
         L.tileLayer("./data/img/dapi/{z}/{x}/{y}.png", {
+            attribution: 'KDH',
+            continuousWorld: false,
             minZoom: 0,
             noWrap: true
         }).addTo(map);
