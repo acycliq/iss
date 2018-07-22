@@ -93,34 +93,6 @@ function dapi(data) {
         //            .openOn(map);
         //        });
 
-        ////////////////////////////////////////////////////////////////////////////
-        // FlyTo
-        ////////////////////////////////////////////////////////////////////////////
-
-        var fly1 = document.getElementById("fly1");
-        var fly2 = document.getElementById("fly2");
-        var container = document.getElementById("container");
-
-        //        fly1.addEventListener("click", function(event) {
-        //            event.preventDefault();
-        //            map.flyTo(xy(0, 0));
-        //        });
-        //
-        //        fly2.addEventListener("click", function(event) {
-        //            event.preventDefault();
-        //            map.flyTo(xy(img));
-        //        });
-
-
-        // add layer control object
-        //    L.control.layers({}, {
-        //        //'Polygon': layerPolygon(map), // no longer need for rc, using xy conversion instead
-        //        //'Countries': layerCountries(map),
-        //        'Bounds': layerBounds(map, img, grid),
-        //        //'Info': layerGeo(map)
-        //    }, {
-        //        collapsed: false
-        //    }).addTo(map)
 
 
         // project pixel p from image img on the a user-defined range
@@ -159,9 +131,9 @@ function dapi(data) {
 
         }
 
-//        var overlay = {
-//            'markers': layerGroup
-//        };
+        //        var overlay = {
+        //            'markers': layerGroup
+        //        };
         //var boundsss = {'Boundsss': layerBounds(map, img, grid)};
         var cl = L.control.layers(null, {
             //'Markers': lga[0], 
@@ -200,6 +172,31 @@ function dapi(data) {
 
             return layerBounds
         }
+        
+        ////////////////////////////////////////////////////////////////////////////
+        // FlyTo
+        ////////////////////////////////////////////////////////////////////////////
+
+        var fly1 = document.getElementById("xValue");
+        var fly2= document.getElementById("yValue");
+        var container = document.getElementById("container");
+
+        fly1.addEventListener("change", function (event) {
+            event.preventDefault();
+            x = +document.getElementById("xValue").value
+            y = +document.getElementById("yValue").value
+            p = xy(project([x,y], img, grid))
+            map.flyTo(p, 5);
+        });
+
+        fly2.addEventListener("change", function (event) {
+            event.preventDefault();
+            x = +document.getElementById("xValue").value
+            y = +document.getElementById("yValue").value
+            p = xy(project([x,y], img, grid))
+            map.flyTo(p, 5);
+        });
+
 
         ////////////////////////////////////////////////////////////////////////////
         // Using Leaflet.Coordinates plugin at https://github.com/MrMufflon/Leaflet.Coordinates
