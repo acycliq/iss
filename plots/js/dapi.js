@@ -6,12 +6,140 @@ function dapi(data) {
             d.y = +d.y
             d.Expt = +d.Expt
         })
+        renderChart(data)
+    })
 
-        ////////////////////////////////////////////////////////////////////////////
-        // Conversion from (x, y) raster image coordinates to equivalent of latLng
-        // Taken from Leaflet tutorial "Non-geographical maps"
-        // http://leafletjs.com/examples/crs-simple/crs-simple.html
-        ////////////////////////////////////////////////////////////////////////////
+    function make_dots(data) {
+        var arr = [];
+        var nest = d3.nest()
+            .key(function (d) {
+                return Math.floor(d.Expt / 10);;
+            })
+            .entries(data);
+
+        for (var k = 0; k < nest.length; ++k) {
+            arr[k] = helper(nest[k].values);
+        }
+        return arr;
+    }
+
+    function helper(data) {
+        dots = {
+            type: "FeatureCollection",
+            features: []
+        };
+        for (var i = 0; i < data.length; ++i) {
+            x = data[i].x;
+            y = data[i].y;
+            var g = {
+                "type": "Point",
+                "coordinates": [x, y]
+            };
+
+            //create feature properties
+            var p = {
+                "id": i,
+                "popup": "Dot_" + i,
+                "year": parseInt(data[i].Expt),
+                "size": 30
+            };
+
+            //create features with proper geojson structure
+            dots.features.push({
+                "geometry": g,
+                "type": "Feature",
+                "properties": p
+            });
+        }
+        return dots;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////////////////////////
+    //styling and displaying the data as circle markers//
+    //////////////////////////////////////////////////////////////////////////////////////////////
+
+    //create color ramp
+    function getColor(y) {
+        return y > 90 ? '#6068F0' :
+            y > 80 ? '#6B64DC' :
+            y > 70 ? '#7660C9' :
+            y > 60 ? '#815CB6' :
+            y > 50 ? '#8C58A3' :
+            y > 40 ? '#985490' :
+            y > 30 ? '#A3507C' :
+            y > 20 ? '#AE4C69' :
+            y > 10 ? '#B94856' :
+            y > 0 ? '#C44443' :
+            '#D04030';
+    }
+
+    //calculate radius so that resulting circles will be proportional by area
+    function getRadius(y) {
+        r = Math.sqrt(y / Math.PI)
+        return r;
+    }
+
+    // This is very important! Use a canvas otherwise the chart is too heavy for the browser when
+    // the number of points is too high, as in this case where we have around 300K points to plot
+    var myRenderer = L.canvas({
+        padding: 0.5
+    });
+
+    //create style, with fillColor picked from color ramp
+    function style(feature) {
+        return {
+            radius: getRadius(feature.properties.size),
+            fillColor: getColor(feature.properties.year),
+            color: "#000",
+            weight: 0,
+            opacity: 1,
+            fillOpacity: 0.9,
+            renderer: myRenderer
+        };
+    }
+
+    //create highlight style, with darker color and larger radius
+    function highlightStyle(feature) {
+        return {
+            radius: getRadius(feature.properties.size) + 1.5,
+            fillColor: "#FFCE00",
+            color: "#FFCE00",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.9
+        };
+    }
+
+    //attach styles and popups to the marker layer
+    function highlightDot(e) {
+        var layer = e.target;
+        dotStyleHighlight = highlightStyle(layer.feature);
+        layer.setStyle(dotStyleHighlight);
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+    }
+
+    function resetDotHighlight(e) {
+        var layer = e.target;
+        dotStyleDefault = style(layer.feature);
+        layer.setStyle(dotStyleDefault);
+    }
+
+    function onEachDot(feature, layer) {
+        layer.on({
+            mouseover: highlightDot,
+            mouseout: resetDotHighlight
+        });
+        layer.bindPopup('<table style="width:150px"><tbody><tr><td><div><b>Name:</b></div></td><td><div>' + feature.properties.popup + '</div></td></tr><tr class><td><div><b>Year:</b></div></td><td><div>' + feature.properties.year + '</div></td></tr></tbody></table>');
+    }
+
+
+
+
+    function renderChart(data) {
+        var myDots = make_dots(data);
         var yx = L.latLng;
 
         var xy = function (x, y) {
@@ -21,79 +149,24 @@ function dapi(data) {
             return yx(y, x); // When doing xy(x, y);
         };
 
-        var minZoom = 0;
-        var maxZoom = 6;
-        var img = [
+        var minZoom = 0,
+            maxZoom = 6,
+            img = [
             16384, // original width of image => x / ~longitude (0 is left, 16384 is right)
             12288 // original height of image => y / ~ reverse of latitude (0 is top, 12288 is bottom)
-        ];
-
-        /**
-         * Tile 0/0/0 is 256 x 256 px, and so are all other tiles.
-         * See https://stackoverflow.com/questions/34638887/leaflet-custom-coordinates-on-image
-         * http://leafletjs.com/reference-1.0.3.html#transformation
-         * 256 px * 2^4 = 4096 px
-         */
-
-        L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
-            //                      coefficients: a      b    c     d
-            transformation: new L.Transformation(1 / 64, 0, 1 / 64, 64) // Compute a and c coefficients so that  tile 0/0/0 is
-            // from [0, 0] to [16384, 12288]. For example, we calc c and d making sure that equation
-            // 256 = c*12288 + d holds. 256 is the tile size and 12288 the original height of the image (in pixels)
-        });
+            ];
 
         var bounds = L.latLngBounds([
-            xy(0, 0),
-            xy(img)
-        ]);
-
-
-        //        var mapSW = [0, 16384],
-        //            mapNE = [16384, 0];
-
-        var map = L.map('map', {
-            crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
-            maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
-            minZoom: minZoom,
-            maxZoom: maxZoom
-        }).setView([img[1] / 2, img[0] / 2], 5);
-
-        L.tileLayer('./data/img/dapi/{z}/{x}/{y}.png', {
-            bounds: bounds,
-            attribution: 'KDH',
-            continuousWorld: false,
-            noWrap: true
-        }).addTo(map);
-
-        //        map.setMaxBounds(new L.LatLngBounds(
-        //            map.unproject(mapSW, map.getMaxZoom()),
-        //            map.unproject(mapNE, map.getMaxZoom())
-        //            ))
-
-        //Markers and popups
-        //LatLng
-        var marker = L.marker([0, 0], {
-            draggable: false,
-        }).addTo(map);
-        marker.bindPopup("");
+                xy(0, 0),
+                xy(img)
+            ]);
 
         var grid = {
             x0: 6150, // range of plot in Matlab
             x1: 13751,
             y0: 12987,
             y1: 18457
-        }
-
-
-        //var marker = L.circleMarker(map.unproject([0, 0], map.getMaxZoom())).addTo(map);
-
-        //        marker.on('dragend', function(e) {
-        //            marker.getPopup().setContent('Clicked' + marker.getLatLng().toString() + '<br />'
-        //                + 'Pixels ' + map.project(marker.getLatLng(), map.getMaxZoom().toString()))
-        //            .openOn(map);
-        //        });
-
-
+        };
 
         // project pixel p from image img on the a user-defined range
         // Projection has origin [0,0] the bottom left corner
@@ -106,86 +179,70 @@ function dapi(data) {
             return [xx, yy]
         }
 
-        // Define an array to keep layerGroups
-        var lga = [];
-        var lgaLen = 10;
-        for (var i = 0; i < lgaLen; i += 1) {
-            lga[i] = L.layerGroup().addTo(map);
-        };
 
-        //var layerGroup = L.layerGroup().addTo(map);
+
+        L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
+            //                      coefficients: a      b    c     d
+            transformation: new L.Transformation(1 / 64, 0, 1 / 64, 64) // Compute a and c coefficients so that  tile 0/0/0 is
+            // from [0, 0] to [16384, 12288]. For example, we calc c and d making sure that equation
+            // 256 = c*12288 + d holds. 256 is the tile size and 12288 the original height of the image (in pixels)
+        });
+
+
+        var map = L.map('map', {
+            crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
+            maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
+            minZoom: minZoom,
+            maxZoom: maxZoom
+        }).setView([img[1] / 2, img[0] / 2], 5);
+
+        L.tileLayer("./data/img/dapi/{z}/{x}/{y}.png", {
+            attribution: 'KDH',
+            continuousWorld: false,
+            minZoom: 0,
+            noWrap: true
+        }).addTo(map);
+
+        //map.setView([55, 20], 6);
 
         var myRenderer = L.canvas({
             padding: 0.5
         });
 
-        for (var i = 0; i < data.length; i += 1) { // 100k points
-            p = [data[i].x, data[i].y];
-            marker = L.circleMarker(xy(project(p, img, grid)), {
-                renderer: myRenderer,
-                radius: 2
-            }).bindPopup("Marker: " + i + "<br />Gene: " + data[i].Expt + " <br />x: " + data[i].x + "<br />y: " + data[i].y);
-            //layerGroup.addLayer(marker).bindPopup('marker ' + i);
-            var key = Math.floor(data[i].Expt / 10);
-            lga[key].addLayer(marker);
+        // Define an array to keep layerGroups
+        var dotlayer = [];
 
+        //create marker layer and display it on the map
+        for (var i = 0; i < myDots.length; i += 1) {
+            dotlayer[i] = L.geoJson(myDots[i], {
+                pointToLayer: function (feature, latlng) {
+                    var p = xy(project([latlng.lng, latlng.lat], img, grid));
+                    return L.circleMarker(p, style(feature));
+                },
+                onEachFeature: onEachDot
+            }).addTo(map);
         }
 
-        //        var overlay = {
-        //            'markers': layerGroup
-        //        };
-        //var boundsss = {'Boundsss': layerBounds(map, img, grid)};
-        var cl = L.control.layers(null, {
-            //'Markers': lga[0], 
-            //'Bounds': layerBounds(map, img, grid)
-        }).addTo(map);
-        for (i = 0; i < lga.length; i += 1) {
-            var name = "Genes " + i + "0-" + i + "9";
-            cl.addOverlay(lga[i], name);
+
+        var cl = L.control.layers(null, {}).addTo(map);
+        for (j = 0; j < dotlayer.length; j += 1) {
+            var name = "Group " + j + "0-" + j + "9";
+            cl.addOverlay(dotlayer[j], name);
         }
 
-        /**
-         * layer with markers
-         */
-        function layerBounds(map, img, grid) {
-            var p = [10000, 18457];
-            // set marker at the image bound edges
-            var layerBounds = L.layerGroup([
-                L.marker(xy([0, 0])).bindPopup('[0,0]'), // Just use xy conversion instead of rc.unproject
-                L.marker(xy(img)).bindPopup(JSON.stringify(img)), // Just use xy conversion instead of rc.unproject
-                L.circleMarker(xy(project(p, img, grid)), {
-                    renderer: myRenderer
-                }).bindPopup(JSON.stringify(p))
-                ])
-            map.addLayer(layerBounds)
-
-            // set markers on click events in the map
-            map.on('click', function (event) {
-                // to obtain raster coordinates from the map use `project` => no longer needed!
-                var coord = event.latlng;
-                // to set a marker, ... in raster coordinates in the map use `unproject` => no longer needed!
-                var marker = L.marker(coord)
-                    .addTo(layerBounds)
-                marker.bindPopup(coord.toString() + "<br />x: " + coord.lng + "<br />y: " + coord.lat)
-                    .openPopup()
-            })
-
-            return layerBounds
-        }
-        
         ////////////////////////////////////////////////////////////////////////////
         // FlyTo
         ////////////////////////////////////////////////////////////////////////////
 
         var fly1 = document.getElementById("xValue");
-        var fly2= document.getElementById("yValue");
+        var fly2 = document.getElementById("yValue");
         var container = document.getElementById("container");
 
         fly1.addEventListener("change", function (event) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
-            p = xy(project([x,y], img, grid))
+            p = xy(project([x, y], img, grid))
             map.flyTo(p, 5);
         });
 
@@ -193,7 +250,7 @@ function dapi(data) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
-            p = xy(project([x,y], img, grid))
+            p = xy(project([x, y], img, grid))
             map.flyTo(p, 5);
         });
 
@@ -234,5 +291,5 @@ function dapi(data) {
 
 
 
-    })
+    }
 }
