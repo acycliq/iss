@@ -132,8 +132,15 @@ function dapi(data) {
             mouseover: highlightDot,
             mouseout: resetDotHighlight
         });
-        layer.bindPopup('<table style="width:150px"><tbody><tr><td><div><b>Name:</b></div></td><td><div>' + feature.properties.popup + '</div></td></tr><tr class><td><div><b>Year:</b></div></td><td><div>' + feature.properties.year + '</div></td></tr></tbody></table>');
+        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup + 
+            '</div></td></tr><tr class><td><div><b>Group:</b></div></td><td><div>' + feature.properties.year + 
+            '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.geometry.coordinates[0] + 
+            '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.geometry.coordinates[1] + 
+            '</div></td></tr></tbody></table>'
+        
+        layer.bindPopup(popup);
     }
+
 
 
 
@@ -288,8 +295,6 @@ function dapi(data) {
             markerType: L.marker, //optional default L.marker
             markerProps: {} //optional default {}
         }).addTo(map);
-
-
 
     }
 }
