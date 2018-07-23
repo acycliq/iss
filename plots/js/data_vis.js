@@ -10,6 +10,8 @@
         dapi(data);
         console.log("Starting Scatter")
         initChart(data);
+        console.log("Starting dt")
+        dt(data)
         console.log("Done!!")
         });
 

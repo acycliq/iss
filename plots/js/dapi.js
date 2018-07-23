@@ -243,7 +243,7 @@ function dapi(data) {
 
         var fly1 = document.getElementById("xValue");
         var fly2 = document.getElementById("yValue");
-        var container = document.getElementById("container");
+        //var container = document.getElementById("container");
 
         fly1.addEventListener("change", function (event) {
             event.preventDefault();

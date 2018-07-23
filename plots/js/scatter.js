@@ -200,6 +200,19 @@ function initChart(data) {
                 .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
                 .replace(/,/g, '<br>'));
 
+            var data = [];
+            data.push({
+                Num: d.Cell_Num,
+                X: d.x,
+                Y: d.y,
+              });
+//            for(let i = 0;i < 100; i++){
+//              data.push({
+//                Num: d.Cell_Num
+//                X: Math.random()*10,
+//                Y: 'test' + i
+//              })
+
 
 
 
