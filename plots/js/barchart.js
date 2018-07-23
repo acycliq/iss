@@ -55,7 +55,7 @@ function barchart(data) {
         .attr("transform", "translate(" + margin2.left + "," + margin2.top + ")");
 
 
-       /* Adjust width / height of clip path */
+    /* Adjust width / height of clip path */
     d3.select("#my-clip-path").select("rect")
       .attr("width",width)
       .attr("height",height)
@@ -140,7 +140,7 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height2 - scale.y2(d.Prob)
-            });
+            })
 
         sPoints.merge(newsPoints)
             .transition().duration(1000)
