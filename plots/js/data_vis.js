@@ -9,9 +9,9 @@
         console.log("Starting DAPI")
         dapi(data);
         console.log("Starting Scatter")
-        initChart(data);
+        mydata = initChart(data);
         console.log("Starting dt")
-        dt(data)
+        //dt(mydata)
         console.log("Done!!")
         });
 

@@ -200,173 +200,196 @@ function initChart(data) {
                 .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
                 .replace(/,/g, '<br>'));
 
-            var data = [];
-            data.push({
-                Num: d.Cell_Num,
-                X: d.x,
-                Y: d.y,
-              });
-//            for(let i = 0;i < 100; i++){
-//              data.push({
-//                Num: d.Cell_Num
-//                X: Math.random()*10,
-//                Y: 'test' + i
-//              })
-
-
-
-
-            //    svg2width = width + padding.right + padding.left
-            //    svg2height = height + padding.top + padding.bottom
-            //
-            //    // set the ranges
-            //    var x = d3.scaleBand()
-            //        .range([0, svg2width])
-            //        .padding(0.1);
-            //    var y = d3.scaleLinear()
-            //        .range([svg2height, 0])
-            //
-            //    x.domain(data.map(function(d,i) { return i; }));
-            //    y.domain([0, d3.max(d, function(d){return d.Prob;})]);
-            //
-            //    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
-            //    svg2 = d3.select('#dc-pie-graph').select('svg')
-            //        .attr("width", width + padding.right + padding.left)
-            //        .attr("height", height + padding.top + padding.bottom)
-            //        .append("g")
-            //       .attr("transform",
-            //          "translate(" + padding.left + "," + padding.top + ")");;
-            //
-            //    var mybars = svg2.selectAll("rect").data(d)
-            //    var barPadding = 5;
-            //    var barWidth = (svg2width / d.Prob.length);
-            //
-            //    mybars.enter().append("rect")
-            //    .attr("y", function(d){return y(d.Prob);})
-            //    .attr("height", function(d) { return height - d.Prob; })
-            //    .attr("width", barWidth - barPadding)
-            //
-            //    mybars.exit().remove()
-
-
-        }
-    }
-
-    // callback for when the mouse moves across the overlay
-    function mouseMoveHandler() {
-        // get the current mouse position
-        const [mx, my] = d3.mouse(this);
-
-        // use the new diagram.find() function to find the voronoi site closest to
-        // the mouse, limited by max distance defined by voronoiRadius
-        //const site = voronoiDiagram.find(mx, my, voronoiRadius);
-        const site = voronoiDiagram.find(mx, my);
-
-        // highlight the point if we found one, otherwise hide the highlight circle
-        highlight(site && site.data);
-
-
-        let sdata = []
-        for (let i = 0; i < site.data.Prob.length; i++) {
-            sdata.push({
-                Prob: site.data.Prob[i],
-                labels: site.data.ClassName[i]
-            })
-        }
-        document.getElementById("xValue").value = site.data.X
-        document.getElementById("yValue").value = site.data.Y
-        var evtx = new CustomEvent('change');
-        document.getElementById('xValue').dispatchEvent(evtx);
-        var evty = new CustomEvent('change');
-        document.getElementById('yValue').dispatchEvent(evty);
-        barchart(sdata)
-        piechart(sdata)
-        //map(sdata)
-    }
-
-    // add the overlay on top of everything to take the mouse events
-    g.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', plotAreaWidth)
-        .attr('height', plotAreaHeight)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        .on('click', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            //highlight(null);
-        });
-
-
-    // ----------------------------------------------------
-    // Add a fun click handler to reveal the details of what is happening
-    // ----------------------------------------------------
-
-    /**
-     * Add/remove a visible voronoi diagram and a circle indicating the radius used
-     * in the voronoi find function
-     */
-    function toggleVoronoiDebug() {
-        // remove if there
-        if (!g.select('.voronoi-polygons').empty()) {
-            g.select('.voronoi-polygons').remove();
-            g.select('.voronoi-radius-circle').remove();
-            g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
-            // otherwise, add the polygons in
-        } else {
-            // add a circle to follow the mouse to draw the voronoi radius
-            g.append('circle')
-                .attr('class', 'voronoi-radius-circle')
-                .attr('r', voronoiRadius)
-                .style('fill', 'none')
-                .style('stroke', 'tomato')
-                .style('stroke-dasharray', '3,2')
-                .style('display', 'none');
-
-
-            // move the voronoi radius mouse circle with the mouse
-            g.select('.overlay')
-                .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
-                    const [mx, my] = d3.mouse(this);
-                    d3.select('.voronoi-radius-circle')
-                        .style('display', '')
-                        .attr('cx', mx)
-                        .attr('cy', my);
+            var mydata = [];
+//            mydata.push({
+//                Num: d.Cell_Num,
+//                X: d.x,
+//                Y: d.y,
+//            });
+//            
+            var n = d3.max([d.CellGeneCount.length, d.Cell_Num.length, d.ClassName.length, d.Genenames.length, d.Prob.length]);
+            for (i = 0; i < n; i++) {
+                mydata.push({
+//                    Num: d.Cell_Num,
+//                    X: d.x,
+//                    Y: d.y,
+//                    "CellGeneCount": d[0].CellGeneCount,
+//                    "Cell_Num": d[0].Cell_Num,
+                    "CellGeneCount": (d.CellGeneCount[i] === undefined)? "": d.CellGeneCount[i],
+                    "ClassName": (d.ClassName[i] === undefined)? "": d.ClassName[i],
+                    "Genenames": (d.Genenames[i] === undefined)? "": d.Genenames[i],
+                    "Prob": (d.Prob[i] === undefined)? "": d.Prob[i],
                 })
-                .on('mouseleave.voronoi', () => {
-                    d3.select('.voronoi-radius-circle').style('display', 'none');
+            }
+
+
+                $(document).ready(function () {
+                    $('#dt').DataTable({
+                        data: mydata,
+                        columns: [
+                            {title: "Gene Names", data: "Genenames"},
+                            {title: "Cell Gene Count", data: "CellGeneCount"},
+                            {title: "Class Name", data: "ClassName"},
+                            {title: "Prob", data: "Prob"},
+		              ]
+                    });
                 });
 
 
-            // draw the polygons
-            const voronoiPolygons = g.append('g')
-                .attr('class', 'voronoi-polygons')
-                .style('pointer-events', 'none');
 
-            const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
-            binding.enter().append('path')
-                .style('stroke', 'tomato')
-                .style('fill', 'none')
-                .style('opacity', 0.15)
-                .attr('d', d => `M${d.join('L')}Z`);
+
+                //    svg2width = width + padding.right + padding.left
+                //    svg2height = height + padding.top + padding.bottom
+                //
+                //    // set the ranges
+                //    var x = d3.scaleBand()
+                //        .range([0, svg2width])
+                //        .padding(0.1);
+                //    var y = d3.scaleLinear()
+                //        .range([svg2height, 0])
+                //
+                //    x.domain(data.map(function(d,i) { return i; }));
+                //    y.domain([0, d3.max(d, function(d){return d.Prob;})]);
+                //
+                //    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
+                //    svg2 = d3.select('#dc-pie-graph').select('svg')
+                //        .attr("width", width + padding.right + padding.left)
+                //        .attr("height", height + padding.top + padding.bottom)
+                //        .append("g")
+                //       .attr("transform",
+                //          "translate(" + padding.left + "," + padding.top + ")");;
+                //
+                //    var mybars = svg2.selectAll("rect").data(d)
+                //    var barPadding = 5;
+                //    var barWidth = (svg2width / d.Prob.length);
+                //
+                //    mybars.enter().append("rect")
+                //    .attr("y", function(d){return y(d.Prob);})
+                //    .attr("height", function(d) { return height - d.Prob; })
+                //    .attr("width", barWidth - barPadding)
+                //
+                //    mybars.exit().remove()
+
+
+            }
         }
+
+        // callback for when the mouse moves across the overlay
+        function mouseMoveHandler() {
+            // get the current mouse position
+            const [mx, my] = d3.mouse(this);
+
+            // use the new diagram.find() function to find the voronoi site closest to
+            // the mouse, limited by max distance defined by voronoiRadius
+            //const site = voronoiDiagram.find(mx, my, voronoiRadius);
+            const site = voronoiDiagram.find(mx, my);
+
+            // highlight the point if we found one, otherwise hide the highlight circle
+            highlight(site && site.data);
+
+
+            let sdata = []
+            for (let i = 0; i < site.data.Prob.length; i++) {
+                sdata.push({
+                    Prob: site.data.Prob[i],
+                    labels: site.data.ClassName[i]
+                })
+            }
+            document.getElementById("xValue").value = site.data.X
+            document.getElementById("yValue").value = site.data.Y
+            var evtx = new CustomEvent('change');
+            document.getElementById('xValue').dispatchEvent(evtx);
+            var evty = new CustomEvent('change');
+            document.getElementById('yValue').dispatchEvent(evty);
+            barchart(sdata)
+            piechart(sdata)
+            //map(sdata)
+        }
+
+        // add the overlay on top of everything to take the mouse events
+        g.append('rect')
+            .attr('class', 'overlay')
+            .attr('width', plotAreaWidth)
+            .attr('height', plotAreaHeight)
+            .style('fill', 'red')
+            .style('opacity', 0)
+            .on('click', mouseMoveHandler)
+            .on('mouseleave', () => {
+                // hide the highlight circle when the mouse leaves the chart
+                //highlight(null);
+            });
+
+
+        // ----------------------------------------------------
+        // Add a fun click handler to reveal the details of what is happening
+        // ----------------------------------------------------
+
+        /**
+         * Add/remove a visible voronoi diagram and a circle indicating the radius used
+         * in the voronoi find function
+         */
+        function toggleVoronoiDebug() {
+            // remove if there
+            if (!g.select('.voronoi-polygons').empty()) {
+                g.select('.voronoi-polygons').remove();
+                g.select('.voronoi-radius-circle').remove();
+                g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
+                // otherwise, add the polygons in
+            } else {
+                // add a circle to follow the mouse to draw the voronoi radius
+                g.append('circle')
+                    .attr('class', 'voronoi-radius-circle')
+                    .attr('r', voronoiRadius)
+                    .style('fill', 'none')
+                    .style('stroke', 'tomato')
+                    .style('stroke-dasharray', '3,2')
+                    .style('display', 'none');
+
+
+                // move the voronoi radius mouse circle with the mouse
+                g.select('.overlay')
+                    .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
+                        const [mx, my] = d3.mouse(this);
+                        d3.select('.voronoi-radius-circle')
+                            .style('display', '')
+                            .attr('cx', mx)
+                            .attr('cy', my);
+                    })
+                    .on('mouseleave.voronoi', () => {
+                        d3.select('.voronoi-radius-circle').style('display', 'none');
+                    });
+
+
+                // draw the polygons
+                const voronoiPolygons = g.append('g')
+                    .attr('class', 'voronoi-polygons')
+                    .style('pointer-events', 'none');
+
+                const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
+                binding.enter().append('path')
+                    .style('stroke', 'tomato')
+                    .style('fill', 'none')
+                    .style('opacity', 0.15)
+                    .attr('d', d => `M${d.join('L')}Z`);
+            }
+        }
+
+        // turn on and off voronoi debugging with click
+        //svg.on('click', toggleVoronoiDebug);
+
+        function onDoubleClick() {
+            d3.select('.highlight-circle').style('display', 'none');
+            highlightOutput.text('');
+            highlightOutput2.text('');
+            highlightOutput3.text('');
+            highlightOutput4.text('');
+            highlightOutput5.text('');
+
+            svg2.selectAll("*").remove()
+
+
+        }
+        svg.on('dblclick', onDoubleClick);
+
+
     }
-
-    // turn on and off voronoi debugging with click
-    //svg.on('click', toggleVoronoiDebug);
-
-    function onDoubleClick() {
-        d3.select('.highlight-circle').style('display', 'none');
-        highlightOutput.text('');
-        highlightOutput2.text('');
-        highlightOutput3.text('');
-        highlightOutput4.text('');
-        highlightOutput5.text('');
-
-        svg2.selectAll("*").remove()
-
-
-    }
-    svg.on('dblclick', onDoubleClick);
-
-}
