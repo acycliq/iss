@@ -223,17 +223,33 @@ function initChart(data) {
             }
 
 
-                $(document).ready(function () {
-                    $('#dt').DataTable({
-                        data: mydata,
-                        columns: [
+            
+            
+            if ( $.fn.dataTable.isDataTable( '#dt' ) ) {
+                table = $('#dt').DataTable();
+                table.clear().rows.add(mydata).draw();
+            }
+            else {
+                    table = $('#dt').DataTable({
+                        //bFilter: false,
+                        "lengthChange": false,
+                        searching: false,
+                        //"scrollY":        "200px",
+                        //"scrollCollapse": true,
+                        "paging":         true,
+                        //dom: 't',
+                        "data": mydata,
+                        "columns": [
                             {title: "Gene Names", data: "Genenames"},
                             {title: "Cell Gene Count", data: "CellGeneCount"},
                             {title: "Class Name", data: "ClassName"},
                             {title: "Prob", data: "Prob"},
 		              ]
                     });
-                });
+            }
+
+
+
 
 
 
