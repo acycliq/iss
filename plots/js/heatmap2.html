@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <style class="cp-pen-styles">
+        .container {
+            text-align: center;
+        }
+
+        .footer {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            /* Set the fixed height of the footer here */
+            height: 80px;
+            background-color: #f5f5f5;
+            text-align: center;
+            background-color: steelblue;
+            line-height: 70%;
+
+
+        }
+
+        .row {
+            margin-top: 50px;
+        }
+
+        .footer .container-fluid {
+            margin-top: 10px;
+            color: white;
+        }
+
+        .page-header {
+            margin-top: 10px;
+        }
+
+        .myrect {
+            padding: 0px;
+            /* fill: red;*/
+            stroke-width: 0px;
+            stroke: white;
+            shape-rendering: crispEdges;
+        }
+
+        #tooltip {
+            position: absolute;
+            background-color: #2B292E;
+            color: white;
+            font-family: sans-serif;
+            font-size: 15px;
+            pointer-events: none;
+            /*dont trigger events on the tooltip*/
+            padding: 15px 20px 10px 20px;
+            text-align: center;
+            opacity: 0;
+            border-radius: 4px;
+        }
+
+        .axis text {
+            font-family: sans-serif;
+            font-size: 14px;
+        }
+        
+        #chartDiv {
+			width: 600px;
+			height: 600px;
+		}
+    </style>
+
+</head>
+
+<body>
+    <div class="container">
+  
+        <div class="row">
+
+            <div class="col-md-10 offset-md-1 col-xs-10 offset-xs-1" id="chartDiv">
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div id="tooltip">Tooltip</div>
+
+    <!--    <script src='//static.codepen.io/assets/common/stopExecutionOnTimeout-41c52890748cd7143004e05d3c5f786c66b19939c4500ce446314d1748483e13.js'></script>-->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/d3/4.5.0/d3.min.js'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src='https://d3js.org/d3-scale-chromatic.v1.min.js'></script>
+    <script src='heatmap2.js'></script>
+    <script>
+        var monthlyVariance = [{
+      "year": 1753,
+      "month": 1,
+      "variance": -1.366
+    },
+    {
+      "year": 1753,
+      "month": 2,
+      "variance": -2.223
+    },
+    {
+      "year": 1753,
+      "month": 3,
+      "variance": 0.211
+    },
+    {
+      "year": 1753,
+      "month": 4,
+      "variance": -0.958
+    },
+    {
+      "year": 1753,
+      "month": 5,
+      "variance": 0.175
+    },
+    {
+      "year": 1753,
+      "month": 6,
+      "variance": 1.049
+    },
+    {
+      "year": 1753,
+      "month": 7,
+      "variance": 0.464
+    },
+    {
+      "year": 1753,
+      "month": 8,
+      "variance": -0.526
+    },
+    {
+      "year": 1753,
+      "month": 9,
+      "variance": 0.470
+    },
+    {
+      "year": 1753,
+      "month": 10,
+      "variance": -0.610
+    },
+    {
+      "year": 1753,
+      "month": 11,
+      "variance": -1.452
+    },
+    {
+      "year": 1753,
+      "month": 12,
+      "variance": -4.256
+    },
+    {
+      "year": 1754,
+      "month": 1,
+      "variance": -1.748
+    },
+    {
+      "year": 1754,
+      "month": 2,
+      "variance": -4.175
+    },
+    {
+      "year": 1754,
+      "month": 3,
+      "variance": -1.448
+    },
+    {
+      "year": 1754,
+      "month": 4,
+      "variance": 2.672
+    },
+    {
+      "year": 1754,
+      "month": 5,
+      "variance": -0.031
+    },
+    {
+      "year": 1754,
+      "month": 6,
+      "variance": 0.826
+    },
+    {
+      "year": 1754,
+      "month": 7,
+      "variance": 0.082
+    },
+    {
+      "year": 1754,
+      "month": 8,
+      "variance": -1.308
+    },
+    {
+      "year": 1754,
+      "month": 9,
+      "variance": -1.773
+    },
+    {
+      "year": 1754,
+      "month": 10,
+      "variance": 0.134
+    },
+    {
+      "year": 1754,
+      "month": 11,
+      "variance": -0.629
+    },
+    {
+      "year": 1754,
+      "month": 12,
+      "variance": -0.362
+    },
+    {
+      "year": 1755,
+      "month": 1,
+      "variance": -2.384
+    },
+    {
+      "year": 1755,
+      "month": 2,
+      "variance": -2.962
+    },
+    {
+      "year": 1755,
+      "month": 3,
+      "variance": -1.498
+    },
+    {
+      "year": 1755,
+      "month": 4,
+      "variance": 0.084
+    },
+    {
+      "year": 1755,
+      "month": 5,
+      "variance": 0.784
+    },
+    {
+      "year": 1755,
+      "month": 6,
+      "variance": 1.872
+    },
+    {
+      "year": 1755,
+      "month": 7,
+      "variance": -0.270
+    },
+    {
+      "year": 1755,
+      "month": 8,
+      "variance": -1.369
+    },
+    {
+      "year": 1755,
+      "month": 9,
+      "variance": -1.096
+    },
+    {
+      "year": 1755,
+      "month": 10,
+      "variance": 0.610
+    },
+    {
+      "year": 1755,
+      "month": 11,
+      "variance": -0.772
+    },
+    {
+      "year": 1755,
+      "month": 12,
+      "variance": -2.551
+    },
+    {
+      "year": 1756,
+      "month": 1,
+      "variance": 0.554
+    },
+    {
+      "year": 1756,
+      "month": 2,
+      "variance": 2.772
+    },
+    {
+      "year": 1756,
+      "month": 3,
+      "variance": -0.995
+    },
+    {
+      "year": 1756,
+      "month": 4,
+      "variance": 0.940
+    },
+    {
+      "year": 1756,
+      "month": 5,
+      "variance": 2.365
+    },
+    {
+      "year": 1756,
+      "month": 6,
+      "variance": 1.066
+    },
+    {
+      "year": 1756,
+      "month": 7,
+      "variance": -0.741
+    },
+    {
+      "year": 1756,
+      "month": 8,
+      "variance": -1.481
+    },
+    {
+      "year": 1756,
+      "month": 9,
+      "variance": -0.221
+    },
+    {
+      "year": 1756,
+      "month": 10,
+      "variance": -2.177
+    },
+    {
+      "year": 1756,
+      "month": 11,
+      "variance": -2.535
+    },
+    {
+      "year": 1756,
+      "month": 12,
+      "variance": -3.079
+    },
+    {
+      "year": 1757,
+      "month": 1,
+      "variance": -3.552
+    },
+    {
+      "year": 1757,
+      "month": 2,
+      "variance": 0.885
+    },
+    {
+      "year": 1757,
+      "month": 3,
+      "variance": -0.588
+    },
+    {
+      "year": 1757,
+      "month": 4,
+      "variance": -0.904
+    },
+    {
+      "year": 1757,
+      "month": 5,
+      "variance": 0.943
+    },
+    {
+      "year": 1757,
+      "month": 6,
+      "variance": 3.635
+    },
+    {
+      "year": 1757,
+      "month": 7,
+      "variance": 3.031
+    },
+    {
+      "year": 1757,
+      "month": 8,
+      "variance": 2.942
+    },
+    {
+      "year": 1757,
+      "month": 9,
+      "variance": 1.807
+    },
+    {
+      "year": 1757,
+      "month": 10,
+      "variance": -3.128
+    },
+    {
+      "year": 1757,
+      "month": 11,
+      "variance": -2.799
+    },
+    {
+      "year": 1757,
+      "month": 12,
+      "variance": -4.085
+    },
+    {
+      "year": 1758,
+      "month": 1,
+      "variance": -5.045
+    },
+    {
+      "year": 1758,
+      "month": 2,
+      "variance": -2.020
+    },
+    {
+      "year": 1758,
+      "month": 3,
+      "variance": -1.596
+    },
+    {
+      "year": 1758,
+      "month": 4,
+      "variance": -2.015
+    },
+    {
+      "year": 1758,
+      "month": 5,
+      "variance": -2.437
+    },
+    {
+      "year": 1758,
+      "month": 6,
+      "variance": -0.572
+    },
+    {
+      "year": 1758,
+      "month": 7,
+      "variance": -0.952
+    },
+    {
+      "year": 1758,
+      "month": 8,
+      "variance": -2.996
+    },
+    {
+      "year": 1758,
+      "month": 9,
+      "variance": -2.763
+    },
+    {
+      "year": 1758,
+      "month": 10,
+      "variance": -6.976
+    },
+    {
+      "year": 1758,
+      "month": 11,
+      "variance": 0.036
+    },
+    {
+      "year": 1758,
+      "month": 12,
+      "variance": -1.591
+    },
+    {
+      "year": 1759,
+      "month": 1,
+      "variance": 1.665
+    },
+    {
+      "year": 1759,
+      "month": 2,
+      "variance": 0.791
+    },
+    {
+      "year": 1759,
+      "month": 3,
+      "variance": -0.933
+    },
+    {
+      "year": 1759,
+      "month": 4,
+      "variance": -3.226
+    },
+    {
+      "year": 1759,
+      "month": 5,
+      "variance": -1.923
+    },
+    {
+      "year": 1759,
+      "month": 6,
+      "variance": -0.250
+    },
+    {
+      "year": 1759,
+      "month": 7,
+      "variance": -2.330
+    },
+    {
+      "year": 1759,
+      "month": 8,
+      "variance": -0.139
+    },
+    {
+      "year": 1759,
+      "month": 9,
+      "variance": -0.204
+    },
+    {
+      "year": 1759,
+      "month": 10,
+      "variance": -1.408
+    },
+    {
+      "year": 1759,
+      "month": 11,
+      "variance": -2.637
+    },
+    {
+      "year": 1759,
+      "month": 12,
+      "variance": -4.660
+    },
+   
+        ];
+        
+        heatmap2(monthlyVariance)
+    </script>
+</body>
+
+</html>
