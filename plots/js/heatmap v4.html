@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <style>
+        .axis text {
+            font: 10px sans-serif;
+        }
+
+        .axis path,
+        .axis line {
+            fill: none;
+            stroke: #000000;
+        }
+
+        .x.axis path {
+            //display: none;
+        }
+
+        .chart rect {
+            fill: steelblue;
+        }
+
+        .chart text {
+            fill: white;
+            font: 10px sans-serif;
+            text-anchor: end;
+        }
+        
+        #tooltip {
+          position:absolute;
+          background-color: #2B292E;
+          color: white;
+          font-family: sans-serif;
+          font-size: 15px;
+          pointer-events: none; /*dont trigger events on the tooltip*/
+          padding: 15px 20px 10px 20px;
+          text-align: center;
+          opacity: 0;
+          border-radius: 4px;
+        }
+    </style>
+    <title>Bar Chart</title>
+
+    <!-- Reference style.css -->
+    <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
+
+    <!-- Reference minified version of D3 -->
+    <script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+</head>
+
+<body>
+    <div id="chart" style="width: 700px; height: 500px"></div>
+    <script>
+        var dataset = [];
+        for (let i = 1; i < 360; i++) {
+            for (j = 1; j < 75; j++) {
+                dataset.push({
+                    day: i,
+                    hour: j,
+                    tOutC: Math.random() * 25,
+                })
+            }
+        };
+
+
+        var days = d3.max(dataset, function(d) {
+                return d.day;
+            }) -
+            d3.min(dataset, function(d) {
+                return d.day;
+            });
+        var hours = d3.max(dataset, function(d) {
+                return d.hour;
+            }) -
+            d3.min(dataset, function(d) {
+                return d.hour;
+            });
+
+        var tMin = d3.min(dataset, function(d) {
+                return d.tOutC;
+            }),
+            tMax = d3.max(dataset, function(d) {
+                return d.tOutC;
+            });
+
+        var dotWidth = 1,
+            dotHeight = 3,
+            dotSpacing = 0.5;
+
+        var margin = {
+                top: 0,
+                right: 25,
+                bottom: 40,
+                left: 25
+            },
+            width = (dotWidth * 2 + dotSpacing) * days,
+            height = (dotHeight * 2 + dotSpacing) * hours; 
+
+
+        var colors = ['#2C7BB6', '#00A6CA','#00CCBC','#90EB9D','#FFFF8C','#F9D057','#F29E2E','#E76818','#D7191C'];
+
+        var xScale = d3.scaleLinear()
+            .domain(d3.extent(dataset, function(d){return d.day}))
+            .range([0, width]);
+
+        var yScale = d3.scaleLinear()
+            .domain(d3.extent(dataset, function(d){return d.hour}))
+            .range([(dotHeight * 2 + dotSpacing) * hours, dotHeight * 2 + dotSpacing]);
+
+        var colorScale = d3.scaleQuantile()
+            .domain([0, colors.length - 1, d3.max(dataset, function(d) {
+                return d.tOutC;
+            })])
+            .range(colors);
+
+        var xAxis = d3.axisBottom().scale(xScale);
+
+
+
+        // Define Y axis
+        var yAxis = d3.axisLeft().scale(yScale);
+
+
+        var zoom = d3.zoom()
+            .scaleExtent([dotWidth, dotHeight])
+            .translateExtent([
+                [80, 20],
+                [width, height]
+            ])
+            .on("zoom", zoomed);
+
+        var tooltip = d3.select("body").append("div")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
+
+        // SVG canvas
+        var svg = d3.select("#chart")
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .call(zoom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Clip path
+        svg.append("clipPath")
+            .attr("id", "clip")
+            .append("rect")
+            .attr("width", width)
+            .attr("height", height);
+
+
+        // Heatmap dots
+        svg.append("g")
+            .attr("clip-path", "url(#clip)")
+            .selectAll("ellipse")
+            .data(dataset)
+            .enter()
+            .append("ellipse")
+            .attr("cx", function(d) {
+                return xScale(d.day);
+            })
+            .attr("cy", function(d) {
+                return yScale(d.hour);
+            })
+            .attr("rx", dotWidth)
+            .attr("ry", dotHeight)
+            .attr("fill", function(d) {
+                return colorScale(d.tOutC);
+            })
+            .on("mouseover", function(d){
+                $("#tooltip").html("X: "+d.day+"<br/>Y:"+d.hour+"<br/>Value:"+Math.round(d.tOutC*100)/100);
+                var xpos = d3.event.pageX +10;
+                var ypos = d3.event.pageY +20;
+                $("#tooltip").css("left",xpos+"px").css("top",ypos+"px").animate().css("opacity",1);
+            }).on("mouseout", function(){
+                $("#tooltip").animate({duration: 500}).css("opacity",0);
+            }); 
+
+        //Create X axis
+        var renderXAxis = svg.append("g")
+            .attr("class", "x axis")
+            .attr("transform", "translate(0," + yScale(0) + ")")
+            .call(xAxis)
+
+        //Create Y axis
+        var renderYAxis = svg.append("g")
+            .attr("class", "y axis")
+            .call(yAxis);
+
+
+        function zoomed() {
+            // update: rescale x axis
+            renderXAxis.call(xAxis.scale(d3.event.transform.rescaleX(xScale)));
+
+            update();
+        }
+
+        function update() {
+            // update: cache rescaleX value
+            var rescaleX = d3.event.transform.rescaleX(xScale);
+            svg.selectAll("ellipse")
+                .attr('clip-path', 'url(#clip)')
+                // update: apply rescaleX value
+                .attr("cx", function(d) {
+                    return rescaleX(d.day);
+                })
+//                .attr("cy", function(d) {
+//                    return yScale(d.hour);
+//                })
+                // update: apply rescaleX value
+                .attr("rx", function(d) {
+                    return (dotWidth * d3.event.transform.k);
+                })
+                .attr("fill", function(d) {
+                    return colorScale(d.tOutC);
+                });
+        }
+        
+
+        
+        
+    </script>
+</body>
+
+</html>
