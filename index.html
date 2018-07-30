@@ -1,11 +1,265 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    hello
+    <meta charset='utf-8'>
+    <style type="text/css">
+        body .container {
+            min-width: 90%;
+            padding: 0 15px;
+            margin: 0 -15px;
+        }
+
+        html {
+            min-height: 101%;
+        }
+
+        .bar {
+            fill: steelblue;
+        }
+
+        #map {
+            height: 485px;
+        }
+
+        th {
+            font-size: 12px;
+        }
+
+        td {
+            font-size: 11px;
+        }
+
+        .dataTables_wrapper { font-size: 10px }
+
+        #tooltip {
+          position:absolute;
+          background-color: #2B292E;
+          color: white;
+          font-family: sans-serif;
+          font-size: 15px;
+          pointer-events: none; /*dont trigger events on the tooltip*/
+          padding: 15px 20px 10px 20px;
+          text-align: center;
+          opacity: 0;
+          border-radius: 4px;
+        }
+    </style>
+
+    <title>Dashboard</title>
+
+
+
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./lib/css/keen-dashboards.css">
+    <link rel="stylesheet" href="./lib/css/dc.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
+    <link rel="stylesheet" href="./lib/css/custom.css">
+    <link rel="stylesheet" href="https://mrmufflon.github.io/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.3.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
+
+
+    <script src="./lib/js/jquery.min.js"></script>
+    <script src="./lib/js/bootstrap.min.js"></script>
+    <script src="./lib/js/underscore-min.js"></script>
+    <script src="./lib/js/crossfilter.js"></script>
+    <!--    <script src="../lib/js/d3.min.js"></script>-->
+    <script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
+    <script src="./lib/js/dc.min.js"></script>
+    <script src="./lib/js/queue.js"></script>
+    <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
+    <script src="./lib/js/keen.min.js"></script>
+    <script src="https://mrmufflon.github.io/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.3.src.js" charset="utf-8"></script>
+    <script type="text/javascript" language="javascript" src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    <script type="text/javascript" language="javascript" src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+
+
+    <script src='./plots/js/data_vis.js' type='text/javascript'></script>
+    <script src='./plots/js/scatter.js' type='text/javascript'></script>
+    <script src='./plots/js/barchart.js' type='text/javascript'></script>
+    <script src='./plots/js/piechart.js' type='text/javascript'></script>
+    <script src='./plots/js/heatmap.js' type='text/javascript'></script>
+    <script src='./plots/js/dt.js' type='text/javascript'></script>
+    <script src='./plots/js/dapi.js' type='text/javascript'></script>
+
 </head>
-<body>
+
+<body class="application">
+
+    <form id="mapCenterForm">
+        <input type="hidden" id="xValue" />
+        <input type="hidden" id="yValue" />
+    </form>
+
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="container-fluid">
+            <div class="navbar-header" style="background-color:skyblue">
+                <a class="navbar-brand" href="./">Cell Mapping Visualization</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container-fluid">
+
+        <div class="row">
+
+            <div class="col-sm-6">
+                <div class="row">
+
+                    <!-- Scatter Plot -->
+                    <div class="col-sm-12">
+                        <div class="chart-wrapper">
+                            <div class="chart-title">
+                                Some title
+                            </div>
+                            <div class="chart-stage">
+                                <div id="scatter-plot">
+                                    <svg></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Scatter Plot -->
+
+                    <!-- Bar Chart -->
+                    <div class="col-sm-8">
+                        <div class="chart-wrapper">
+                            <div class="chart-title">
+                                Bar Chart
+                            </div>
+                            <div class="chart-stage" id="bar-chart">
+                                <svg width="550" height="300">
+                                    <!-- Add a clip path -->
+                                 <defs>
+                                   <clipPath id="my-clip-path">
+                                       <rect></rect>
+                                   </clipPath>
+                                 </defs>
+                                <g class="focus">
+                                    <g class="axis"></g>
+                                    <g class="axis axis--y"></g>
+                                </g>
+                                <g class="context">
+                                    <g class="axis2"></g>
+                                    <g class="brush"></g>
+                                </g>
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Bar Chart -->
+
+
+                    <div class="col-sm-4">
+
+                        <div class="row">
+                            <!-- Pie Chart -->
+                            <div class="col-sm-12" style="background-color:lavender">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title">
+                                        Some title
+                                    </div>
+                                    <div class="chart-stage" id="pie">
+                                        <svg></svg>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Pie Chart -->
+
+                        <!-- 2nd Chart below Pie chart-->
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="chart-wrapper">
+                                    <div class="chart-title" style="background-color:indianred">
+                                        Some text goes here
+                                    </div>
+                                    <div class="chart-stage">
+                                        <div id="age-segment-row-chart"></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- 2nd Chart below Pie chart -->
+                        </div>
+                    </div>
+
+
+                </div>
+            </div>
+
+
+            <div class="col-sm-2">
+                <div class="row">
+
+                    <!-- Blah blah -->
+                    <div class="col-sm-12">
+                        <div class="chart-wrapper">
+                            <div class="chart-title">
+                                Heatmap
+                            </div>
+                            <div class="chart-stage">
+                                <div id="heat-chart">
+                                    <svg width="250" height="780"></svg>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Blah blah-->
+                </div>
+            </div>
+
+
+            <div class="col-sm-4">
+                <div class="row">
+                    <!-- Map -->
+                    <div class="col-sm-12">
+                        <div class="chart-wrapper">
+                            <div class="chart-title">
+                                DAPI
+                            </div>
+                            <div class="chart-stage">
+                                <div id="map" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Map -->
+                </div>
+
+                <div class="row">
+                    <!-- Datatable -->
+                    <div class="col-sm-12">
+                        <div class="chart-wrapper">
+                            <div class="chart-title" id="dtTitle">
+                                Title
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="chart-stage">
+                                    <table id="dtTable" class="display compact custom" ; width=100%></table>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="chart-stage">
+                                    <table id="dtTable2" class="display compact custom" ; width=100%></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Datatable -->
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <hr>
+    <p class="small text-muted">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
+
+
 
 </body>
+
 </html>
