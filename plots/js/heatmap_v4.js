@@ -23,26 +23,15 @@ function heatmap(dataset) {
         }
     };
 
+    var margin = {top: 0, right: 25,
+                  bottom: 110, left: 75};  
 
-    
-var margin = {
-            top: 0,
-            right: 25,
-            bottom: 40,
-            left: 75
-        };  
-    
-var width = +svg.attr("width") - margin.left - margin.right,
-    height = +svg.attr("height") - margin.top - margin.bottom;
+    var width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
 
-var dotSpacing = 0,
-    dotWidth = width/(2*(xLabels.length+1)),
-    dotHeight = height/(2*yLabels.length);
-
-//    var dotWidth = 1,
-//        dotHeight = 3,
-//        dotSpacing = 0.5;
-    
+    var dotSpacing = 0,
+        dotWidth = width/(2*(xLabels.length+1)),
+        dotHeight = height/(2*yLabels.length);
 
     var daysRange = d3.extent(dataset, function (d) {return d.xKey}),
         days = daysRange[1] - daysRange[0];
@@ -54,20 +43,15 @@ var dotSpacing = 0,
         tMin = tRange[0],
         tMax = tRange[1];
 
-//    var width = (dotWidth * 2 + dotSpacing) * days,
-//        height = (dotHeight * 2 + dotSpacing) * hours;
-//    var width = +svg.attr("width") - margin.left - margin.right,
-//        height = +svg.attr("height") - margin.top - margin.bottom;
-
     var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
     
     // the scale
     var scale = {
         x: d3.scaleLinear()
-            .domain([-1, d3.max(dataset, d => d.xKey)])
+            //.domain([-1, d3.max(dataset, d => d.xKey)])
             .range([-1, width]),
         y: d3.scaleLinear()
-            .domain([0, d3.max(dataset, d => d.yKey)])
+            //.domain([0, d3.max(dataset, d => d.yKey)])
             .range([height, 0]),
             //.range([(dotHeight * 2 + dotSpacing) * hours, dotHeight * 2 + dotSpacing]),
     };
@@ -89,8 +73,6 @@ var dotSpacing = 0,
     var colorScale = d3.scaleQuantile()
         .domain([0, colors.length - 1, d3.max(dataset, function (d) {return d.val;})])
         .range(colors);
-
-
 
     var zoom = d3.zoom()
         .scaleExtent([1, dotHeight])
@@ -121,15 +103,13 @@ var dotSpacing = 0,
         .attr("clip-path", "url(#clip)")
         .append("g");
         
-//        heatDotsGroup.call(zoom);
-
     
 
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + scale.y(-1) + ")")
-        .call(axis.x)
+        //.attr("transform", "translate(0," + scale.y(-0.5) + ")")
+        //.call(axis.x)
 
     //Create Y axis
     var renderYAxis = svg.append("g")
@@ -141,20 +121,27 @@ var dotSpacing = 0,
         d3.event.transform.y = 0;
         d3.event.transform.x = Math.min(d3.event.transform.x, 5);
         d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
-        //d3.event.transform.k = Math.max(d3.event.transform.k, 1);
-        console.log(d3.event.transform)
+        // console.log(d3.event.transform)
 
         // update: rescale x axis
         renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
 
+        // Make sure that only the x axis is zoomed
         heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
     }
     
     svg.call(renderPlot, dataset)
     
     function renderPlot(selection, dataset){
-        //updateScales(dataset);
         
+        //Do the axes
+        updateScales(dataset)
+        selection.select('.y.axis').call(axis.y)
+        selection.select('.x.axis')
+                .attr("transform", "translate(0," + scale.y(-0.5) + ")")
+                .call(axis.x)
+        
+        // Do the chart
         heatDotsGroup.selectAll("ellipse")
         .data(dataset)
         .enter()
