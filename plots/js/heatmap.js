@@ -1,128 +1,190 @@
-function heatmap(){
-
-var data=[{week:1,hour:0,value:8.1495,timestamp:"16-07-2014"},{week:1,hour:1,value:8.2288,timestamp:"16-07-2014"},{week:1,hour:2,value:8.3106,timestamp:"16-07-2014"},{week:1,hour:3,value:8.3446,timestamp:"16-07-2014"},{week:1,hour:4,value:18.4695,timestamp:"16-07-2014"},{week:1,hour:5,value:66.46975,timestamp:"16-07-2014"},{week:1,hour:6,value:.000249999999141,timestamp:"16-07-2014"},{week:1,hour:7,value:0,timestamp:"16-07-2014"},{week:1,hour:8,value:0,timestamp:"16-07-2014"},{week:1,hour:9,value:0,timestamp:"16-07-2014"},{week:1,hour:10,value:0,timestamp:"16-07-2014"},{week:1,hour:11,value:0,timestamp:"16-07-2014"},{week:1,hour:12,value:0,timestamp:"16-07-2014"},{week:1,hour:13,value:0,timestamp:"16-07-2014"},{week:1,hour:14,value:0,timestamp:"16-07-2014"},{week:1,hour:15,value:0,timestamp:"16-07-2014"},{week:1,hour:16,value:0,timestamp:"16-07-2014"},{week:1,hour:17,value:0,timestamp:"16-07-2014"},{week:1,hour:18,value:0,timestamp:"16-07-2014"},{week:1,hour:19,value:0,timestamp:"16-07-2014"},{week:1,hour:20,value:5.9575,timestamp:"16-07-2014"},{week:1,hour:21,value:7.89933333333,timestamp:"16-07-2014"},{week:1,hour:22,value:7.92066666667,timestamp:"16-07-2014"},{week:1,hour:23,value:8.00775,timestamp:"16-07-2014"},{week:2,hour:0,value:8.0664,timestamp:"23-07-2014"},{week:2,hour:1,value:8.19825,timestamp:"23-07-2014"},{week:2,hour:2,value:8.307,timestamp:"23-07-2014"},{week:2,hour:3,value:8.36125,timestamp:"23-07-2014"},{week:2,hour:4,value:8.42825,timestamp:"23-07-2014"},{week:2,hour:5,value:7.344,timestamp:"23-07-2014"},{week:2,hour:6,value:0,timestamp:"23-07-2014"},{week:2,hour:7,value:.000200000000768,timestamp:"23-07-2014"},{week:2,hour:8,value:.000199999999313,timestamp:"23-07-2014"},{week:2,hour:9,value:0,timestamp:"23-07-2014"},{week:2,hour:10,value:0,timestamp:"23-07-2014"},{week:2,hour:11,value:0,timestamp:"23-07-2014"},{week:2,hour:12,value:0,timestamp:"23-07-2014"},{week:2,hour:13,value:0,timestamp:"23-07-2014"},{week:2,hour:14,value:0,timestamp:"23-07-2014"},{week:2,hour:15,value:0,timestamp:"23-07-2014"},{week:2,hour:16,value:0,timestamp:"23-07-2014"},{week:2,hour:17,value:0,timestamp:"23-07-2014"},{week:2,hour:18,value:0,timestamp:"23-07-2014"},{week:2,hour:19,value:0,timestamp:"23-07-2014"}];
-
-function parseDate(input) {
-  var parts = input.split('-');
-  // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
-  return new Date(parts[2], parts[1]-1, parts[0]); // Note: months are 0-based
-}
-
-var formatDate = d3.timeFormat("%d-%m-%Y");
-
-for (var i = 0; i < data.length; i++) {
-	data[i]["timestamp"] = parseDate(data[i]["timestamp"]);
-}
-
-var margin = {top: 20, right: 20, bottom: 30, left: 60};
-    var width = 1200 - margin.left - margin.right;
-    var height = 500 - margin.top - margin.bottom;
-    var colors = ["#E0F7FA", "#B2EBF2", "#80DEEA", "#4DD0E1", "#26C6DA", "#00BCD4", "#00ACC1", "#0097A7", "#00838F", "#006064"];
-    var times = ["12a", "1a", "2a", "3a", "4a", "5a", "6a", "7a", "8a", "9a", "10a", "11a", "12p", "1p", "2p", "3p", "4p", "5p", "6p", "7p", "8p", "9p", "10p", "11p"];
-    //var buckets = 10;
-
-    var svg = d3.select(".chart").append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-			var minDate = data[0].timestamp;
-            var maxDate = d3.timeWeek.offset(data[data.length - 1].timestamp, 1);
-
-            var plotArea = svg.append("g")
-                    .attr("clip-path", "url(#plotAreaClip)");
-
-            // update: set widht and height of clippath rect
-            plotArea.append("clipPath")
-                    .attr("id", "plotAreaClip")
-                    .append("rect")
-                    .attr('width', width)
-                    .attr('height', height);
-                    //.attr({width: width, height: height});
-
-            var x = d3.scaleTime()
-                    .range([0, width])
-                    .domain([minDate, maxDate]);
-
-            console.log(x(data[2].timestamp));
-
-            var y = d3.scaleLinear()
-                    .range([height, 0])
-                    .domain([24, 0]);
-
-            var colorScale = d3.scaleQuantile()
-                    .domain([0, colors.length - 1, d3.max(data, function (d) {
-                        return d.value;
-                    })])
-                    .range(colors);
-
-            var xAxis = d3.axisBottom()
-                    .scale(x);
-
-            var yAxis = d3.axisLeft()
-                    .scale(y)
-                    .tickFormat(function (d) {
-                        return times[d];
-                    });
-
-
-
-
-    svg.call(renderPlot, data)
-
-    function renderPlot(selection, data) {
-
-            svg.selectAll(".cell")
-                    .data(data)
-                    .enter().append("rect")
-                    .attr("class", "cell")
-                    .attr("x", function (d) { return x(d.timestamp); })
-                    .attr("y", function (d) { return y(d.hour); })
-                    .attr("width", function (d) { return x(d3.timeWeek.offset(d.timestamp, 1)) - x(d.timestamp); })
-                    .attr("height", function (d) { return y(d.hour + 1) - y(d.hour); })
-                    .attr("fill", function (d) { return colorScale(d.value); });
-
-            var renderXAxis = svg.append("g")
-                    .attr("class", "x axis")
-                    .attr("transform", "translate(0," + height + ")")
-                    .call(xAxis);
-
-            var renderYAxis = svg.append("g")
-                    .attr("class", "y axis")
-                    .call(yAxis);
-        
-        var zoom = d3.zoom()
-                    .scaleExtent([1, 2])
-                    .translateExtent([[80, 20], [width, height]])
-                    .on("zoom", zoomed);
-
-            svg.call(zoom);
-        
-
-
-            function zoomed() {
-                // update: rescale x axis
-                renderXAxis.call(xAxis.scale(d3.event.transform.rescaleX(x)));
-
-                update();
+function heatmap() {
+    
+    var dataset = [];
+        for (let i = 1; i < 360; i++) { //360
+            for (j = 1; j < 7; j++) {  //75
+                dataset.push({
+                    xKey: i,
+                    xLabel: "xMark " + i,
+                    yKey: j,
+                    yLabel: "yMark " + j,
+                    val: Math.random() * 25,
+                    
+                })
             }
-
-            function update() {
-                // update: cache rescaleX value
-                var rescaleX = d3.event.transform.rescaleX(x);
-                svg.selectAll(".cell")
-                        .attr('clip-path', 'url(#plotAreaClip)')
-                        // update: apply rescaleX value
-                        .attr("x", function (d) { return rescaleX(d.timestamp); })
-                        .attr("y", function (d) { return y(d.hour); })
-                        // update: apply rescaleX value
-                        .attr("width", function (d) { return rescaleX(d3.timeWeek.offset(d.timestamp, 1)) - rescaleX(d.timestamp); })
-                        .attr("height", function (d) { return y(d.hour + 1) - y(d.hour); })
-                        .attr("fill", function (d) { return colorScale(d.value); });
+        };
+    
+    
+    var svg = d3.select("#heat-chart").select("svg")
+    
+    var xLabels = [],
+        yLabels = [];
+    for (i = 0; i < dataset.length; i++) {
+        if (i==0){
+            xLabels.push(dataset[i].xLabel);
+            var j = 0;
+            while (dataset[j+1].xLabel == dataset[j].xLabel){
+                yLabels.push(dataset[j].yLabel);
+                j++;
             }
+            yLabels.push(dataset[j].yLabel);
+        } else {
+            if (dataset[i-1].xLabel == dataset[i].xLabel){
+                //do nothing
+            } else {
+                xLabels.push(dataset[i].xLabel);                    
+            }
+        }
+    };
+
+    var margin = {top: 0, right: -40,
+                  bottom: 80, left: 45};  
+
+    var width = +svg.attr("width") - margin.left - margin.right,
+        height = +svg.attr("height") - margin.top - margin.bottom;
+
+    var dotSpacing = 0,
+        dotWidth = width/(2*(xLabels.length+1)),
+        dotHeight = height/(2*yLabels.length);
+
+    var daysRange = d3.extent(dataset, function (d) {return d.xKey}),
+        days = daysRange[1] - daysRange[0];
+    
+    var hoursRange = d3.extent(dataset, function (d) {return d.yKey}),
+        hours = hoursRange[1] - hoursRange[0];    
+    
+    var tRange = d3.extent(dataset, function (d) {return d.val}),
+        tMin = tRange[0],
+        tMax = tRange[1];
+
+    var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
+    
+    // the scale
+    var scale = {
+        x: d3.scaleLinear()
+            //.domain([-1, d3.max(dataset, d => d.xKey)])
+            .range([-1, width]),
+        y: d3.scaleLinear()
+            //.domain([0, d3.max(dataset, d => d.yKey)])
+            .range([height, 0]),
+            //.range([(dotHeight * 2 + dotSpacing) * hours, dotHeight * 2 + dotSpacing]),
+    };
+    
+    var xBand = d3.scaleBand().domain(xLabels).range([0, width]),
+        yBand = d3.scaleBand().domain(yLabels).range([height, 0]);
+    
+    var axis = {
+        x: d3.axisBottom(scale.x).tickFormat((d, e) => xLabels[d]),
+        y: d3.axisLeft(scale.y).tickFormat((d, e) => yLabels[d]),
+    };
 
 
+    function updateScales(data){
+        scale.x.domain([-1, d3.max(data, d => d.xKey)]),
+        scale.y.domain([ 0, d3.max(data, d => d.yKey)])
     }
 
+    var colorScale = d3.scaleQuantile()
+        .domain([0, colors.length - 1, d3.max(dataset, function (d) {return d.val;})])
+        .range(colors);
+
+    var zoom = d3.zoom()
+        .scaleExtent([1, dotHeight])
+        .on("zoom", zoomed);
+
+    var tooltip = d3.select("body").append("div")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
+
+    // SVG canvas
+    svg = d3.select("#heat-chart").select("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .call(zoom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    // Clip path
+    svg.append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height+dotHeight);
+
+
+    // Heatmap dots
+    var heatDotsGroup = svg.append("g")
+        .attr("clip-path", "url(#clip)")
+        .append("g");
+        
+    
+
+    //Create X axis
+    var renderXAxis = svg.append("g")
+        .attr("class", "x axis")
+        //.attr("transform", "translate(0," + scale.y(-0.5) + ")")
+        //.call(axis.x)
+
+    //Create Y axis
+    var renderYAxis = svg.append("g")
+        .attr("class", "y axis")
+        .call(axis.y);
+
+
+    function zoomed() {
+        d3.event.transform.y = 0;
+        d3.event.transform.x = Math.min(d3.event.transform.x, 5);
+        d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
+        // console.log(d3.event.transform)
+
+        // update: rescale x axis
+        renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
+
+        // Make sure that only the x axis is zoomed
+        heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
     }
+    
+    svg.call(renderPlot, dataset)
+    
+    function renderPlot(selection, dataset){
+        
+        //Do the axes
+        updateScales(dataset)
+        selection.select('.y.axis').call(axis.y)
+        selection.select('.x.axis')
+                .attr("transform", "translate(0," + scale.y(-0.5) + ")")
+                .call(axis.x)
+        
+        selection.call(renderPoints, dataset);
+    }
+    
+    
+    function renderPoints(selection, dataset){
+        
+        // Do the chart
+        heatDotsGroup.selectAll("ellipse")
+        .data(dataset)
+        .enter()
+        .append("ellipse")
+        .attr("cx", function (d) {return scale.x(d.xKey) - xBand.bandwidth();})
+        .attr("cy", function (d) {return scale.y(d.yKey) + yBand.bandwidth();})
+        .attr("rx", dotWidth)
+        .attr("ry", dotHeight)
+        .attr("fill", function (d) {
+            return colorScale(d.val);
+        })
+        .on("mouseover", function (d) {
+            $("#tooltip").html("X: " + d.xKey + "<br/>Y: " + d.yKey + "<br/>Value: " + Math.round(d.val * 100) / 100);
+            var xpos = d3.event.pageX + 10;
+            var ypos = d3.event.pageY + 20;
+            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+        }).on("mouseout", function () {
+            $("#tooltip").animate({
+                duration: 500
+            }).css("opacity", 0);
+        });    
+        
+    }
+
+
+};

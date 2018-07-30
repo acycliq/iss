@@ -54,12 +54,13 @@
 
 <body>
     <div id="chart">
-        <svg width="1550" height="1000"></svg>
+        <svg width="700" height="500"></svg>
     </div>
+    <input id="clickMe" type="button" value="clickme" onclick="run();" />
     <script>
         var dataset = [];
         for (let i = 1; i < 360; i++) { //360
-            for (j = 1; j < 70; j++) {  //75
+            for (j = 1; j < 7; j++) {  //75
                 dataset.push({
                     xKey: i,
                     xLabel: "xMark " + i,
@@ -73,6 +74,27 @@
         
         heatmap(dataset)
 
+    </script>
+    
+    <script>
+        function run() {
+            var dataset = [];
+                for (let i = 1; i < 360; i++) { //360
+                    for (j = 1; j < 7; j++) {  //75
+                        dataset.push({
+                            xKey: i,
+                            xLabel: "xMark " + i,
+                            yKey: j,
+                            yLabel: "yMark " + j,
+                            val: Math.random() * 25,
+                            })
+                        }
+                    };
+
+                    heatmap(dataset)
+        }
+
+        $(document).ready(function() {});
     </script>
 </body>
 

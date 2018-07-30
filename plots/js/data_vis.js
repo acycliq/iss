@@ -10,8 +10,8 @@
         dapi(data);
         console.log("Starting Scatter")
         mydata = initChart(data);
-        console.log("Starting dt")
-        //dt(mydata)
+        console.log("Starting heatmap")
+        heatmap()
         console.log("Done!!")
         });
 
