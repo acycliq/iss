@@ -24,7 +24,7 @@ function heatmap(dataset) {
     };
 
     var margin = {top: 0, right: 25,
-                  bottom: 110, left: 75};  
+                  bottom: 60, left: 75};  
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
