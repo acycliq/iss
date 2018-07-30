@@ -93,7 +93,7 @@ var dotSpacing = 0,
 
 
     var zoom = d3.zoom()
-        .scaleExtent([dotWidth, dotHeight])
+        .scaleExtent([1, dotHeight])
         .on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
@@ -104,7 +104,7 @@ var dotSpacing = 0,
     svg = d3.select("svg")
         .attr("width", width + margin.left + margin.right)
         .attr("height", height + margin.top + margin.bottom)
-        //.call(zoom)
+        .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
@@ -121,7 +121,7 @@ var dotSpacing = 0,
         .attr("clip-path", "url(#clip)")
         .append("g");
         
-        heatDotsGroup.call(zoom);
+//        heatDotsGroup.call(zoom);
 
     
 
@@ -141,7 +141,7 @@ var dotSpacing = 0,
         d3.event.transform.y = 0;
         d3.event.transform.x = Math.min(d3.event.transform.x, 5);
         d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
-        d3.event.transform.k = Math.max(d3.event.transform.k, 1);
+        //d3.event.transform.k = Math.max(d3.event.transform.k, 1);
         console.log(d3.event.transform)
 
         // update: rescale x axis
