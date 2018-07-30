@@ -1,6 +1,6 @@
 function dapi(data) {
 
-    d3.csv("./data/myarr.csv", function (data) {
+    d3.csv("./plots/data/myarr.csv", function (data) {
         data.forEach(function (d) {
             d.x = +d.x
             d.y = +d.y
@@ -203,7 +203,7 @@ function dapi(data) {
             maxZoom: maxZoom
         }).setView([img[1] / 2, img[0] / 2], 5);
 
-        L.tileLayer("./data/img/dapi/{z}/{x}/{y}.png", {
+        L.tileLayer("./plots/data/img/dapi/{z}/{x}/{y}.png", {
             attribution: 'KDH',
             continuousWorld: false,
             minZoom: 0,
