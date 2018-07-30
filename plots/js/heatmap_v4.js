@@ -141,6 +141,12 @@ function heatmap(dataset) {
                 .attr("transform", "translate(0," + scale.y(-0.5) + ")")
                 .call(axis.x)
         
+        selection.call(renderPoints, dataset);
+    }
+    
+    
+    function renderPoints(selection, dataset){
+        
         // Do the chart
         heatDotsGroup.selectAll("ellipse")
         .data(dataset)
@@ -162,8 +168,7 @@ function heatmap(dataset) {
             $("#tooltip").animate({
                 duration: 500
             }).css("opacity", 0);
-        });
-        
+        });    
         
     }
 
