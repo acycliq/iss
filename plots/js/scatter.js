@@ -200,14 +200,11 @@ function initChart(data) {
                 .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
                 .replace(/,/g, '<br>'));
 
+            
+// ************************  Datatable Handler (start) ************************************************            
             var mydata = [];
             var mydata2 = [];
-//            mydata.push({
-//                Num: d.Cell_Num,
-//                X: d.x,
-//                Y: d.y,
-//            });
-//          
+
             var str =   "<strong>Cell Num: </strong>" + d.Cell_Num + 
                         ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2)+")" ;
             document.getElementById('dtTitle').innerHTML = str;
@@ -226,8 +223,6 @@ function initChart(data) {
                     "Prob": (d.Prob[i] === undefined)? "": d.Prob[i],
                 })
             }
-
-
 
             
             // check if a there is a reference to a datatable.
@@ -288,41 +283,7 @@ function initChart(data) {
                 .draw();
 
 
-
-
-                //    svg2width = width + padding.right + padding.left
-                //    svg2height = height + padding.top + padding.bottom
-                //
-                //    // set the ranges
-                //    var x = d3.scaleBand()
-                //        .range([0, svg2width])
-                //        .padding(0.1);
-                //    var y = d3.scaleLinear()
-                //        .range([svg2height, 0])
-                //
-                //    x.domain(data.map(function(d,i) { return i; }));
-                //    y.domain([0, d3.max(d, function(d){return d.Prob;})]);
-                //
-                //    d3.select('#dc-pie-graph').select('svg').selectAll("*").remove()
-                //    svg2 = d3.select('#dc-pie-graph').select('svg')
-                //        .attr("width", width + padding.right + padding.left)
-                //        .attr("height", height + padding.top + padding.bottom)
-                //        .append("g")
-                //       .attr("transform",
-                //          "translate(" + padding.left + "," + padding.top + ")");;
-                //
-                //    var mybars = svg2.selectAll("rect").data(d)
-                //    var barPadding = 5;
-                //    var barWidth = (svg2width / d.Prob.length);
-                //
-                //    mybars.enter().append("rect")
-                //    .attr("y", function(d){return y(d.Prob);})
-                //    .attr("height", function(d) { return height - d.Prob; })
-                //    .attr("width", barWidth - barPadding)
-                //
-                //    mybars.exit().remove()
-
-
+// ************************  Datatable Handler (end) ************************************************            
             }
         }
 
