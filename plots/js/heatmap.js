@@ -1,17 +1,19 @@
 function heatmap(data) {
     
     var dataset = [];
-        for (let i = 1; i < 6; i++) { //360
-            for (j = 1; j < 7; j++) {  //75
+    var idx = 0;
+    var cur = 0;
+        for (let i = 1; i < 92; i++) { //360
+            for (j = 1; j < 72; j++) {  //75
                 dataset.push({
                     xKey: i,
-                    xLabel: "xMark " + i,
+                    xLabel: data[cur].col,
                     yKey: j,
-                    yLabel: "yMark " + j,
-                    val: Math.random() * 25,
-                    
+                    yLabel: data[j].row,
+                    val: data[idx].val,     
                 })
-            }
+        cur++ }
+        idx++
         };
     
     
