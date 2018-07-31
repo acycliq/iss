@@ -1,7 +1,7 @@
-function heatmap() {
+function heatmap(data) {
     
     var dataset = [];
-        for (let i = 1; i < 360; i++) { //360
+        for (let i = 1; i < 6; i++) { //360
             for (j = 1; j < 7; j++) {  //75
                 dataset.push({
                     xKey: i,
