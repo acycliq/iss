@@ -53,9 +53,15 @@
 </head>
 
 <body>
-    <div id="chart">
-        <svg width="700" height="500"></svg>
-    </div>
+    <div id='chart'>
+    <svg width="700" height="500">
+      <g class="focus">
+        <g class="xaxis"></g>
+        <g class="yaxis"></g>
+      </g>
+    </svg>
+   </div>
+    
     <input id="clickMe" type="button" value="clickme" onclick="run();" />
     <script>
         var dataset = [];
@@ -87,7 +93,7 @@
                             yKey: j,
                             yLabel: "yMark " + j,
                             val: Math.random() * 25,
-                            })
+                        })
                         }
                     };
 
