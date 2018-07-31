@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>Weighted Mapt</title>
+
+    <!-- Reference style.css -->
+    <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
+
+    <!-- Reference minified version of D3 -->
+    <script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.1/jquery.min.js'></script>
+    <script src='heatmap.js' type='text/javascript'></script>
+</head>
+
+<body>
+    <div id='heat-chart'>
+        <svg width="700" height="500">
+    </svg>
+   </div>
+
+    <script>
+        var dataset = [];
+        var classNames = [];
+        var geneNames = [];
+        
+        d3.json("../data/weightedMap/json/ClassNames.json", function(data) {
+            for (let i = 0; i < 72; i++) {
+                classNames.push({
+                    value: data[i].ClassNames,
+                })
+        };
+        });
+        
+        d3.json("../data/weightedMap/json/GeneNames.json", function(data) {
+            for (let i = 0; i < 92; i++) {
+                geneNames.push({
+                    value: data[i].GeneNames,
+                })
+        };
+        });
+        
+        var nK = 72;
+        var nG = 92;
+        d3.json("../data/weightedMap/json/wm_0.json", function(data) {
+            for (let i = 0; i < nK; i++) { 
+            for (j = 0; j < nG; j++) {  
+                var key = "wm"+(j+1); 
+                dataset.push({
+                    col: classNames[i].value,
+                    row: geneNames[j].value,
+                    val:data[i][key],
+                })
+            }
+        };
+            
+            console.log("hello start")
+            heatmap(dataset)
+            console.log("hello")
+        });
+
+    </script>
+    
+    <script>
+//        heatmap(dataset)
+    </script>
+</body>
+
+</html>
