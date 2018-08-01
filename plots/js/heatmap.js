@@ -50,6 +50,12 @@ var hoursRange = d3.extent(dataset, function (d) {return d.yKey}),
 var tRange = d3.extent(dataset, function (d) {return d.val}),
     tMin = tRange[0],
     tMax = tRange[1];
+    
+var avg = d3.mean(dataset, function(d) { return d.val; });
+    
+var sd = d3.deviation(dataset, function(d) { return d.val; });
+    
+var zScore = function(d){return (d-avg)/sd};   
 
 var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
 
@@ -74,7 +80,7 @@ var colorScale = d3.scaleQuantile()
     .range(colors);
 
 var zoom = d3.zoom()
-    .scaleExtent([1, dotHeight])
+    .scaleExtent([1, 2*dotHeight])
     .on("zoom", zoomed);
 
 var tooltip = d3.select("body").append("div")
