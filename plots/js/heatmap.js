@@ -167,6 +167,16 @@ function renderHeatmap(dataset){
     .append("ellipse")
     .attr("rx", chartData.dotWidth)
     .attr("ry", chartData.dotHeight)
+    .on("mouseover", function (d) {
+            $("#tooltip").html("x: " + d.xLabel + "<br/>y: " + d.yLabel + "<br/>Value: " + Math.round(d.val * 100) / 100);
+            var xpos = d3.event.pageX + 10;
+            var ypos = d3.event.pageY + 20;
+            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+        }).on("mouseout", function () {
+            $("#tooltip").animate({
+                duration: 500
+            }).css("opacity", 0);
+        })
     .merge(update)
     .transition().duration(800)
         .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
