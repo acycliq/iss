@@ -297,10 +297,12 @@ function initChart(data) {
             
             
             var dataset = [];
+            var heatmapData = [];
             var classNames = [];
             var geneNames = [];
+            var cur = 0;
 
-            d3.json("../plots/data/weightedMap/json/ClassNames.json", function(data) {
+            d3.json("./plots/data/weightedMap/json/ClassNames.json", function(data) {
                 for (let i = 0; i < 72; i++) {
                     classNames.push({
                         value: data[i].ClassNames,
@@ -308,7 +310,7 @@ function initChart(data) {
             };
             });
 
-            d3.json("../plots/data/weightedMap/json/GeneNames.json", function(data) {
+            d3.json("./plots/data/weightedMap/json/GeneNames.json", function(data) {
                 for (let i = 0; i < 92; i++) {
                     geneNames.push({
                         value: data[i].GeneNames,
@@ -319,7 +321,7 @@ function initChart(data) {
 
             var nK = 72;
             var nG = 92;
-            d3.json("../plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
+            d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
                 for (let i = 0; i < nK; i++) {
                     for (j = 0; j < nG; j++) {
                         var key = "wm" + (j + 1);
@@ -330,9 +332,22 @@ function initChart(data) {
                         })
                     }
                 };
-
+                
+            for (let i = 0; i < nK; i++) { //360
+                for (j = 0; j < nG; j++) {  //75
+                m = i+(Math.floor(cur/nG)*nG)
+                heatmapData.push({
+                    xKey: i,
+                    xLabel: dataset[m].col,
+                    yKey: j,
+                    yLabel: dataset[j].row,
+                    val: dataset[cur].val,     
+                })
+            cur++ }
+            };
+    
                 console.log("hello start")
-                heatmap(dataset)
+                renderHeatmap(heatmapData)
                 console.log("hello")
             });
 
