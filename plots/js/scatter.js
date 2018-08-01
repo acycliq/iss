@@ -200,209 +200,263 @@ function initChart(data) {
                 .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
                 .replace(/,/g, '<br>'));
 
-            
-// ************************  Datatable Handler (start) ************************************************            
+
+            // ************************  Datatable Handler (start) ************************************************            
             var mydata = [];
             var mydata2 = [];
 
-            var str =   "<strong>Cell Num: </strong>" + d.Cell_Num + 
-                        ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2)+")" ;
+            var str = "<strong>Cell Num: </strong>" + d.Cell_Num +
+                ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")";
             document.getElementById('dtTitle').innerHTML = str;
             var n = d3.max([d.CellGeneCount.length, d.Genenames.length]);
             for (i = 0; i < n; i++) {
                 mydata.push({
-                    "Genenames": (d.Genenames[i] === undefined)? "": d.Genenames[i],
-                    "CellGeneCount": (d.CellGeneCount[i] === undefined)? "": d.CellGeneCount[i],
+                    "Genenames": (d.Genenames[i] === undefined) ? "" : d.Genenames[i],
+                    "CellGeneCount": (d.CellGeneCount[i] === undefined) ? "" : d.CellGeneCount[i],
                 })
             }
-            
+
             var n = d3.max([d.ClassName.length, d.Prob.length]);
             for (i = 0; i < n; i++) {
                 mydata2.push({
-                    "ClassName": (d.ClassName[i] === undefined)? "": d.ClassName[i],
-                    "Prob": (d.Prob[i] === undefined)? "": d.Prob[i],
+                    "ClassName": (d.ClassName[i] === undefined) ? "" : d.ClassName[i],
+                    "Prob": (d.Prob[i] === undefined) ? "" : d.Prob[i],
                 })
             }
 
-            
+
             // check if a there is a reference to a datatable.
             // If yes, refresh with the new data
             // Otherwise create and populate a datatable
-            if ( $.fn.dataTable.isDataTable( '#dtTable' ) ) {
+            if ($.fn.dataTable.isDataTable('#dtTable')) {
                 table = $('#dtTable').DataTable();
                 table.clear().rows.add(mydata).draw();
-            }
-            else {
-                    table = $('#dtTable').DataTable({
-                        //bFilter: false,
-                        "lengthChange": false,
-                        searching: false,
-                        //"scrollY":        "200px",
-                        //"scrollCollapse": true,
-                        "paging":         true,
-                        //dom: 't',
-                        
-                        "data": mydata,
-                        "columns": [
-                            {title: "Gene Names", data: "Genenames"},
-                            {title: "Cell Gene Count", data: "CellGeneCount"},
+            } else {
+                table = $('#dtTable').DataTable({
+                    //bFilter: false,
+                    "lengthChange": false,
+                    searching: false,
+                    //"scrollY":        "200px",
+                    //"scrollCollapse": true,
+                    "paging": true,
+                    //dom: 't',
+
+                    "data": mydata,
+                    "columns": [
+                        {
+                            title: "Gene Names",
+                            data: "Genenames"
+                        },
+                        {
+                            title: "Cell Gene Count",
+                            data: "CellGeneCount"
+                        },
 		                  ],
-                    });
-                
+                });
+
             }
 
-            
-            if ( $.fn.dataTable.isDataTable( '#dtTable2' ) ) {
+
+            if ($.fn.dataTable.isDataTable('#dtTable2')) {
                 table2 = $('#dtTable2').DataTable();
                 table2.clear().rows.add(mydata2).draw();
-            }
-            else {
-                    table2 = $('#dtTable2').DataTable({
-                        //bFilter: false,
-                        "lengthChange": false,
-                        searching: false,
-                        //"scrollY":        "200px",
-                        //"scrollCollapse": true,
-                        "paging":         true,
-                        //dom: 't',
-                        "data": mydata2,
-                        "columns": [
-                            {title: "Class Name", data: "ClassName"},
-                            {title: "Prob", data: "Prob"},
+            } else {
+                table2 = $('#dtTable2').DataTable({
+                    //bFilter: false,
+                    "lengthChange": false,
+                    searching: false,
+                    //"scrollY":        "200px",
+                    //"scrollCollapse": true,
+                    "paging": true,
+                    //dom: 't',
+                    "data": mydata2,
+                    "columns": [
+                        {
+                            title: "Class Name",
+                            data: "ClassName"
+                        },
+                        {
+                            title: "Prob",
+                            data: "Prob"
+                        },
 		              ]
-                    });
+                });
             }
 
             // Sort by column 1 and then re-draw
             table
-                .order( [ 1, 'desc' ] )
+                .order([1, 'desc'])
                 .draw();
-            
+
             table2
-                .order( [ 1, 'desc' ] )
+                .order([1, 'desc'])
                 .draw();
 
 
-// ************************  Datatable Handler (end) ************************************************            
-            }
-        }
+            // ************************  Datatable Handler (end) ************************************************  
+            
+            
+            var dataset = [];
+            var classNames = [];
+            var geneNames = [];
 
-        // callback for when the mouse moves across the overlay
-        function mouseMoveHandler() {
-            // get the current mouse position
-            const [mx, my] = d3.mouse(this);
+            d3.json("../plots/data/weightedMap/json/ClassNames.json", function(data) {
+                for (let i = 0; i < 72; i++) {
+                    classNames.push({
+                        value: data[i].ClassNames,
+                    })
+            };
+            });
 
-            // use the new diagram.find() function to find the voronoi site closest to
-            // the mouse, limited by max distance defined by voronoiRadius
-            //const site = voronoiDiagram.find(mx, my, voronoiRadius);
-            const site = voronoiDiagram.find(mx, my);
-
-            // highlight the point if we found one, otherwise hide the highlight circle
-            highlight(site && site.data);
-
-
-            let sdata = []
-            for (let i = 0; i < site.data.Prob.length; i++) {
-                sdata.push({
-                    Prob: site.data.Prob[i],
-                    labels: site.data.ClassName[i]
-                })
-            }
-            document.getElementById("xValue").value = site.data.X
-            document.getElementById("yValue").value = site.data.Y
-            var evtx = new CustomEvent('change');
-            document.getElementById('xValue').dispatchEvent(evtx);
-            var evty = new CustomEvent('change');
-            document.getElementById('yValue').dispatchEvent(evty);
-            barchart(sdata)
-            piechart(sdata)
-            //map(sdata)
-        }
-
-        // add the overlay on top of everything to take the mouse events
-        g.append('rect')
-            .attr('class', 'overlay')
-            .attr('width', plotAreaWidth)
-            .attr('height', plotAreaHeight)
-            .style('fill', 'red')
-            .style('opacity', 0)
-            .on('click', mouseMoveHandler)
-            .on('mouseleave', () => {
-                // hide the highlight circle when the mouse leaves the chart
-                //highlight(null);
+            d3.json("../plots/data/weightedMap/json/GeneNames.json", function(data) {
+                for (let i = 0; i < 92; i++) {
+                    geneNames.push({
+                        value: data[i].GeneNames,
+                    })
+            };
             });
 
 
-        // ----------------------------------------------------
-        // Add a fun click handler to reveal the details of what is happening
-        // ----------------------------------------------------
+            var nK = 72;
+            var nG = 92;
+            d3.json("../plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
+                for (let i = 0; i < nK; i++) {
+                    for (j = 0; j < nG; j++) {
+                        var key = "wm" + (j + 1);
+                        dataset.push({
+                            col: classNames[i].value,
+                            row: geneNames[j].value,
+                            val: data[i][key],
+                        })
+                    }
+                };
 
-        /**
-         * Add/remove a visible voronoi diagram and a circle indicating the radius used
-         * in the voronoi find function
-         */
-        function toggleVoronoiDebug() {
-            // remove if there
-            if (!g.select('.voronoi-polygons').empty()) {
-                g.select('.voronoi-polygons').remove();
-                g.select('.voronoi-radius-circle').remove();
-                g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
-                // otherwise, add the polygons in
-            } else {
-                // add a circle to follow the mouse to draw the voronoi radius
-                g.append('circle')
-                    .attr('class', 'voronoi-radius-circle')
-                    .attr('r', voronoiRadius)
-                    .style('fill', 'none')
-                    .style('stroke', 'tomato')
-                    .style('stroke-dasharray', '3,2')
-                    .style('display', 'none');
+                console.log("hello start")
+                heatmap(dataset)
+                console.log("hello")
+            });
 
-
-                // move the voronoi radius mouse circle with the mouse
-                g.select('.overlay')
-                    .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
-                        const [mx, my] = d3.mouse(this);
-                        d3.select('.voronoi-radius-circle')
-                            .style('display', '')
-                            .attr('cx', mx)
-                            .attr('cy', my);
-                    })
-                    .on('mouseleave.voronoi', () => {
-                        d3.select('.voronoi-radius-circle').style('display', 'none');
-                    });
-
-
-                // draw the polygons
-                const voronoiPolygons = g.append('g')
-                    .attr('class', 'voronoi-polygons')
-                    .style('pointer-events', 'none');
-
-                const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
-                binding.enter().append('path')
-                    .style('stroke', 'tomato')
-                    .style('fill', 'none')
-                    .style('opacity', 0.15)
-                    .attr('d', d => `M${d.join('L')}Z`);
-            }
-        }
-
-        // turn on and off voronoi debugging with click
-        //svg.on('click', toggleVoronoiDebug);
-
-        function onDoubleClick() {
-            d3.select('.highlight-circle').style('display', 'none');
-            highlightOutput.text('');
-            highlightOutput2.text('');
-            highlightOutput3.text('');
-            highlightOutput4.text('');
-            highlightOutput5.text('');
-
-            svg2.selectAll("*").remove()
 
 
         }
-        svg.on('dblclick', onDoubleClick);
+    }
+
+    // callback for when the mouse moves across the overlay
+    function mouseMoveHandler() {
+        // get the current mouse position
+        const [mx, my] = d3.mouse(this);
+
+        // use the new diagram.find() function to find the voronoi site closest to
+        // the mouse, limited by max distance defined by voronoiRadius
+        //const site = voronoiDiagram.find(mx, my, voronoiRadius);
+        const site = voronoiDiagram.find(mx, my);
+
+        // highlight the point if we found one, otherwise hide the highlight circle
+        highlight(site && site.data);
+
+
+        let sdata = []
+        for (let i = 0; i < site.data.Prob.length; i++) {
+            sdata.push({
+                Prob: site.data.Prob[i],
+                labels: site.data.ClassName[i]
+            })
+        }
+        document.getElementById("xValue").value = site.data.X
+        document.getElementById("yValue").value = site.data.Y
+        var evtx = new CustomEvent('change');
+        document.getElementById('xValue').dispatchEvent(evtx);
+        var evty = new CustomEvent('change');
+        document.getElementById('yValue').dispatchEvent(evty);
+        barchart(sdata)
+        piechart(sdata)
+        //map(sdata)
+    }
+
+    // add the overlay on top of everything to take the mouse events
+    g.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', plotAreaWidth)
+        .attr('height', plotAreaHeight)
+        .style('fill', 'red')
+        .style('opacity', 0)
+        .on('click', mouseMoveHandler)
+        .on('mouseleave', () => {
+            // hide the highlight circle when the mouse leaves the chart
+            //highlight(null);
+        });
+
+
+    // ----------------------------------------------------
+    // Add a fun click handler to reveal the details of what is happening
+    // ----------------------------------------------------
+
+    /**
+     * Add/remove a visible voronoi diagram and a circle indicating the radius used
+     * in the voronoi find function
+     */
+    function toggleVoronoiDebug() {
+        // remove if there
+        if (!g.select('.voronoi-polygons').empty()) {
+            g.select('.voronoi-polygons').remove();
+            g.select('.voronoi-radius-circle').remove();
+            g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
+            // otherwise, add the polygons in
+        } else {
+            // add a circle to follow the mouse to draw the voronoi radius
+            g.append('circle')
+                .attr('class', 'voronoi-radius-circle')
+                .attr('r', voronoiRadius)
+                .style('fill', 'none')
+                .style('stroke', 'tomato')
+                .style('stroke-dasharray', '3,2')
+                .style('display', 'none');
+
+
+            // move the voronoi radius mouse circle with the mouse
+            g.select('.overlay')
+                .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
+                    const [mx, my] = d3.mouse(this);
+                    d3.select('.voronoi-radius-circle')
+                        .style('display', '')
+                        .attr('cx', mx)
+                        .attr('cy', my);
+                })
+                .on('mouseleave.voronoi', () => {
+                    d3.select('.voronoi-radius-circle').style('display', 'none');
+                });
+
+
+            // draw the polygons
+            const voronoiPolygons = g.append('g')
+                .attr('class', 'voronoi-polygons')
+                .style('pointer-events', 'none');
+
+            const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
+            binding.enter().append('path')
+                .style('stroke', 'tomato')
+                .style('fill', 'none')
+                .style('opacity', 0.15)
+                .attr('d', d => `M${d.join('L')}Z`);
+        }
+    }
+
+    // turn on and off voronoi debugging with click
+    //svg.on('click', toggleVoronoiDebug);
+
+    function onDoubleClick() {
+        d3.select('.highlight-circle').style('display', 'none');
+        highlightOutput.text('');
+        highlightOutput2.text('');
+        highlightOutput3.text('');
+        highlightOutput4.text('');
+        highlightOutput5.text('');
+
+        svg2.selectAll("*").remove()
 
 
     }
+    svg.on('dblclick', onDoubleClick);
+
+
+}

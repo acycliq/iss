@@ -3,17 +3,22 @@ function heatmap(data) {
     var dataset = [];
     var idx = 0;
     var cur = 0;
-        for (let i = 1; i < 92; i++) { //360
-            for (j = 1; j < 72; j++) {  //75
+    var nK = 72;
+    var nG = 92;
+    var m = 0;
+    var n = 0;
+    
+        for (let i = 0; i < nK; i++) { //360
+            for (j = 0; j < nG; j++) {  //75
+                m = i+(Math.floor(cur/nG)*nG)
                 dataset.push({
                     xKey: i,
-                    xLabel: data[cur].col,
+                    xLabel: data[m].col,
                     yKey: j,
                     yLabel: data[j].row,
-                    val: data[idx].val,     
+                    val: data[cur].val,     
                 })
         cur++ }
-        idx++
         };
     
     
@@ -39,8 +44,8 @@ function heatmap(data) {
         }
     };
 
-    var margin = {top: 0, right: -40,
-                  bottom: 80, left: 45};  
+    var margin = {top: 0, right: 0,
+                  bottom: 40, left: 45};  
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -60,7 +65,7 @@ function heatmap(data) {
         tMax = tRange[1];
 
     var colors = ['#2C7BB6', '#00A6CA', '#00CCBC', '#90EB9D', '#FFFF8C', '#F9D057', '#F29E2E', '#E76818', '#D7191C'];
-    
+
     // the scale
     var scale = {
         x: d3.scaleLinear()
@@ -87,11 +92,11 @@ function heatmap(data) {
     }
 
     var colorScale = d3.scaleQuantile()
-        .domain([0, colors.length - 1, d3.max(dataset, function (d) {return d.val;})])
+        .domain([tMin, colors.length - 1, tMax])
         .range(colors);
 
     var zoom = d3.zoom()
-        .scaleExtent([1, dotHeight])
+        .scaleExtent([1, 2*dotHeight])
         .on("zoom", zoomed);
 
     var tooltip = d3.select("body").append("div")
@@ -173,10 +178,10 @@ function heatmap(data) {
         .attr("rx", dotWidth)
         .attr("ry", dotHeight)
         .attr("fill", function (d) {
-            return colorScale(d.val);
+            return colorScale(d.val*35);
         })
         .on("mouseover", function (d) {
-            $("#tooltip").html("X: " + d.xKey + "<br/>Y: " + d.yKey + "<br/>Value: " + Math.round(d.val * 100) / 100);
+            $("#tooltip").html("X: " + d.xLabel + "<br/>Y: " + d.yLabel + "<br/>Value: " + Math.round(d.val * 100) / 100);
             var xpos = d3.event.pageX + 10;
             var ypos = d3.event.pageY + 20;
             $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
