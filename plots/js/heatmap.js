@@ -171,7 +171,7 @@ function renderHeatmap(dataset){
     .transition().duration(800)
         .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
-        .attr("fill", function (d) { return chartData.colorScale(25*d.val);} );
+        .attr("fill", function (d) { return chartData.colorScale(10*d.val);} );
     
     update.exit().remove();
 }
