@@ -1,22 +1,10 @@
 function heatmap(dataset) {
     console.log("I am in heatmap.js")
 
-    var idx = 0;
-    var cur = 0;
-    var nK = 72;
-    var nG = 92;
-    var m = 0;
-    var n = 0;
-
-
     var svg = d3.select("#heat-chart").select("svg")
 
-    var xLabels = d3.map(dataset, function (d) {
-            return d.xLabel;
-        }).keys(),
-        yLabels = d3.map(dataset, function (d) {
-            return d.yLabel;
-        }).keys();
+    var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
+        yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
 
     var margin = {
         top: 0,
@@ -56,7 +44,11 @@ function heatmap(dataset) {
         return d.val;
     });
 
-    var zScore = function (d) {
+    var zScore = function (p, n) {
+        var mu = p[0],
+            sigma = p[1]
+        for (; ++u<r;)
+            
         return (d - avg) / sd
     };
 
@@ -64,10 +56,8 @@ function heatmap(dataset) {
 
     // the scale
     var scale = {
-        x: d3.scaleLinear()
-            .range([-1, width]),
-        y: d3.scaleLinear()
-            .range([height, 0]),
+        x: d3.scaleLinear().range([-1, width]),
+        y: d3.scaleLinear().range([height, 0]),
     };
 
     var xBand = d3.scaleBand().domain(xLabels).range([0, width]),
