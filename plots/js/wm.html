@@ -21,43 +21,15 @@
    </div>
 
     <script>
-        var dataset = [];
-        var classNames = [];
-        var geneNames = [];
-        
-        d3.json("../data/weightedMap/json/ClassNames.json", function(data) {
-            for (let i = 0; i < 72; i++) {
-                classNames.push({
-                    value: data[i].ClassNames,
-                })
-        };
-        });
-        
-        d3.json("../data/weightedMap/json/GeneNames.json", function(data) {
-            for (let i = 0; i < 92; i++) {
-                geneNames.push({
-                    value: data[i].GeneNames,
-                })
-        };
-        });
-        
-        var nK = 72;
-        var nG = 92;
-        d3.json("../data/weightedMap/json/wm_0.json", function(data) {
-            for (let i = 0; i < nK; i++) { 
-            for (j = 0; j < nG; j++) {  
-                var key = "wm"+(j+1); 
-                dataset.push({
-                    col: classNames[i].value,
-                    row: geneNames[j].value,
-                    val:data[i][key],
-                })
-            }
-        };
-            
+
+        d3.json("../data/weightedMap/trash/wm_0.json", function(data) {
+            data.forEach(function(d) {
+            d.xKey = +d.xKey
+            d.yKey = +d.yKey
+            d.val = +d.val});
             console.log("hello start")
-            renderHeatmap(dataset)
-            console.log("hello")
+            renderHeatmap(data)
+            console.log("hello")            
         });
 
     </script>
