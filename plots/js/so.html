@@ -5,6 +5,20 @@
 <meta charset="utf-8">
 
 <title>Chart</title>
+    <style>
+        #tooltip {
+          position:absolute;
+          background-color: #2B292E;
+          color: white;
+          font-family: sans-serif;
+          font-size: 15px;
+          pointer-events: none; /*dont trigger events on the tooltip*/
+          padding: 15px 20px 10px 20px;
+          text-align: center;
+          opacity: 0;
+          border-radius: 4px;
+        }
+    </style>
 
 <!-- Reference style.css -->
 <!--    <link rel="stylesheet" type="text/css" href="style.css">-->
@@ -48,10 +62,10 @@
                 {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-                {'xKey':6, 'xLabel':'x6','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-                {'xKey':6, 'xLabel':'x6','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-                {'xKey':6, 'xLabel':'x6','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-                {'xKey':6, 'xLabel':'x6','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+//                {'xKey':6, 'xLabel':'x6','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+//                {'xKey':6, 'xLabel':'x6','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+//                {'xKey':6, 'xLabel':'x6','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+//                {'xKey':6, 'xLabel':'x6','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
 //
             ];
         renderPlot(dataset)
@@ -75,7 +89,7 @@
         height = +svg.attr("height") - margin.top - margin.bottom;
 
     var dotSpacing = 0,
-        dotWidth = width / (2 * (xLabels.length + 1)),
+        dotWidth = width / (2 * (xLabels.length)),
         dotHeight = height / (2 * yLabels.length);
 
     var valRange = d3.extent(dataset, function (d) {return d.val});
@@ -88,11 +102,11 @@
 
     // the scale
     var scale = {
-        x: d3.scaleLinear().range([-1, width]),
+        x: d3.scaleLinear().range([0, width]),
         y: d3.scaleLinear().range([height, 0]),
     };
 
-    var xBand = d3.scaleBand().domain(xLabels).rangeRound([0, width-2*dotWidth]),
+    var xBand = d3.scaleBand().domain(xLabels).rangeRound([0, width]),
         yBand = d3.scaleBand().domain(yLabels).rangeRound([height-2*dotHeight, 2*dotHeight]);
 
     var axis = {
@@ -103,6 +117,10 @@
     var zoom = d3.zoom()
         .scaleExtent([1, dotHeight])
         .on("zoom", zoomed);
+
+    var tooltip = d3.select("body").append("div")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
 
     // SVG canvas
     svg = d3.select("svg")
@@ -165,7 +183,7 @@
 };
 
 function updateScales(data, scale){
-    scale.x.domain([-1, d3.max(data, d => d.xKey)]),
+    scale.x.domain([0, d3.max(data, d => d.xKey)]),
     scale.y.domain([0, d3.max(data, d => d.yKey)])
 }
 
@@ -191,12 +209,22 @@ function renderPlot(dataset) {
         .data(dataset);
 
     update
-    .enter()
-    .append("ellipse")
-    .attr("rx", chartData.dotWidth)
-    .attr("ry", chartData.dotHeight)
-    .merge(update)
-    .transition(chartData.tsn)
+        .enter()
+        .append("ellipse")
+        .attr("rx", chartData.dotWidth)
+        .attr("ry", chartData.dotHeight)
+        .on("mouseover", function (d) {
+            $("#tooltip").html("x: " + d.xLabel + "<br/>y: " + d.yLabel + "<br/>Value: " + Math.round(d.val * 100) / 100);
+            var xpos = d3.event.pageX + 10;
+            var ypos = d3.event.pageY + 20;
+            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+        }).on("mouseout", function () {
+            $("#tooltip").animate({
+                duration: 500
+            }).css("opacity", 0);
+        })
+        .merge(update)
+        .transition(chartData.tsn)
         .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
