@@ -106,7 +106,7 @@
         y: d3.scaleLinear().range([height, 0]),
     };
 
-    var xBand = d3.scaleBand().domain(xLabels).rangeRound([2*dotWidth, width-2*dotWidth]).padding(0.1),
+    var xBand = d3.scaleBand().domain(xLabels).range([2*dotWidth, width-2*dotWidth]).paddingOuter(0.5),
         yBand = d3.scaleBand().domain(yLabels).rangeRound([height-2*dotHeight, 2*dotHeight]);
 
     var axis = {
@@ -225,7 +225,7 @@ function renderPlot(dataset) {
         })
         .merge(update)
         .transition(chartData.tsn)
-        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth()/2;})
+        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth()/1;})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
