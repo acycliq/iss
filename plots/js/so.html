@@ -62,10 +62,10 @@
                 {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
-//                {'xKey':6, 'xLabel':'x6','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
-//                {'xKey':6, 'xLabel':'x6','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
-//                {'xKey':6, 'xLabel':'x6','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
-//                {'xKey':6, 'xLabel':'x6','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
 //
             ];
         renderPlot(dataset)
@@ -106,7 +106,7 @@
         y: d3.scaleLinear().range([height, 0]),
     };
 
-    var xBand = d3.scaleBand().domain(xLabels).rangeRound([0, width]),
+    var xBand = d3.scaleBand().domain(xLabels).rangeRound([2*dotWidth, width-2*dotWidth]).padding(0.1),
         yBand = d3.scaleBand().domain(yLabels).rangeRound([height-2*dotHeight, 2*dotHeight]);
 
     var axis = {
@@ -135,7 +135,7 @@
         .attr("id", "clip")
         .append("rect")
         .attr("width", width)
-        .attr("height", height + dotHeight);
+        .attr("height", height);
 
 
     // Heatmap dots
@@ -200,7 +200,7 @@ function renderPlot(dataset) {
     updateScales(dataset, chartData.scale);
     svg.select('.y.axis').call(chartData.axis.y)
     svg.select('.x.axis')
-        .attr("transform", "translate(0," + chartData.scale.y(0.0) + ")")
+        .attr("transform", "translate(" + chartData.dotWidth + ", " + chartData.scale.y(0.0) + ")")
         .call(chartData.axis.x)
 
 
@@ -225,7 +225,7 @@ function renderPlot(dataset) {
         })
         .merge(update)
         .transition(chartData.tsn)
-        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
+        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth()/2;})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
         .attr("fill", function (d) { return chartData.colorScale(d.val);} );
 
