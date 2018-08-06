@@ -46,7 +46,12 @@
                 {'xKey':5, 'xLabel':'x5','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':5, 'xLabel':'x5','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
                 {'xKey':5, 'xLabel':'x5','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':1, 'yLabel':'y1', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':2, 'yLabel':'y2', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':3, 'yLabel':'y3', 'val':Math.random() * 25},
+                {'xKey':6, 'xLabel':'x6','yKey':4, 'yLabel':'y4', 'val':Math.random() * 25},
 //
             ];
         renderPlot(dataset)
@@ -129,6 +134,7 @@
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
+        .attr("transform", "translate(0," + (-1)*dotHeight + ")")
 
 
     function zoomed() {
