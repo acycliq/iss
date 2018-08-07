@@ -31,6 +31,11 @@ function scatterPlot(data) {
         y: d3.axisLeft(scale.y).ticks(yTicks).tickSizeOuter(0),
     };
     
+    var gridlines = {
+        x: d3.axisBottom(scale.x).tickFormat("").tickSize(plotAreaHeight),
+        y: d3.axisLeft(scale.y).tickFormat("").tickSize(-plotAreaWidth),
+    }
+    
 
     var colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
 
@@ -67,12 +72,14 @@ function scatterPlot(data) {
         .append("g");
     
     //Create X axis
-    renderXAxis = svg.append("g")
+    var renderXAxis = svg.append("g")
         .attr("class", "x axis")
 
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
+    
+    
 
 
     // set up axis generating functions
@@ -123,6 +130,15 @@ function scatterPlot(data) {
         svg.select('.x.axis')
             .attr("transform", "translate(0, " + h + ")")
             .call(axis.x);
+        
+        svg.append("g")
+            .attr("class", "grid")
+            .call(gridlines.x);
+        
+        svg.append("g")
+            .attr("class", "grid")
+            .call(gridlines.y);
+        
         
         //Do the chart
         var update = heatDotsGroup.selectAll("circle").data(data)
@@ -189,7 +205,7 @@ function scatterPlot(data) {
         // use the new diagram.find() function to find the voronoi site closest to
         // the mouse, limited by max distance defined by voronoiRadius
         //var site = voronoiDiagram.find(mx, my, voronoiRadius);
-        var site = voronoiDiagram.find(mx, my, 10);
+        var site = voronoiDiagram.find(mx, my);
 
         // highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data);
@@ -197,10 +213,12 @@ function scatterPlot(data) {
 
         let sdata = []
         for (let i = 0; i < site.data.Prob.length; i++) {
+            console.log("Pushing...")
             sdata.push({
                 Prob: site.data.Prob[i],
                 labels: site.data.ClassName[i]
             })
+            console.log("...Pushing done!")
         }
         console.log(data.length)
     }
