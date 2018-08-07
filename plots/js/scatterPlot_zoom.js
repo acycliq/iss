@@ -96,7 +96,20 @@ function scatterPlot(data) {
 
         heatDotsGroup.attr("transform", d3.event.transform);
     }
-
+    
+    // add the overlay on top of everything to take the mouse events
+    heatDotsGroup.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', plotAreaWidth)
+        .attr('height', plotAreaHeight)
+        .style('fill', 'red')
+        .style('opacity', 0)
+        .on('mousemove', mouseMoveHandler)
+        .on('mouseleave', () => {
+            // hide the highlight circle when the mouse leaves the chart
+            //highlight(null);
+        });
+    
     renderPlot(data);
     
     function renderPlot(data){
@@ -122,30 +135,13 @@ function scatterPlot(data) {
             .attr('cy', d => scale.y(d.y))
             .attr('fill', d => colorScale(d.y))
             .on("mouseover", function (d) {
-            $("#tooltip").html("x: " + d.x + "<br/>y: " + d.y + "<br/>Value: " + d.Cell_Num );
+            $("#tooltip").html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num );
             var xpos = d3.event.pageX + 10;
             var ypos = d3.event.pageY + 20;
             $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
             })
-            
-//        // add in circles
-//        var circles = svg.append('g').attr('class', 'circles');
-//        var binding = circles.selectAll('.data-point').data(data, d => d.id);
-//        binding.enter().append('circle')
-//            .classed('data-point', true)
-//            .attr('r', pointRadius)
-//            .attr('cx', d => scale.x(d.x))
-//            .attr('cy', d => scale.y(d.y))
-//            .attr('fill', d => colorScale(d.y));
-//
-//        binding.transition().duration(1000)
-//            .attr("cx", d => scale.x(d.x))
-//            .attr("cy", d => scale.x(d.y)) // This is meant to be scale.y probably
-//            .attr("r", 2)
-//            .style("opacity", 1);
-        
-        
-    }
+  
+    };
 
     // ----------------------------------------------------
     // Add in Voronoi interaction
@@ -193,7 +189,7 @@ function scatterPlot(data) {
         // use the new diagram.find() function to find the voronoi site closest to
         // the mouse, limited by max distance defined by voronoiRadius
         //var site = voronoiDiagram.find(mx, my, voronoiRadius);
-        var site = voronoiDiagram.find(mx, my);
+        var site = voronoiDiagram.find(mx, my, 10);
 
         // highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data);
@@ -209,18 +205,6 @@ function scatterPlot(data) {
         console.log(data.length)
     }
 
-    // add the overlay on top of everything to take the mouse events
-    heatDotsGroup.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', plotAreaWidth)
-        .attr('height', plotAreaHeight)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        .on('mousemove', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            //highlight(null);
-        });
 
 
 
