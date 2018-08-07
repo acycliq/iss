@@ -38,7 +38,7 @@ function scatterPlot(data) {
     var container = d3.select('#scatter-plot');
 
     var zoom = d3.zoom()
-        .scaleExtent([1, 10])
+        .scaleExtent([1, 20])
         .on("zoom", zoomed);
     
     var tooltip = d3.select("body").append("div")
@@ -57,8 +57,8 @@ function scatterPlot(data) {
     svg.append("clipPath")
         .attr("id", "clip")
         .append("rect")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", plotAreaWidth)
+        .attr("height", plotAreaHeight);
 
 
     // Heatmap dots
@@ -209,18 +209,18 @@ function scatterPlot(data) {
         console.log(data.length)
     }
 
-//    // add the overlay on top of everything to take the mouse events
-//    svg.append('rect')
-//        .attr('class', 'overlay')
-//        .attr('width', plotAreaWidth)
-//        .attr('height', plotAreaHeight)
-//        .style('fill', 'red')
-//        .style('opacity', 0)
-//        .on('mousemove', mouseMoveHandler)
-//        .on('mouseleave', () => {
-//            // hide the highlight circle when the mouse leaves the chart
-//            //highlight(null);
-//        });
+    // add the overlay on top of everything to take the mouse events
+    heatDotsGroup.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', plotAreaWidth)
+        .attr('height', plotAreaHeight)
+        .style('fill', 'red')
+        .style('opacity', 0)
+        .on('mousemove', mouseMoveHandler)
+        .on('mouseleave', () => {
+            // hide the highlight circle when the mouse leaves the chart
+            //highlight(null);
+        });
 
 
 
