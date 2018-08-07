@@ -38,8 +38,12 @@ function scatterPlot(data) {
     var container = d3.select('#scatter-plot');
 
     var zoom = d3.zoom()
-        .scaleExtent([1, 5])
+        .scaleExtent([1, 10])
         .on("zoom", zoomed);
+    
+    var tooltip = d3.select("body").append("div")
+        .attr("id", "tooltip")
+        .style("opacity", 0);
 
     // initialize main SVG
     var svg = container.select('svg')
@@ -48,6 +52,19 @@ function scatterPlot(data) {
         .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+    // Clip path
+    svg.append("clipPath")
+        .attr("id", "clip")
+        .append("rect")
+        .attr("width", width)
+        .attr("height", height);
+
+
+    // Heatmap dots
+    var heatDotsGroup = svg.append("g")
+        .attr("clip-path", "url(#clip)")
+        .append("g");
     
     //Create X axis
     renderXAxis = svg.append("g")
@@ -69,15 +86,15 @@ function scatterPlot(data) {
     }
 
     function zoomed() {
-//        d3.event.transform.y = 0;
-//        d3.event.transform.x = Math.min(d3.event.transform.x, 5);
-//        d3.event.transform.x = Math.max(d3.event.transform.x, (1 - d3.event.transform.k) * width);
+        d3.event.transform.x = d3.event.transform.x;
+        d3.event.transform.y = d3.event.transform.y;
 
         // update: rescale x axis
         renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
+        renderYAxis.call(axis.y.scale(d3.event.transform.rescaleX(scale.y)));
 
-        // Make sure that only the x axis is zoomed
-        heatDotsGroup.attr("transform", d3.event.transform.toString().replace(/scale\((.*?)\)/, "scale($1, 1)"));
+
+        heatDotsGroup.attr("transform", d3.event.transform);
     }
 
     renderPlot(data);
@@ -94,21 +111,38 @@ function scatterPlot(data) {
             .attr("transform", "translate(0, " + h + ")")
             .call(axis.x);
         
-        // add in circles
-        var circles = svg.append('g').attr('class', 'circles');
-        var binding = circles.selectAll('.data-point').data(data, d => d.id);
-        binding.enter().append('circle')
-            .classed('data-point', true)
+        //Do the chart
+        var update = heatDotsGroup.selectAll("circle").data(data)
+        
+        update
+            .enter()
+            .append('circle')
             .attr('r', pointRadius)
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
-            .attr('fill', d => colorScale(d.y));
-
-        binding.transition().duration(1000)
-            .attr("cx", d => scale.x(d.x))
-            .attr("cy", d => scale.x(d.y)) // This is meant to be scale.y probably
-            .attr("r", 2)
-            .style("opacity", 1);
+            .attr('fill', d => colorScale(d.y))
+            .on("mouseover", function (d) {
+            $("#tooltip").html("x: " + d.x + "<br/>y: " + d.y + "<br/>Value: " + d.Cell_Num );
+            var xpos = d3.event.pageX + 10;
+            var ypos = d3.event.pageY + 20;
+            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+            })
+            
+//        // add in circles
+//        var circles = svg.append('g').attr('class', 'circles');
+//        var binding = circles.selectAll('.data-point').data(data, d => d.id);
+//        binding.enter().append('circle')
+//            .classed('data-point', true)
+//            .attr('r', pointRadius)
+//            .attr('cx', d => scale.x(d.x))
+//            .attr('cy', d => scale.y(d.y))
+//            .attr('fill', d => colorScale(d.y));
+//
+//        binding.transition().duration(1000)
+//            .attr("cx", d => scale.x(d.x))
+//            .attr("cy", d => scale.x(d.y)) // This is meant to be scale.y probably
+//            .attr("r", 2)
+//            .style("opacity", 1);
         
         
     }
@@ -129,7 +163,7 @@ function scatterPlot(data) {
 
 
     // add a circle for indicating the highlighted point
-    svg.append('circle')
+    heatDotsGroup.append('circle')
         .attr('class', 'highlight-circle')
         .attr('r', pointRadius + 2) // slightly larger than our points
         .style('fill', 'none')
@@ -175,18 +209,18 @@ function scatterPlot(data) {
         console.log(data.length)
     }
 
-    // add the overlay on top of everything to take the mouse events
-    svg.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', plotAreaWidth)
-        .attr('height', plotAreaHeight)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        .on('mousemove', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            //highlight(null);
-        });
+//    // add the overlay on top of everything to take the mouse events
+//    svg.append('rect')
+//        .attr('class', 'overlay')
+//        .attr('width', plotAreaWidth)
+//        .attr('height', plotAreaHeight)
+//        .style('fill', 'red')
+//        .style('opacity', 0)
+//        .on('mousemove', mouseMoveHandler)
+//        .on('mouseleave', () => {
+//            // hide the highlight circle when the mouse leaves the chart
+//            //highlight(null);
+//        });
 
 
 
