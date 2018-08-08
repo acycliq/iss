@@ -1,17 +1,21 @@
 function scatterPlot(data) {
 
+   var totalWidth = 920,
+        totalHeight = 480;
+
     var margin = {
             top: 10,
             left: 50,
             bottom: 30,
             right: 0
-        },
-        width = 920 - margin.left - margin.right,
-        height = 480 - margin.top - margin.bottom;
+        }
+
+    var width = totalWidth  - margin.left - margin.right,
+        height = totalHeight  - margin.top - margin.bottom;
 
     // inner chart dimensions, where the dots are plotted
-    var plotAreaWidth = width - margin.left - margin.right;
-    var plotAreaHeight = height - margin.top - margin.bottom;
+//    var width = width - margin.left - margin.right;
+//    var height = height - margin.top - margin.bottom;
 
      var tsn = d3.transition().duration(200);
 
@@ -24,20 +28,19 @@ function scatterPlot(data) {
     };
 
     var scale = {
-        x: d3.scaleLinear().range([0, plotAreaWidth]),
-        y: d3.scaleLinear().range([plotAreaHeight, 0]),
+        x: d3.scaleLinear().range([0, width]),
+        y: d3.scaleLinear().range([height, 0]),
     };
 
     var axis = {
         x: d3.axisBottom(scale.x).ticks(xTicks).tickSizeOuter(0),
         y: d3.axisLeft(scale.y).ticks(yTicks).tickSizeOuter(0),
     };
-
+    
     var gridlines = {
-        x: d3.axisBottom(scale.x).tickFormat("").tickSize(plotAreaHeight),
-        y: d3.axisLeft(scale.y).tickFormat("").tickSize(-plotAreaWidth),
+        x: d3.axisBottom(scale.x).tickFormat("").tickSize(height),
+        y: d3.axisLeft(scale.y).tickFormat("").tickSize(-width),
     }
-
 
     var colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
 
@@ -64,14 +67,8 @@ function scatterPlot(data) {
     svg.append("clipPath")
         .attr("id", "clip")
         .append("rect")
-        .attr("width", plotAreaWidth)
-        .attr("height", plotAreaHeight);
-
-
-    // Heatmap dots
-    var dotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clip)")
-        .append("g");
+        .attr("width", width)
+        .attr("height", height);
 
     //Create X axis
     var renderXAxis = svg.append("g")
@@ -81,17 +78,13 @@ function scatterPlot(data) {
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
 
-
-
-
     // set up axis generating functions
-    var xTicks = Math.round(plotAreaWidth / 50);
-    var yTicks = Math.round(plotAreaHeight / 50);
-
+    var xTicks = Math.round(width / 50);
+    var yTicks = Math.round(height / 50);
 
     function updateScales(data, scale){
-        scale.x.domain([extent.x[0] - 100, extent.x[1] + 100]).nice(),
-        scale.y.domain([extent.y[0] - 100, extent.y[1] + 100]).nice()
+        scale.x.domain([extent.x[0], extent.x[1]]).nice(),
+        scale.y.domain([extent.y[0], extent.y[1]]).nice()
     }
 
     function zoomed() {
@@ -102,51 +95,39 @@ function scatterPlot(data) {
         renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
         renderYAxis.call(axis.y.scale(d3.event.transform.rescaleX(scale.y)));
 
-
         dotsGroup.attr("transform", d3.event.transform);
     }
 
-    // add the overlay on top of everything to take the mouse events
-    dotsGroup.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', plotAreaWidth)
-        .attr('height', plotAreaHeight)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        //.on('mousemove', mouseMoveHandler)
-        .on('mousemove', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            highlight(null);
-
-        });
-
+    var dotsGroup;
     renderPlot(data);
 
     function renderPlot(data){
         updateScales(data, scale);
-
+        
         svg.select('.y.axis')
             .attr("transform", "translate(" + -pointRadius + " 0)" )
             .call(axis.y);
-
-        var h = plotAreaHeight + pointRadius;
+        
+        var h = height + pointRadius;
         svg.select('.x.axis')
             .attr("transform", "translate(0, " + h + ")")
             .call(axis.x);
-
+        
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.x);
-
+        
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.y);
 
-
+        dotsGroup = svg.append("g")
+                       .attr("clip-path", "url(#clip)")
+                       .append("g");
+        
         //Do the chart
         var update = dotsGroup.selectAll("circle").data(data)
-
+        
         update
             .enter()
             .append('circle')
@@ -154,71 +135,66 @@ function scatterPlot(data) {
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
             .attr('fill', d => colorScale(d.y))
-//            .on("mouseover", function (d) {
-//            $("#tooltip").html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num );
-//            var xpos = d3.event.pageX + 10;
-//            var ypos = d3.event.pageY + 20;
-//            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
-//            })
-
-
     };
 
-    // ----------------------------------------------------
-    // Add in Voronoi interaction
-    // ----------------------------------------------------
-
-    // add in interaction via voronoi
-    // create a voronoi diagram based on the data and the scales
+    // create a voronoi diagram 
     var voronoiDiagram = d3.voronoi()
         .x(d => scale.x(d.x))
         .y(d => scale.y(d.y))
-        .size([plotAreaWidth, plotAreaHeight])(data);
-
-    // limit how far away the mouse can be from finding a voronoi site
-    var voronoiRadius = plotAreaWidth / 10;
-
+        .size([width, height])(data);
 
     // add a circle for indicating the highlighted point
     dotsGroup.append('circle')
         .attr('class', 'highlight-circle')
-        .attr('r', pointRadius + 2) // slightly larger than our points
+        .attr('r', pointRadius*2) // increase the size if highlighted
         .style('fill', 'red')
         .style('display', 'none');
 
+    // add the overlay on top of everything to take the mouse events
+    dotsGroup.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', width)
+        .attr('height', height)
+        .style('fill', 'red')
+        .style('opacity', 0)
+        .on('mousemove', mouseMoveHandler)
+        .on('mouseleave', () => {
+            // hide the highlight circle when the mouse leaves the chart
+            console.log('mouse leave');
+            highlight(null);
+    });
+
+    var prevHighlightDotNum = null;
     // callback to highlight a point
     function highlight(d) {
         // no point to highlight - hide the circle and the tooltip
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
+            prevHighlightDotNum = null;
             //tooltip.style("opacity",0);
             // otherwise, show the highlight circle at the correct position
         } else {
-            d3.select('.highlight-circle')
-                .style('display', '')
-                .style('stroke', colorScale(d.y))
-                .attr('cx', scale.x(d.x))
-                .attr('cy', scale.y(d.y));
-            tooltip.transition()
-                    .duration(200)
-                tooltip
-                    .style("opacity", .9)
-                    .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
-                    .style("left", (d3.event.pageX + 35) + "px")
-                    .style("top", (d3.event.pageY + 10) + "px");
+            if (prevHighlightDotNum !== d.Cell_Num) {
+                d3.select('.highlight-circle')
+                  .style('display', '')
+                  .style('stroke', colorScale(d.y))
+                  .attr('cx', scale.x(d.x))
+                  .attr('cy', scale.y(d.y));
+                prevHighlightDotNum = d.dotNum;
+            }
         }
     }
 
     // callback for when the mouse moves across the overlay
     function mouseMoveHandler() {
+        console.log('mouse move');
+        
         // get the current mouse position
         var [mx, my] = d3.mouse(this);
 
-        // use the new diagram.find() function to find the voronoi site closest to
-        // the mouse, limited by max distance defined by voronoiRadius
-        //var site = voronoiDiagram.find(mx, my, voronoiRadius);
         var site = voronoiDiagram.find(mx, my);
 
+        //console.log('site', site);
         // highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data);
 
@@ -234,9 +210,6 @@ function scatterPlot(data) {
         }
         console.log(data.length)
     }
-
-
-
-
+    
 }
 
