@@ -13,6 +13,8 @@ function scatterPlot(data) {
     var plotAreaWidth = width - margin.left - margin.right;
     var plotAreaHeight = height - margin.top - margin.bottom;
 
+     var tsn = d3.transition().duration(200);
+
     // radius of points in the scatterplot
     var pointRadius = 2;
 
@@ -30,12 +32,12 @@ function scatterPlot(data) {
         x: d3.axisBottom(scale.x).ticks(xTicks).tickSizeOuter(0),
         y: d3.axisLeft(scale.y).ticks(yTicks).tickSizeOuter(0),
     };
-    
+
     var gridlines = {
         x: d3.axisBottom(scale.x).tickFormat("").tickSize(plotAreaHeight),
         y: d3.axisLeft(scale.y).tickFormat("").tickSize(-plotAreaWidth),
     }
-    
+
 
     var colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
 
@@ -45,7 +47,7 @@ function scatterPlot(data) {
     var zoom = d3.zoom()
         .scaleExtent([1, 20])
         .on("zoom", zoomed);
-    
+
     var tooltip = d3.select("body").append("div")
         .attr("id", "tooltip")
         .style("opacity", 0);
@@ -57,7 +59,7 @@ function scatterPlot(data) {
         .call(zoom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    
+
     // Clip path
     svg.append("clipPath")
         .attr("id", "clip")
@@ -67,10 +69,10 @@ function scatterPlot(data) {
 
 
     // Heatmap dots
-    var heatDotsGroup = svg.append("g")
+    var dotsGroup = svg.append("g")
         .attr("clip-path", "url(#clip)")
         .append("g");
-    
+
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
@@ -78,15 +80,15 @@ function scatterPlot(data) {
     //Create Y axis
     var renderYAxis = svg.append("g")
         .attr("class", "y axis")
-    
-    
+
+
 
 
     // set up axis generating functions
     var xTicks = Math.round(plotAreaWidth / 50);
     var yTicks = Math.round(plotAreaHeight / 50);
 
-    
+
     function updateScales(data, scale){
         scale.x.domain([extent.x[0] - 100, extent.x[1] + 100]).nice(),
         scale.y.domain([extent.y[0] - 100, extent.y[1] + 100]).nice()
@@ -101,48 +103,50 @@ function scatterPlot(data) {
         renderYAxis.call(axis.y.scale(d3.event.transform.rescaleX(scale.y)));
 
 
-        heatDotsGroup.attr("transform", d3.event.transform);
+        dotsGroup.attr("transform", d3.event.transform);
     }
-    
+
     // add the overlay on top of everything to take the mouse events
-    heatDotsGroup.append('rect')
+    dotsGroup.append('rect')
         .attr('class', 'overlay')
         .attr('width', plotAreaWidth)
         .attr('height', plotAreaHeight)
         .style('fill', 'red')
         .style('opacity', 0)
+        //.on('mousemove', mouseMoveHandler)
         .on('mousemove', mouseMoveHandler)
         .on('mouseleave', () => {
             // hide the highlight circle when the mouse leaves the chart
-            //highlight(null);
+            highlight(null);
+
         });
-    
+
     renderPlot(data);
-    
+
     function renderPlot(data){
         updateScales(data, scale);
-        
+
         svg.select('.y.axis')
             .attr("transform", "translate(" + -pointRadius + " 0)" )
             .call(axis.y);
-        
+
         var h = plotAreaHeight + pointRadius;
         svg.select('.x.axis')
             .attr("transform", "translate(0, " + h + ")")
             .call(axis.x);
-        
+
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.x);
-        
+
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.y);
-        
-        
+
+
         //Do the chart
-        var update = heatDotsGroup.selectAll("circle").data(data)
-        
+        var update = dotsGroup.selectAll("circle").data(data)
+
         update
             .enter()
             .append('circle')
@@ -150,13 +154,14 @@ function scatterPlot(data) {
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
             .attr('fill', d => colorScale(d.y))
-            .on("mouseover", function (d) {
-            $("#tooltip").html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num );
-            var xpos = d3.event.pageX + 10;
-            var ypos = d3.event.pageY + 20;
-            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
-            })
-  
+//            .on("mouseover", function (d) {
+//            $("#tooltip").html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num );
+//            var xpos = d3.event.pageX + 10;
+//            var ypos = d3.event.pageY + 20;
+//            $("#tooltip").css("left", xpos + "px").css("top", ypos + "px").animate().css("opacity", 1);
+//            })
+
+
     };
 
     // ----------------------------------------------------
@@ -175,18 +180,18 @@ function scatterPlot(data) {
 
 
     // add a circle for indicating the highlighted point
-    heatDotsGroup.append('circle')
+    dotsGroup.append('circle')
         .attr('class', 'highlight-circle')
         .attr('r', pointRadius + 2) // slightly larger than our points
-        .style('fill', 'none')
+        .style('fill', 'red')
         .style('display', 'none');
 
     // callback to highlight a point
     function highlight(d) {
-        // no point to highlight - hide the circle and clear the text
+        // no point to highlight - hide the circle and the tooltip
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
-
+            //tooltip.style("opacity",0);
             // otherwise, show the highlight circle at the correct position
         } else {
             d3.select('.highlight-circle')
@@ -194,6 +199,13 @@ function scatterPlot(data) {
                 .style('stroke', colorScale(d.y))
                 .attr('cx', scale.x(d.x))
                 .attr('cy', scale.y(d.y));
+            tooltip.transition()
+                    .duration(200)
+                tooltip
+                    .style("opacity", .9)
+                    .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
+                    .style("left", (d3.event.pageX + 35) + "px")
+                    .style("top", (d3.event.pageY + 10) + "px");
         }
     }
 
