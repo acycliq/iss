@@ -83,8 +83,8 @@ function scatterPlot(data) {
     var yTicks = Math.round(height / 50);
 
     function updateScales(data, scale){
-        scale.x.domain([extent.x[0], extent.x[1]]).nice(),
-        scale.y.domain([extent.y[0], extent.y[1]]).nice()
+        scale.x.domain([extent.x[0]*0.99, extent.x[1]*1.01]).nice(),
+        scale.y.domain([extent.y[0]*0.99, extent.y[1]*1.01]).nice()
     }
 
     function zoomed() {
@@ -171,7 +171,7 @@ function scatterPlot(data) {
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
             prevHighlightDotNum = null;
-            //tooltip.style("opacity",0);
+            tooltip.style("opacity",0);
             // otherwise, show the highlight circle at the correct position
         } else {
             if (prevHighlightDotNum !== d.Cell_Num) {
@@ -180,7 +180,14 @@ function scatterPlot(data) {
                   .style('stroke', colorScale(d.y))
                   .attr('cx', scale.x(d.x))
                   .attr('cy', scale.y(d.y));
-                prevHighlightDotNum = d.dotNum;
+                  tooltip.transition()
+                    .duration(200)
+                tooltip
+                    .style("opacity", .9)
+                    .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
+                    .style("left", (d3.event.pageX + 35) + "px")
+                    .style("top", (d3.event.pageY + 10) + "px");
+                prevHighlightDotNum = d.Cell_Num;
             }
         }
     }
