@@ -1,195 +1,204 @@
 function initChart(data) {
 
-   var totalWidth = 920,
-        totalHeight = 480;
 
-    var margin = {
+    // ----------------------------------------------------
+    // Build a basic scatterplot
+    // ----------------------------------------------------
+
+    // outer svg dimensions
+    //const width = 600;
+    //const height = 400;
+
+    // padding around the chart where axes will go
+    const padding = {
             top: 10,
             left: 50,
             bottom: 30,
             right: 0
-        }
-
-    var width = totalWidth  - margin.left - margin.right,
-        height = totalHeight  - margin.top - margin.bottom;
+        },
+        width = 920 - padding.left - padding.right,
+        height = 480 - padding.top - padding.bottom;
 
     // inner chart dimensions, where the dots are plotted
-//    var width = width - margin.left - margin.right;
-//    var height = height - margin.top - margin.bottom;
-
-     var tsn = d3.transition().duration(200);
+    const plotAreaWidth = width - padding.left - padding.right;
+    const plotAreaHeight = height - padding.top - padding.bottom;
 
     // radius of points in the scatterplot
-    var pointRadius = 2;
+    const pointRadius = 2;
 
     var extent = {
-        x: d3.extent(data, function (d) {return d.x}),
-        y: d3.extent(data, function (d) {return d.y}),
+        x: d3.extent(data, function (d) {
+            return d.x
+        }),
+        y: d3.extent(data, function (d) {
+            return d.y
+        })
     };
 
-    var scale = {
-        x: d3.scaleLinear().range([0, width]),
-        y: d3.scaleLinear().range([height, 0]),
-    };
-
-    var axis = {
-        x: d3.axisBottom(scale.x).ticks(xTicks).tickSizeOuter(0),
-        y: d3.axisLeft(scale.y).ticks(yTicks).tickSizeOuter(0),
-    };
-    
-    var gridlines = {
-        x: d3.axisBottom(scale.x).tickFormat("").tickSize(height),
-        y: d3.axisLeft(scale.y).tickFormat("").tickSize(-width),
-    }
-
-    var colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
+    // initialize scales
+    const xScale = d3.scaleLinear().domain([extent.x[0] - 100, extent.x[1] + 100]).range([0, plotAreaWidth]).nice();
+    const yScale = d3.scaleLinear().domain([extent.y[0] - 100, extent.y[1] + 100]).range([plotAreaHeight, 0]).nice();
+    const colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
 
     // select the root container where the chart will be added
-    var container = d3.select('#scatter-plot');
-
-    var zoom = d3.zoom()
-        .scaleExtent([1, 20])
-        .on("zoom", zoomed);
-
-    var tooltip = d3.select("body").append("div")
-        .attr("id", "tooltip")
-        .style("opacity", 0);
+    const container = d3.select('#scatter-plot');
 
     // initialize main SVG
-    var svg = container.select('svg')
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-        .call(zoom)
-        .append("g")
-        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    const svg = container.select('svg')
+        .attr("width", width + padding.left + padding.right)
+        .attr("height", height + padding.top + padding.bottom);
 
-    // Clip path
-    svg.append("clipPath")
-        .attr("id", "clip")
-        .append("rect")
-        .attr("width", width)
-        .attr("height", height);
+    // the main <g> where all the chart content goes inside
+    const g = svg.append('g')
+        .attr('transform', `translate(${padding.left} ${padding.top})`);
 
-    //Create X axis
-    var renderXAxis = svg.append("g")
-        .attr("class", "x axis")
+    // add in axis groups
+    const xAxisG = g.append('g').classed('x-axis', true)
+        .attr('transform', `translate(0 ${plotAreaHeight + pointRadius})`);
 
-    //Create Y axis
-    var renderYAxis = svg.append("g")
-        .attr("class", "y axis")
+    // x-axis label
+    g.append('text')
+        .attr('transform', `translate(${plotAreaWidth / 2} ${plotAreaHeight + (padding.bottom)})`)
+        .attr('dy', +10) // adjust distance from the bottom edge
+        .attr('class', 'axis-label')
+        .attr('text-anchor', 'middle')
+        .text('X Axis');
+
+    const yAxisG = g.append('g').classed('y-axis', true)
+        .attr('transform', `translate(${-pointRadius} 0)`);
+
+    // y-axis label
+    g.append('text')
+        .attr('transform', `rotate(270) translate(${-plotAreaHeight / 2} ${-padding.left})`)
+        .attr('dy', 12) // adjust distance from the left edge
+        .attr('class', 'axis-label')
+        .attr('text-anchor', 'middle')
+        .text('Y Axis');
 
     // set up axis generating functions
-    var xTicks = Math.round(width / 50);
-    var yTicks = Math.round(height / 50);
+    const xTicks = Math.round(plotAreaWidth / 50);
+    const yTicks = Math.round(plotAreaHeight / 50);
 
-    function updateScales(data, scale){
-        scale.x.domain([extent.x[0]*0.99, extent.x[1]*1.01]).nice(),
-        scale.y.domain([extent.y[0]*0.99, extent.y[1]*1.01]).nice()
-    }
+    const xAxis = d3.axisBottom(xScale)
+        .ticks(xTicks)
+        .tickSizeOuter(0);
 
-    function zoomed() {
-        d3.event.transform.x = d3.event.transform.x;
-        d3.event.transform.y = d3.event.transform.y;
+    const yAxis = d3.axisLeft(yScale)
+        .ticks(yTicks)
+        .tickSizeOuter(0);
 
-        // update: rescale x axis
-        renderXAxis.call(axis.x.scale(d3.event.transform.rescaleX(scale.x)));
-        renderYAxis.call(axis.y.scale(d3.event.transform.rescaleX(scale.y)));
+    // draw the axes
+    yAxisG.call(yAxis);
+    xAxisG.call(xAxis);
 
-        dotsGroup.attr("transform", d3.event.transform);
-    }
 
-    var dotsGroup;
-    renderPlot(data);
+    // add in circles
+    const circles = g.append('g').attr('class', 'circles');
+    const binding = circles.selectAll('.data-point').data(data, d => d.id);
+    binding.enter().append('circle')
+        .classed('data-point', true)
+        .attr('r', pointRadius)
+        .attr('cx', d => xScale(d.x))
+        .attr('cy', d => yScale(d.y))
+        .attr('fill', d => colorScale(d.y));
 
-    function renderPlot(data){
-        updateScales(data, scale);
-        
-        svg.select('.y.axis')
-            .attr("transform", "translate(" + -pointRadius + " 0)" )
-            .call(axis.y);
-        
-        var h = height + pointRadius;
-        svg.select('.x.axis')
-            .attr("transform", "translate(0, " + h + ")")
-            .call(axis.x);
-        
-        svg.append("g")
-            .attr("class", "grid")
-            .call(gridlines.x);
-        
-        svg.append("g")
-            .attr("class", "grid")
-            .call(gridlines.y);
+    binding.transition().duration(1000)
+        .attr("cx", d => xScale(d.x))
+        .attr("cy", d => xScale(d.y))
+        .attr("r", 2)
+        .style("opacity", 1);
 
-        dotsGroup = svg.append("g")
-                       .attr("clip-path", "url(#clip)")
-                       .append("g");
-        
-        //Do the chart
-        var update = dotsGroup.selectAll("circle").data(data)
-        
-        update
-            .enter()
-            .append('circle')
-            .attr('r', pointRadius)
-            .attr('cx', d => scale.x(d.x))
-            .attr('cy', d => scale.y(d.y))
-            .attr('fill', d => colorScale(d.y))
-    };
 
-    // create a voronoi diagram 
-    var voronoiDiagram = d3.voronoi()
-        .x(d => scale.x(d.x))
-        .y(d => scale.y(d.y))
-        .size([width, height])(data);
+    // ----------------------------------------------------
+    // Add in Voronoi interaction
+    // ----------------------------------------------------
+
+    // add in interaction via voronoi
+    // initialize text output for highlighted points
+    const highlightOutput = d3.select('#id_position')
+        .attr('class', 'highlight-output')
+    //  .style('padding-left', `${padding.left}px`)
+    //  .style('min-height', '100px');
+
+    const highlightOutput2 = d3.select('#id_cellgenecount')
+        .attr('class', 'highlight-output')
+        .style('padding-left', `${10}px`)
+        .style('min-height', '100px');
+
+    const highlightOutput4 = d3.select('#id_genenames')
+        .attr('class', 'highlight-output')
+        .style('padding-left', `${10}px`)
+        .style('min-height', '100px');
+
+    const highlightOutput3 = d3.select('#id_classname')
+        .attr('class', 'highlight-output')
+        .style('padding-left', `${10}px`)
+        .style('min-height', '100px');
+
+    const highlightOutput5 = d3.select('#id_prob')
+        .attr('class', 'highlight-output')
+        .style('padding-left', `${10}px`)
+        .style('min-height', '100px');
+
+
+    // create a voronoi diagram based on the data and the scales
+    const voronoiDiagram = d3.voronoi()
+        .x(d => xScale(d.x))
+        .y(d => yScale(d.y))
+        .size([plotAreaWidth, plotAreaHeight])(data);
+
+    // limit how far away the mouse can be from finding a voronoi site
+    const voronoiRadius = plotAreaWidth / 10;
+
 
     // add a circle for indicating the highlighted point
-    dotsGroup.append('circle')
+    g.append('circle')
         .attr('class', 'highlight-circle')
-        .attr('r', pointRadius*2) // increase the size if highlighted
-        .style('fill', 'red')
+        .attr('r', pointRadius + 2) // slightly larger than our points
+        .style('fill', 'none')
         .style('display', 'none');
 
-    // add the overlay on top of everything to take the mouse events
-    dotsGroup.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', width)
-        .attr('height', height)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        .on('mousemove', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            console.log('mouse leave');
-            highlight(null);
-    });
-
-    var prevHighlightDotNum = null;
     // callback to highlight a point
     function highlight(d) {
         // no point to highlight - hide the circle and clear the text
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
-            prevHighlightDotNum = null;
-            tooltip.style("opacity",0);
+            highlightOutput.text('');
+            highlightOutput2.text('');
 
             // otherwise, show the highlight circle at the correct position
         } else {
-            if (prevHighlightDotNum !== d.Cell_Num) {
-                d3.select('.highlight-circle')
+            d3.select('.highlight-circle')
                 .style('display', '')
                 .style('stroke', colorScale(d.y))
-                .attr('cx', scale.x(d.x))
-                .attr('cy', scale.y(d.y));
-                tooltip.transition()
-                    .duration(200)
-                tooltip
-                    .style("opacity", .9)
-                    .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
-                    .style("left", (d3.event.pageX + 35) + "px")
-                    .style("top", (d3.event.pageY + 10) + "px");
-                prevHighlightDotNum = d.Cell_Num;
-        
+                .attr('cx', xScale(d.x))
+                .attr('cy', yScale(d.y));
+
+            // format the highlighted data point for inspection
+            highlightOutput.html("<strong>Cell Num: </strong>" + JSON.stringify(d.Cell_Num) + "<br> <strong>X </strong> = " + d.x + "<br> <strong>Y </strong> = " + d.y);
+
+            highlightOutput2.html(JSON.stringify(d.CellGeneCount)
+                .replace(/]|[[]/g, '')
+                .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+                .replace(/,/g, '<br>'));
+            //document.getElementById('id_1').innerHTML = JSON.stringify("Some text to enterrr")
+
+            highlightOutput4.html(JSON.stringify(d.ClassName)
+                .replace(/]|[[]/g, '')
+                .replace(/\"/g, "")
+                .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+                .replace(/,/g, '<br>'));
+
+            highlightOutput3.html(JSON.stringify(d.Genenames)
+                .replace(/]|[[]/g, '')
+                .replace(/\"/g, "")
+                .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+                .replace(/,/g, '<br>'));
+
+            highlightOutput5.html(JSON.stringify(d.Prob)
+                .replace(/]|[[]/g, '')
+                .replace(/"(.+?)":/g, '<strong style="width: 40px; display: inline-block">$1:</strong> ')
+                .replace(/,/g, '<br>'));
 
 
             // ************************  Datatable Handler (start) ************************************************            
@@ -287,19 +296,64 @@ function initChart(data) {
             // ************************  Datatable Handler (end) ************************************************  
             
             
-            
+            var dataset = [];
+            var heatmapData = [];
+            var classNames = [];
+            var geneNames = [];
+            var cur = 0;
+
+            d3.json("./plots/data/weightedMap/json/ClassNames.json", function(data) {
+                for (let i = 0; i < 72; i++) {
+                    classNames.push({
+                        value: data[i].ClassNames,
+                    })
+            };
+            });
+
+            d3.json("./plots/data/weightedMap/json/GeneNames.json", function(data) {
+                for (let i = 0; i < 92; i++) {
+                    geneNames.push({
+                        value: data[i].GeneNames,
+                    })
+            };
+            });
+
+
+            var nK = 72;
+            var nG = 92;
             d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
-                data.forEach(function(d) {
-                d.xKey = +d.xKey
-                d.yKey = +d.yKey
-                d.val = +d.val});
+                for (let i = 0; i < nK; i++) {
+                    for (j = 0; j < nG; j++) {
+                        var key = "wm" + (j + 1);
+                        dataset.push({
+                            col: classNames[i].value,
+                            row: geneNames[j].value,
+                            val: data[i][key],
+                        })
+                    }
+                };
+                
+            for (let i = 0; i < nK; i++) { //360
+                for (j = 0; j < nG; j++) {  //75
+                m = i+(Math.floor(cur/nG)*nG)
+                heatmapData.push({
+                    xKey: i,
+                    xLabel: dataset[m].col,
+                    yKey: j,
+                    yLabel: dataset[j].row,
+                    val: dataset[cur].val,     
+                })
+            cur++ }
+            };
+    
                 console.log("hello start")
-                renderHeatmap(data)
+                renderHeatmap(heatmapData)
                 console.log("hello")
             });
-        
+
+
+
         }
-    }
     }
 
     // callback for when the mouse moves across the overlay
@@ -333,6 +387,91 @@ function initChart(data) {
         piechart(sdata)
         //map(sdata)
     }
+
+    // add the overlay on top of everything to take the mouse events
+    g.append('rect')
+        .attr('class', 'overlay')
+        .attr('width', plotAreaWidth)
+        .attr('height', plotAreaHeight)
+        .style('fill', 'red')
+        .style('opacity', 0)
+        .on('click', mouseMoveHandler)
+        .on('mouseleave', () => {
+            // hide the highlight circle when the mouse leaves the chart
+            //highlight(null);
+        });
+
+
+    // ----------------------------------------------------
+    // Add a fun click handler to reveal the details of what is happening
+    // ----------------------------------------------------
+
+    /**
+     * Add/remove a visible voronoi diagram and a circle indicating the radius used
+     * in the voronoi find function
+     */
+    function toggleVoronoiDebug() {
+        // remove if there
+        if (!g.select('.voronoi-polygons').empty()) {
+            g.select('.voronoi-polygons').remove();
+            g.select('.voronoi-radius-circle').remove();
+            g.select('.overlay').on('mousemove.voronoi', null).on('mouseleave.voronoi', null);
+            // otherwise, add the polygons in
+        } else {
+            // add a circle to follow the mouse to draw the voronoi radius
+            g.append('circle')
+                .attr('class', 'voronoi-radius-circle')
+                .attr('r', voronoiRadius)
+                .style('fill', 'none')
+                .style('stroke', 'tomato')
+                .style('stroke-dasharray', '3,2')
+                .style('display', 'none');
+
+
+            // move the voronoi radius mouse circle with the mouse
+            g.select('.overlay')
+                .on('mousemove.voronoi', function mouseMoveVoronoiHandler() {
+                    const [mx, my] = d3.mouse(this);
+                    d3.select('.voronoi-radius-circle')
+                        .style('display', '')
+                        .attr('cx', mx)
+                        .attr('cy', my);
+                })
+                .on('mouseleave.voronoi', () => {
+                    d3.select('.voronoi-radius-circle').style('display', 'none');
+                });
+
+
+            // draw the polygons
+            const voronoiPolygons = g.append('g')
+                .attr('class', 'voronoi-polygons')
+                .style('pointer-events', 'none');
+
+            const binding = voronoiPolygons.selectAll('path').data(voronoiDiagram.polygons());
+            binding.enter().append('path')
+                .style('stroke', 'tomato')
+                .style('fill', 'none')
+                .style('opacity', 0.15)
+                .attr('d', d => `M${d.join('L')}Z`);
+        }
+    }
+
+    // turn on and off voronoi debugging with click
+    //svg.on('click', toggleVoronoiDebug);
+
+    function onDoubleClick() {
+        d3.select('.highlight-circle').style('display', 'none');
+        highlightOutput.text('');
+        highlightOutput2.text('');
+        highlightOutput3.text('');
+        highlightOutput4.text('');
+        highlightOutput5.text('');
+
+        svg2.selectAll("*").remove()
+
+
+    }
+    svg.on('dblclick', onDoubleClick);
 
 
 }
