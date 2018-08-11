@@ -3,12 +3,12 @@ function heatmap(dataset) {
 
     var svg = d3.select("#heat-chart").select("svg")
 
-     var tsn = d3.transition().duration(1000);
+    var tsn = d3.transition().duration(1000);
 
     var xLabels = d3.map(dataset, function (d) {return d.xLabel;}).keys(),
         yLabels = d3.map(dataset, function (d) {return d.yLabel;}).keys();
 
-    var margin = {top: 0, right: 25, bottom: 70, left: 35};
+    var margin = {top: 0, right: 0, bottom: 20, left: 55};
 
     var width = +svg.attr("width") - margin.left - margin.right,
         height = +svg.attr("height") - margin.top - margin.bottom;
@@ -25,18 +25,28 @@ function heatmap(dataset) {
         .domain([valRange[0], colors.length - 1, valRange[1]])
         .range(colors);
 
+
+    var max_val = d3.max( dataset, function(d) { return d.val });
+    var min_val = d3.min( dataset, function(d) { return d.val });
+    var median_val = d3.median( dataset, function(d) { return d.val });
+    var color_scale = d3.scaleLinear().domain([min_val, median_val, max_val]).range(['blue', 'beige', 'red']);
+
     // the scale
     var scale = {
         x: d3.scaleLinear().range([0, width]),
         y: d3.scaleLinear().range([height, 0]),
     };
 
-    var xBand = d3.scaleBand().domain(xLabels).range([2*dotWidth, width+2*dotWidth]),
+    var q = {
+        x: d3.scaleQuantile().range([0, width])
+    };
+
+    var xBand = d3.scaleBand().domain(xLabels).range([0, width]),
         yBand = d3.scaleBand().domain(yLabels).rangeRound([height-2*dotHeight, 2*dotHeight]);
 
     var axis = {
         x: d3.axisBottom(scale.x).tickFormat((d, e) => xLabels[d]),
-        y: d3.axisLeft(scale.y).tickFormat((d, e) => yLabels[d]),
+        y: d3.axisLeft(scale.y).ticks(yLabels.length).tickFormat((d, e) => yLabels[d]),
     };
 
     var zoom = d3.zoom()
@@ -57,7 +67,7 @@ function heatmap(dataset) {
 
     // Clip path
     svg.append("clipPath")
-        .attr("id", "clip")
+        .attr("id", "clip2")
         .append("rect")
         .attr("width", width)
         .attr("height", height);
@@ -65,7 +75,7 @@ function heatmap(dataset) {
 
     // Heatmap dots
     var heatDotsGroup = svg.append("g")
-        .attr("clip-path", "url(#clip)")
+        .attr("clip-path", "url(#clip2)")
         .append("g");
 
 
@@ -125,7 +135,7 @@ function renderHeatmap(dataset) {
     updateScales(dataset, chartData.scale);
     svg.select('.y.axis').call(chartData.axis.y)
     svg.select('.x.axis')
-        .attr("transform", "translate(" + chartData.dotWidth + ", " + chartData.scale.y(0.0) + ")")
+        .attr("transform", "translate(0, " + chartData.scale.y(0.0) + ")")
         .call(chartData.axis.x)
 
 
@@ -150,9 +160,9 @@ function renderHeatmap(dataset) {
         })
         .merge(update)
         .transition(chartData.tsn)
-        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth()/2;})
+        .attr("cx", function (d) {return chartData.scale.x(d.xKey) - chartData.xBand.bandwidth();})
         .attr("cy", function (d) {return chartData.scale.y(d.yKey) + chartData.yBand.bandwidth();})
-        .attr("fill", function (d) { return chartData.colorScale(d.val);} );
+        .attr("fill", function (d) { return chartData.colorScale(d.val*25);} );
 
     update.exit().remove();
 
