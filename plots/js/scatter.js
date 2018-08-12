@@ -117,7 +117,7 @@ function initChart(data) {
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.x);
-        
+
         svg.append("g")
             .attr("class", "grid")
             .call(gridlines.y);
@@ -287,62 +287,16 @@ function initChart(data) {
             // ************************  Datatable Handler (end) ************************************************  
             
             
-            var dataset = [];
-            var heatmapData = [];
-            var classNames = [];
-            var geneNames = [];
-            var cur = 0;
 
-            d3.json("./plots/data/weightedMap/json/ClassNames.json", function(data) {
-                for (let i = 0; i < 72; i++) {
-                    classNames.push({
-                        value: data[i].ClassNames,
-                    })
-            };
-            });
-
-            d3.json("./plots/data/weightedMap/json/GeneNames.json", function(data) {
-                for (let i = 0; i < 92; i++) {
-                    geneNames.push({
-                        value: data[i].GeneNames,
-                    })
-            };
-            });
-
-
-            var nK = 72;
-            var nG = 92;
             d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
-                for (let i = 0; i < nK; i++) {
-                    for (j = 0; j < nG; j++) {
-                        var key = "wm" + (j + 1);
-                        dataset.push({
-                            col: classNames[i].value,
-                            row: geneNames[j].value,
-                            val: data[i][key],
-                        })
-                    }
-                };
-                
-            for (let i = 0; i < nK; i++) { //360
-                for (j = 0; j < nG; j++) {  //75
-                m = i+(Math.floor(cur/nG)*nG)
-                heatmapData.push({
-                    xKey: i,
-                    xLabel: dataset[m].col,
-                    yKey: j,
-                    yLabel: dataset[j].row,
-                    val: dataset[cur].val,     
-                })
-            cur++ }
-            };
-    
+                data.forEach(function(d) {
+                    d.xKey = +d.xKey
+                    d.yKey = +d.yKey
+                    d.val = +d.val});
                 console.log("hello start")
-                renderHeatmap(heatmapData)
+                renderHeatmap(data)
                 console.log("hello")
             });
-
-
 
         }
     }
@@ -378,19 +332,6 @@ function initChart(data) {
         piechart(sdata)
         //map(sdata)
     }
-
-    // add the overlay on top of everything to take the mouse events
-    g.append('rect')
-        .attr('class', 'overlay')
-        .attr('width', plotAreaWidth)
-        .attr('height', plotAreaHeight)
-        .style('fill', 'red')
-        .style('opacity', 0)
-        .on('click', mouseMoveHandler)
-        .on('mouseleave', () => {
-            // hide the highlight circle when the mouse leaves the chart
-            //highlight(null);
-        });
 
 
 }
