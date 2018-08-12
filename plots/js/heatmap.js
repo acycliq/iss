@@ -82,7 +82,7 @@ function heatmap(dataset) {
     //Create X axis
     var renderXAxis = svg.append("g")
         .attr("class", "x axis")
-        //.attr("transform", "translate(0," + scale.y(-0.5) + ")")
+        .attr("transform", "translate(0," + scale.y(-0.5) + ")")
 
     //Create Y axis
     var renderYAxis = svg.append("g")
