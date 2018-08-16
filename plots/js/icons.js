@@ -1,6 +1,7 @@
 function makeIcon(name, color) {
 
     if (name == "cross") {
+        console.log("I am doing a cross")
         // here's the SVG for the marker
         var icon = "<svg xmlns='http://www.w3.org/2000/svg' version='1.1' width='10' height='10'> " +
             "<path stroke=" + "'" + color + "'" + " stroke-width='2' fill='none' " +
