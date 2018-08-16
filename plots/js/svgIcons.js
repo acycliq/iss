@@ -203,3 +203,78 @@ L.Canvas.include({
         this._fillStroke(ctx, layer);
     }
 });
+
+var svgMarker = []; // create an empty array
+svgMarker.push({key: "Circle", value: L.CircleMarker});
+
+var MarkerStar = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerStar(this);
+    }
+});
+svgMarker.push({key: "Star", value: MarkerStar});
+
+
+var Marker6Point = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarker6Point(this);
+    }
+});
+svgMarker.push({key: "Star6Pointed", value: Marker6Point});
+
+
+var MarkerDiamond = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerDiamond(this);
+    }
+});
+svgMarker.push({key: "Diamond", value: MarkerDiamond});
+
+
+var MarkerSquare = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerSquare(this);
+    }
+});
+svgMarker.push({key: "Square", value: MarkerSquare});
+
+
+var MarkerTriangleUp = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerTriangleUp(this);
+    }
+});
+svgMarker.push({key: "TriangleUp", value: MarkerTriangleUp});
+
+
+var MarkerTriangleDown = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerTriangleDown(this);
+    }
+});
+svgMarker.push({key: "TriangleDown", value: MarkerTriangleDown});
+
+
+var MarkerTriangleLeft = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerTriangleLeft(this);
+    }
+});
+svgMarker.push({key: "TriangleLeft", value: MarkerTriangleLeft});
+
+
+var MarkerTriangleRight = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerTriangleRight(this);
+    }
+});
+svgMarker.push({key: "TriangleRight", value: MarkerTriangleRight});
+
+
+var MarkerCross = L.CircleMarker.extend({
+    _updatePath: function () {
+        this._renderer._updateMarkerCross(this);
+    }
+});
+svgMarker.push({key: "Cross", value: MarkerCross});
+
