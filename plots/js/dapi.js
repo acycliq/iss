@@ -1,4 +1,63 @@
-function dapi(data) {
+function dapi(cellData) {
+
+    var Marker6Point = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarker6Point(this);
+        }
+    });
+
+
+    var MarkerStar = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerStar(this);
+        }
+    });
+
+
+    var MarkerDiamond = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerDiamond(this);
+        }
+    });
+
+    var MarkerSquare = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerSquare(this);
+        }
+    });
+
+    var MarkerTriangleUp = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerTriangleUp(this);
+        }
+    });
+
+
+    var MarkerTriangleDown = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerTriangleDown(this);
+        }
+    });
+
+    var MarkerTriangleLeft = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerTriangleLeft(this);
+        }
+    });
+
+    var MarkerTriangleRight = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerTriangleRight(this);
+        }
+    });
+
+    var MarkerCross = L.CircleMarker.extend({
+        _updatePath: function () {
+            this._renderer._updateMarkerCross(this);
+        }
+    });
+
+
 
     d3.csv("./plots/data/myarr.csv", function (data) {
         data.forEach(function (d) {
@@ -224,7 +283,8 @@ function dapi(data) {
             dotlayer[i] = L.geoJson(myDots[i], {
                 pointToLayer: function (feature, latlng) {
                     var p = xy(project([latlng.lng, latlng.lat], img, grid));
-                    return L.circleMarker(p, style(feature));
+                    //return L.circleMarker(p, style(feature));
+                    return new MarkerStar(p, style(feature));
                 },
                 onEachFeature: onEachDot
             }).addTo(map);
