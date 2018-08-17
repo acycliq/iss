@@ -14,7 +14,7 @@ function dapi(cellData) {
         var arr = [];
         var nest = d3.nest()
             .key(function (d) {
-                return Math.floor(d.Expt / 10);;
+                return Math.floor(d.Expt / 10);
             })
             .entries(data);
 
