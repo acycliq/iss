@@ -25,7 +25,7 @@ function dapi(cellData) {
     }
 
     function helper(data) {
-        dots = {
+        var dots = {
             type: "FeatureCollection",
             features: []
         };
