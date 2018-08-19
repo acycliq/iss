@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+	<title>CRS.Simple example - Leaflet</title>
+
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ==" crossorigin=""/>
+	<script src='https://d3js.org/d3.v4.min.js' type='text/javascript'></script>
+	<script src='https://unpkg.com/d3-delaunay@4.1.0/dist/d3-delaunay.min.js'></script>
+	<script src='https://unpkg.com/voronator@1.1.0/dist/voronator.min.js'></script>
+	<script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js" integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw==" crossorigin=""></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.5/turf.min.js"></script>
+
+	<style>
+		html, body {
+			height: 100%;
+			margin: 0;
+		}
+		#map {
+			width: 600px;
+			height: 600px;
+		}
+	</style>
+
+
+</head>
+<body>
+
+<div id='map'></div>
+
+<script>
+
+    d3.json('../../plots/data/iss.json', function (data) {
+        data.forEach(function(d) {
+            d.Cell_Num = +d.Cell_Num
+            d.y = +d.Y
+            d.x = +d.X
+            console.log(d.Prob)
+        });
+        renderChart(data);
+        console.log("Done!!")
+    });
+
+
+    var img = [
+        16384, // original width of image
+        12288 // original height of image
+    ];
+
+    var roi = { //range of interest
+        x0: 6150,
+        x1: 13751,
+        y0: 12987,
+        y1: 18457
+    };
+
+    a = img[0] / (roi.x1 - roi.x0)
+    b = -img[0] / (roi.x1 - roi.x0) * roi.x0
+    c = img[1] / (roi.y1 - roi.y0)
+    d = -img[1] / (roi.y1 - roi.y0) * roi.y0
+
+    // This transformation maps a point in pixel dimensions to our user defined roi
+    var t = new L.Transformation(a, b, c, d);
+
+    function helper(data) {
+        var dots = {
+            type: "FeatureCollection",
+            features: []
+        };
+        for (var i = 0; i < data.length; i+=5) {
+            x = data[i].x;
+            y = data[i].y;
+            var lp = t.transform(L.point([x, y]));
+            var g = {
+                "type": "Point",
+                "coordinates": [lp.x, lp.y]
+            };
+
+            //create feature properties
+            var p = {
+                "id": i,
+                "popup": "Dot_" + i,
+                "year": parseInt(data[i].Expt),
+                "size": 30
+            };
+
+            //create features with proper geojson structure
+            dots.features.push({
+                "geometry": g,
+                "type": "Feature",
+                "properties": p
+            });
+        }
+        return dots;
+    }
+
+
+function renderChart(data) {
+
+    var dots = helper(data);
+    var features = dots.features;
+
+    var yx = L.latLng;
+
+    var xy = function (x, y) {
+        if (L.Util.isArray(x)) { // When doing xy([x, y]);
+            return yx(x[1], x[0]);
+        }
+        return yx(y, x); // When doing xy(x, y);
+    };
+    var myRenderer = L.canvas({
+        padding: 0.5
+    });
+
+    //create style, with fillColor picked from color ramp
+    function style(feature) {
+        return {
+            radius: 3,
+            fillColor: 'tomato',
+            color: "#000",
+            weight: 0,
+            opacity: 1,
+            fillOpacity: 0.9,
+            renderer: myRenderer,
+        };
+    }
+
+
+
+    // The transformation in this CRS maps the the bottom right corner to (0,0) and the topleft to (256, 256)
+    L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
+        transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
+    });
+
+    var bounds = L.latLngBounds([
+        xy(0, 0),
+        xy(img)
+    ]);
+
+    var map = L.map('map', {
+        crs: L.CRS.MySimple,
+        maxBounds: bounds.pad(.5),
+    }).setView([img[1] / 2, img[0] / 2], 5);
+
+
+    L.tileLayer('../data/img/dapi/{z}/{x}/{y}.png', {
+        bounds: bounds,
+        minZoom: 1,
+        maxZoom: 6,
+    }).addTo(map);
+
+
+    var fc = turf.featureCollection(features)
+    var pointLayer = L.geoJSON(fc, {
+        pointToLayer: function (feature, latlng){
+            console.log("hello")
+            return L.circleMarker(latlng, style(feature));
+        }
+    }).addTo(map);
+
+    var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
+    var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
+        return {
+            weight: 0.75,
+            color: 'tomato',
+            opacity: 0.5,
+            fill: false,
+            dashArray: "4 1",
+            renderer: myRenderer
+        };
+    },
+		onEachFeature: function(feature, layer) {
+        layer.on(
+            {
+				'mousemove': function(e){e.target.setStyle({weight:7, color: 'red'})},
+                'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
+				'click': function(e){map.fitBounds(e.target.getBounds());
+				this.bindPopup("<b>"+"Hello");},
+
+            }
+		);//close layer
+
+
+
+		}
+
+    }).addTo(map);
+
+    var cl = L.control.layers(null, {}).addTo(map);
+    cl.addOverlay(voronoiLayer, "Voronoi Polygons");
+    cl.addOverlay(pointLayer, "Cells");
+
+
+
+
+    L.circleMarker(xy([0, img[1] / 2])).addTo(map).bindPopup("[0, img[1]/2]");
+    L.circleMarker(xy([4000, 0])).addTo(map).bindPopup("[4000, 0]");
+
+
+    // var p = t.transform(L.point(roi.x1, roi.y1));
+    // L.circleMarker(xy([p.x, p.y])).addTo(map);
+    //
+    // p = t.transform(L.point(10000, 12987));
+    // L.circleMarker(xy([p.x, p.y])).addTo(map);
+    //
+    // p = t.transform(L.point(13000, 12987));
+    // L.circleMarker(xy([p.x, p.y])).addTo(map);
+    //
+    // p = t.transform(L.point(6150, 18000));
+    // L.circleMarker(xy([p.x, p.y])).addTo(map);
+
+
+}
+
+</script>
+
+
+
+</body>
+</html>
