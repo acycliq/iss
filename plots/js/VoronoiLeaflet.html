@@ -81,7 +81,7 @@
             //create feature properties
             var p = {
                 "id": i,
-                "popup": "Dot_" + i,
+                "popup": "Cell_" + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
             };
@@ -94,6 +94,75 @@
             });
         }
         return dots;
+    }
+    
+    
+    var myRenderer = L.canvas({
+        padding: 0.5
+    });
+
+
+    //calculate radius so that resulting circles will be proportional by area
+    function getRadius(y) {
+        r = Math.sqrt(y / Math.PI)
+        return r;
+    }
+    
+    //create style, with fillColor picked from color ramp
+    function style(feature) {
+        return {
+            radius: getRadius(feature.properties.size),
+            fillColor: 'tomato',
+            color: "#000",
+            weight: 0,
+            opacity: 1,
+            fillOpacity: 0.9,
+            renderer: myRenderer
+        };
+    }
+    
+    
+     //create highlight style, with darker color and larger radius
+    function highlightStyle(feature) {
+        return {
+            radius: 1.5 * getRadius(feature.properties.size),
+            fillColor: "#FFCE00",
+            color: "#FFCE00",
+            weight: 1,
+            opacity: 1,
+            fillOpacity: 0.9
+        };
+    }
+    
+    
+    //attach styles and popups to the marker layer
+    function highlightDot(e) {
+        var layer = e.target;
+        dotStyleHighlight = highlightStyle(layer.feature);
+        layer.setStyle(dotStyleHighlight);
+        if (!L.Browser.ie && !L.Browser.opera) {
+            layer.bringToFront();
+        }
+    }
+
+    function resetDotHighlight(e) {
+        var layer = e.target;
+        dotStyleDefault = style(layer.feature);
+        layer.setStyle(dotStyleDefault);
+    }
+
+    function onEachDot(feature, layer) {
+        layer.on({
+            mouseover: highlightDot,
+            mouseout: resetDotHighlight
+        });
+        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup + 
+            '</div></td></tr><tr class><td><div><b>Group:</b></div></td><td><div>' + feature.properties.year + 
+            '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.geometry.coordinates[0] + 
+            '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.geometry.coordinates[1] + 
+            '</div></td></tr></tbody></table>'
+        
+        layer.bindPopup(popup);
     }
 
 
@@ -110,23 +179,6 @@ function renderChart(data) {
         }
         return yx(y, x); // When doing xy(x, y);
     };
-    var myRenderer = L.canvas({
-        padding: 0.5
-    });
-
-    //create style, with fillColor picked from color ramp
-    function style(feature) {
-        return {
-            radius: 3,
-            fillColor: 'tomato',
-            color: "#000",
-            weight: 0,
-            opacity: 1,
-            fillOpacity: 0.9,
-            renderer: myRenderer,
-        };
-    }
-
 
 
     // The transformation in this CRS maps the the bottom right corner to (0,0) and the topleft to (256, 256)
@@ -153,13 +205,6 @@ function renderChart(data) {
 
 
     var fc = turf.featureCollection(features)
-    var pointLayer = L.geoJSON(fc, {
-        pointToLayer: function (feature, latlng){
-            console.log("hello")
-            return L.circleMarker(latlng, style(feature));
-        }
-    }).addTo(map);
-
     var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
     var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
         return {
@@ -181,12 +226,19 @@ function renderChart(data) {
 
             }
 		);//close layer
-
-
-
 		}
 
     }).addTo(map);
+    
+    
+    var pointLayer = L.geoJSON(fc, {
+        pointToLayer: function (feature, latlng){
+            console.log("hello")
+            return L.circleMarker(latlng, style(feature));
+        },
+        onEachFeature: onEachDot
+    }).addTo(map);
+    
 
     var cl = L.control.layers(null, {}).addTo(map);
     cl.addOverlay(voronoiLayer, "Voronoi Polygons");
