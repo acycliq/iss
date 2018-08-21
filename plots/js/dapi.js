@@ -1,14 +1,5 @@
 function dapi(cellData) {
 
-
-    d3.csv("./plots/data/myarr.csv", function (data) {
-        data.forEach(function (d) {
-            d.x = +d.x
-            d.y = +d.y
-            d.Expt = +d.Expt
-        })
-        renderChart(data)
-    })
     
     var img = [
         16384, // original width of image
@@ -164,9 +155,16 @@ function dapi(cellData) {
         
         layer.bindPopup(popup);
     }
-
-
-
+    
+    
+    d3.csv("./plots/data/myarr.csv", function (data) {
+        data.forEach(function (d) {
+            d.x = +d.x
+            d.y = +d.y
+            d.Expt = +d.Expt
+        })
+        renderChart(data)
+    })    
 
 
     function renderChart(data) {
