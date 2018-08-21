@@ -117,7 +117,7 @@ function dapi(cellData) {
     //create highlight style, with darker color and larger radius
     function highlightStyle(feature) {
         return {
-            radius: getRadius(feature.properties.size) + 1.5,
+            radius: getRadius(feature.properties.size) * 2,
             fillColor: "#FFCE00",
             color: "#FFCE00",
             weight: 1,
@@ -206,14 +206,9 @@ function dapi(cellData) {
             noWrap: true
         }).addTo(map);
 
-        //map.setView([55, 20], 6);
-
-        var myRenderer = L.canvas({
-            padding: 0.5
-        });
 
         // Voronoi
-        var cellDots = helper(cellData);
+        var cellDots = helper(cellData, "Cell");
         var cellFeatures = cellDots.features;
         var fc = turf.featureCollection(cellFeatures)
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
@@ -240,6 +235,19 @@ function dapi(cellData) {
             }
 
         }).addTo(map);
+        
+        
+        var cellLayer = L.geoJSON(fc, {
+            pointToLayer: function (feature, latlng){
+                console.log("hello")
+                return L.circleMarker(latlng, style(feature));
+            },
+            onEachFeature: onEachDot
+        }).addTo(map);
+
+
+        //var cl = L.control.layers(null, {}).addTo(map);
+
 
         // Define an array to keep layerGroups
         var dotlayer = [];
@@ -266,23 +274,13 @@ function dapi(cellData) {
             var name = "Group " + j + "0-" + j + "9";
             cl.addOverlay(dotlayer[j], name);
         }
+        cl.addOverlay(cellLayer, "Cells");
+        cl.addOverlay(voronoiLayer, "Voronoi Polygons");
+        
         
 
 
 
-
-        var cellLayer = L.geoJSON(fc, {
-            pointToLayer: function (feature, latlng){
-                console.log("hello")
-                return L.circleMarker(latlng, style(feature));
-            },
-            onEachFeature: onEachDot
-        }).addTo(map);
-
-
-        //var cl = L.control.layers(null, {}).addTo(map);
-        cl.addOverlay(voronoiLayer, "Voronoi Polygons");
-        cl.addOverlay(cellLayer, "Cells");
 
 
         ////////////////////////////////////////////////////////////////////////////

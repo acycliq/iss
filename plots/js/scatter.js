@@ -43,7 +43,7 @@ function initChart(data) {
         y: d3.axisLeft(scale.y).tickFormat("").tickSize(-width),
     }
 
-    var colorScale = d3.scaleLinear().domain([0, 1]).range(['#06a', '#06a']);
+    var colorScale = d3.scaleLinear().domain([0, 1]).range(['tomato', 'tomato']);
 
     // select the root container where the chart will be added
     var container = d3.select('#scatter-plot');
@@ -148,7 +148,7 @@ function initChart(data) {
     dotsGroup.append('circle')
         .attr('class', 'highlight-circle')
         .attr('r', pointRadius*2) // increase the size if highlighted
-        .style('fill', 'red')
+        .style('fill', '#FFCE00')
         .style('display', 'none');
 
     // add the overlay on top of everything to take the mouse events
@@ -156,9 +156,9 @@ function initChart(data) {
         .attr('class', 'overlay')
         .attr('width', width)
         .attr('height', height)
-        .style('fill', 'red')
+        .style('fill', '#FFCE00')
         .style('opacity', 0)
-        .on('mousemove', mouseMoveHandler)
+        .on('click', mouseMoveHandler)
         .on('mouseleave', () => {
             // hide the highlight circle when the mouse leaves the chart
             console.log('mouse leave');

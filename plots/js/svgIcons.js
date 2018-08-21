@@ -5,7 +5,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 6);
+            r = Math.max(Math.round(layer._radius), 8);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -34,7 +34,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 6);
+            r = Math.max(Math.round(layer._radius), 8);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -62,7 +62,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 6);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -84,7 +84,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -105,7 +105,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -125,7 +125,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -147,7 +147,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -168,7 +168,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 1);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
@@ -189,7 +189,7 @@ L.Canvas.include({
 
         var p = layer._point,
             ctx = this._ctx,
-            r = Math.max(Math.round(layer._radius), 6);
+            r = Math.max(Math.round(layer._radius), 5);
 
         this._drawnLayers[layer._leaflet_id] = layer;
 
