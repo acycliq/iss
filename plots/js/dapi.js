@@ -9,6 +9,26 @@ function dapi(cellData) {
         })
         renderChart(data)
     })
+    
+    var img = [
+        16384, // original width of image
+        12288 // original height of image
+    ];
+
+    var roi = { //range of interest
+        x0: 6150,
+        x1: 13751,
+        y0: 12987,
+        y1: 18457
+    };
+
+    a = img[0] / (roi.x1 - roi.x0)
+    b = -img[0] / (roi.x1 - roi.x0) * roi.x0
+    c = img[1] / (roi.y1 - roi.y0)
+    d = -img[1] / (roi.y1 - roi.y0) * roi.y0
+
+    // This transformation maps a point in pixel dimensions to our user defined roi
+    var t = new L.Transformation(a, b, c, d);
 
     function make_dots(data) {
         var arr = [];
@@ -32,14 +52,17 @@ function dapi(cellData) {
         for (var i = 0; i < data.length; ++i) {
             x = data[i].x;
             y = data[i].y;
+            var lp = t.transform(L.point([x, y]));
             var g = {
                 "type": "Point",
-                "coordinates": [x, y]
+                "coordinates": [lp.x, lp.y]
             };
 
             //create feature properties
             var p = {
                 "id": i,
+                "x": x,
+                "y": y,
                 "popup": "Dot_" + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
@@ -133,10 +156,10 @@ function dapi(cellData) {
             mouseover: highlightDot,
             mouseout: resetDotHighlight
         });
-        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup + 
+        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup +          
             '</div></td></tr><tr class><td><div><b>Group:</b></div></td><td><div>' + feature.properties.year + 
-            '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.geometry.coordinates[0] + 
-            '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.geometry.coordinates[1] + 
+            '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.properties.x + 
+            '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.properties.y + 
             '</div></td></tr></tbody></table>'
         
         layer.bindPopup(popup);
@@ -158,43 +181,21 @@ function dapi(cellData) {
         };
 
         var minZoom = 0,
-            maxZoom = 6,
-            img = [
-            16384, // original width of image => x / ~longitude (0 is left, 16384 is right)
-            12288 // original height of image => y / ~ reverse of latitude (0 is top, 12288 is bottom)
-            ];
+            maxZoom = 6;
+//            img = [
+//            16384, // original width of image => x / ~longitude (0 is left, 16384 is right)
+//            12288 // original height of image => y / ~ reverse of latitude (0 is top, 12288 is bottom)
+//            ];
+
+        // The transformation in this CRS maps the the bottom right corner to (0,0) and the topleft to (256, 256)
+        L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
+            transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
+        });
 
         var bounds = L.latLngBounds([
-                xy(0, 0),
-                xy(img)
-            ]);
-
-        var grid = {
-            x0: 6150, // range of plot in Matlab
-            x1: 13751,
-            y0: 12987,
-            y1: 18457
-        };
-
-        // project pixel p from image img on the a user-defined range
-        // Projection has origin [0,0] the bottom left corner
-        function project(p, img, grid) {
-            var x = p[0],
-                y = p[1];
-            xx = img[0] / (grid.x1 - grid.x0) * (x - grid.x0);
-            yy = img[1] - img[1] / (grid.y1 - grid.y0) * (y - grid.y0);
-
-            return [xx, yy]
-        }
-
-
-
-        L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
-            //                      coefficients: a      b    c     d
-            transformation: new L.Transformation(1 / 64, 0, 1 / 64, 64) // Compute a and c coefficients so that  tile 0/0/0 is
-            // from [0, 0] to [16384, 12288]. For example, we calc c and d making sure that equation
-            // 256 = c*12288 + d holds. 256 is the tile size and 12288 the original height of the image (in pixels)
-        });
+            xy(0, 0),
+            xy(img)
+        ]);
 
 
         var map = L.map('map', {
@@ -224,10 +225,11 @@ function dapi(cellData) {
         for (var i = 0; i < myDots.length; i += 1) {
             dotlayer[i] = L.geoJson(myDots[i], {
                 pointToLayer: function (feature, latlng) {
-                    var p = xy(project([latlng.lng, latlng.lat], img, grid));
+                    //var p = xy(project([latlng.lng, latlng.lat], img, grid));
                     //return L.circleMarker(p, style(feature));
                     // return new MarkerStar(p, style(feature));
-                    return new svgMarker[i].value(p, style(feature));
+                    
+                    return new svgMarker[i].value(latlng, style(feature));
                 },
                 onEachFeature: onEachDot
             }).addTo(map);
