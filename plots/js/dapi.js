@@ -30,12 +30,12 @@ function dapi(cellData) {
             .entries(data);
 
         for (var k = 0; k < nest.length; ++k) {
-            arr[k] = helper(nest[k].values);
+            arr[k] = helper(nest[k].values, "Gene");
         }
         return arr;
     }
 
-    function helper(data) {
+    function helper(data, label) {
         var dots = {
             type: "FeatureCollection",
             features: []
@@ -54,7 +54,7 @@ function dapi(cellData) {
                 "id": i,
                 "x": x,
                 "y": y,
-                "popup": "Dot_" + i,
+                "popup": label + " " + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
             };
@@ -163,11 +163,11 @@ function dapi(cellData) {
             d.y = +d.y
             d.Expt = +d.Expt
         })
-        renderChart(data)
+        renderChart(data, cellData)
     })    
 
 
-    function renderChart(data) {
+    function renderChart(data, cellData) {
         var myDots = make_dots(data);
         var yx = L.latLng;
 
@@ -180,12 +180,8 @@ function dapi(cellData) {
 
         var minZoom = 0,
             maxZoom = 6;
-//            img = [
-//            16384, // original width of image => x / ~longitude (0 is left, 16384 is right)
-//            12288 // original height of image => y / ~ reverse of latitude (0 is top, 12288 is bottom)
-//            ];
 
-        // The transformation in this CRS maps the the bottom right corner to (0,0) and the topleft to (256, 256)
+        // The transformation in this CRS maps the the bottom left corner to (0,0) and the top right to (256, 256)
         L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
             transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
         });
@@ -216,6 +212,35 @@ function dapi(cellData) {
             padding: 0.5
         });
 
+        // Voronoi
+        var cellDots = helper(cellData);
+        var cellFeatures = cellDots.features;
+        var fc = turf.featureCollection(cellFeatures)
+        var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
+        var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
+            return {
+                weight: 0.75,
+                color: 'tomato',
+                opacity: 0.5,
+                fill: false,
+                dashArray: "4 1",
+                renderer: myRenderer
+            };
+        },
+            onEachFeature: function(feature, layer) {
+            layer.on(
+                {
+                    'mousemove': function(e){e.target.setStyle({weight:7, color: 'red'})},
+                    'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
+                    'click': function(e){map.fitBounds(e.target.getBounds());
+                    this.bindPopup("<b>"+"Hello");},
+
+                }
+            );//close layer
+            }
+
+        }).addTo(map);
+
         // Define an array to keep layerGroups
         var dotlayer = [];
 
@@ -232,6 +257,8 @@ function dapi(cellData) {
                 onEachFeature: onEachDot
             }).addTo(map);
         }
+        
+        
 
 
         var cl = L.control.layers(null, {}).addTo(map);
@@ -239,6 +266,24 @@ function dapi(cellData) {
             var name = "Group " + j + "0-" + j + "9";
             cl.addOverlay(dotlayer[j], name);
         }
+        
+
+
+
+
+        var cellLayer = L.geoJSON(fc, {
+            pointToLayer: function (feature, latlng){
+                console.log("hello")
+                return L.circleMarker(latlng, style(feature));
+            },
+            onEachFeature: onEachDot
+        }).addTo(map);
+
+
+        //var cl = L.control.layers(null, {}).addTo(map);
+        cl.addOverlay(voronoiLayer, "Voronoi Polygons");
+        cl.addOverlay(cellLayer, "Cells");
+
 
         ////////////////////////////////////////////////////////////////////////////
         // FlyTo
@@ -252,16 +297,18 @@ function dapi(cellData) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
-            p = xy(project([x, y], img, grid))
-            map.flyTo(p, 5);
+            p = t.transform(L.point([x, y]));
+            //p = xy(project([x, y], img, grid))
+            map.flyTo([p.y, p.x], 5);
         });
 
         fly2.addEventListener("change", function (event) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
-            p = xy(project([x, y], img, grid))
-            map.flyTo(p, 5);
+            p = t.transform(L.point([x, y]));
+            //p = xy(project([x, y], img, grid))
+            map.flyTo([p.y, p.x], 5);
         });
 
 
