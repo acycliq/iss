@@ -176,7 +176,7 @@ function initChart(data) {
         });
         
         // Manually dispach a mouse click event. That will kick-off rendering of the other charts on the dashboard.
-        d3.select('#my-rect').dispatch('click')
+        d3.select('.overlay').dispatch('click')
     
     }; //end renderPlot
 
