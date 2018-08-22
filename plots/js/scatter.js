@@ -199,9 +199,6 @@ function initChart(data) {
         // highlight the point if we found one, otherwise hide the highlight circle
         highlight(site && site.data, true);
 
-
-
-        //map(sdata)
     }
 
 
@@ -235,7 +232,6 @@ function initChart(data) {
                 
                 // If true do the dataTable 
                 renderDataTable(d)
-
 
                 // Do the heatmap as well
                 d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
