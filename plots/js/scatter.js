@@ -256,14 +256,17 @@ function initChart(data) {
                         labels: d.ClassName[i]
                     })
                 }
+
+                barchart(sdata)
+                piechart(sdata)
+                
+                //Thats a temp solution to make the dapi chart responsive. There must be a better way
                 document.getElementById("xValue").value = d.X
                 document.getElementById("yValue").value = d.Y
                 var evtx = new CustomEvent('change');
                 document.getElementById('xValue').dispatchEvent(evtx);
                 var evty = new CustomEvent('change');
                 document.getElementById('yValue').dispatchEvent(evty);
-                barchart(sdata)
-                piechart(sdata)    
 
             }
         }
