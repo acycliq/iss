@@ -158,7 +158,8 @@ function initChart(data) {
         .attr('height', height)
         .style('fill', '#FFCE00')
         .style('opacity', 0)
-        .on('click', mouseMoveHandler)
+        .on('click', mouseClickHandler)
+        .on('mousemove', mouseMoveHandler)
         .on('mouseleave', () => {
             // hide the highlight circle when the mouse leaves the chart
             console.log('mouse leave');
@@ -167,7 +168,7 @@ function initChart(data) {
 
     var prevHighlightDotNum = null;
     // callback to highlight a point
-    function highlight(d) {
+    function highlight(d, flag) {
         // no point to highlight - hide the circle and clear the text
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
@@ -190,117 +191,119 @@ function initChart(data) {
                     .style("top", (d3.event.pageY + 10) + "px");
                 prevHighlightDotNum = d.Cell_Num;                
             }
+            
+            if (flag === true) {
+
+                // ************************  Datatable Handler (start) ************************************************            
+                var mydata = [];
+                var mydata2 = [];
+
+                var str = "<strong>Cell Num: </strong>" + d.Cell_Num +
+                    ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")";
+                document.getElementById('dtTitle').innerHTML = str;
+                var n = d3.max([d.CellGeneCount.length, d.Genenames.length]);
+                for (i = 0; i < n; i++) {
+                    mydata.push({
+                        "Genenames": (d.Genenames[i] === undefined) ? "" : d.Genenames[i],
+                        "CellGeneCount": (d.CellGeneCount[i] === undefined) ? "" : d.CellGeneCount[i],
+                    })
+                }
+
+                var n = d3.max([d.ClassName.length, d.Prob.length]);
+                for (i = 0; i < n; i++) {
+                    mydata2.push({
+                        "ClassName": (d.ClassName[i] === undefined) ? "" : d.ClassName[i],
+                        "Prob": (d.Prob[i] === undefined) ? "" : d.Prob[i],
+                    })
+                }
 
 
-            // ************************  Datatable Handler (start) ************************************************            
-            var mydata = [];
-            var mydata2 = [];
+                // check if a there is a reference to a datatable.
+                // If yes, refresh with the new data
+                // Otherwise create and populate a datatable
+                if ($.fn.dataTable.isDataTable('#dtTable')) {
+                    table = $('#dtTable').DataTable();
+                    table.clear().rows.add(mydata).draw();
+                } else {
+                    table = $('#dtTable').DataTable({
+                        //bFilter: false,
+                        "lengthChange": false,
+                        searching: false,
+                        //"scrollY":        "200px",
+                        //"scrollCollapse": true,
+                        "paging": true,
+                        //dom: 't',
 
-            var str = "<strong>Cell Num: </strong>" + d.Cell_Num +
-                ",  (<strong>x, y</strong>): (" + d.x.toFixed(2) + ", " + d.y.toFixed(2) + ")";
-            document.getElementById('dtTitle').innerHTML = str;
-            var n = d3.max([d.CellGeneCount.length, d.Genenames.length]);
-            for (i = 0; i < n; i++) {
-                mydata.push({
-                    "Genenames": (d.Genenames[i] === undefined) ? "" : d.Genenames[i],
-                    "CellGeneCount": (d.CellGeneCount[i] === undefined) ? "" : d.CellGeneCount[i],
-                })
-            }
+                        "data": mydata,
+                        "columns": [
+                            {
+                                title: "Gene Names",
+                                data: "Genenames"
+                            },
+                            {
+                                title: "Cell Gene Count",
+                                data: "CellGeneCount"
+                            },
+                              ],
+                    });
 
-            var n = d3.max([d.ClassName.length, d.Prob.length]);
-            for (i = 0; i < n; i++) {
-                mydata2.push({
-                    "ClassName": (d.ClassName[i] === undefined) ? "" : d.ClassName[i],
-                    "Prob": (d.Prob[i] === undefined) ? "" : d.Prob[i],
-                })
-            }
+                }
 
 
-            // check if a there is a reference to a datatable.
-            // If yes, refresh with the new data
-            // Otherwise create and populate a datatable
-            if ($.fn.dataTable.isDataTable('#dtTable')) {
-                table = $('#dtTable').DataTable();
-                table.clear().rows.add(mydata).draw();
-            } else {
-                table = $('#dtTable').DataTable({
-                    //bFilter: false,
-                    "lengthChange": false,
-                    searching: false,
-                    //"scrollY":        "200px",
-                    //"scrollCollapse": true,
-                    "paging": true,
-                    //dom: 't',
+                if ($.fn.dataTable.isDataTable('#dtTable2')) {
+                    table2 = $('#dtTable2').DataTable();
+                    table2.clear().rows.add(mydata2).draw();
+                } else {
+                    table2 = $('#dtTable2').DataTable({
+                        //bFilter: false,
+                        "lengthChange": false,
+                        searching: false,
+                        //"scrollY":        "200px",
+                        //"scrollCollapse": true,
+                        "paging": true,
+                        //dom: 't',
+                        "data": mydata2,
+                        "columns": [
+                            {
+                                title: "Class Name",
+                                data: "ClassName"
+                            },
+                            {
+                                title: "Prob",
+                                data: "Prob"
+                            },
+                          ]
+                    });
+                }
 
-                    "data": mydata,
-                    "columns": [
-                        {
-                            title: "Gene Names",
-                            data: "Genenames"
-                        },
-                        {
-                            title: "Cell Gene Count",
-                            data: "CellGeneCount"
-                        },
-		                  ],
+                // Sort by column 1 and then re-draw
+                table
+                    .order([1, 'desc'])
+                    .draw();
+
+                table2
+                    .order([1, 'desc'])
+                    .draw();
+
+
+                // ************************  Datatable Handler (end) ************************************************  
+
+
+
+                d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
+                    data.forEach(function(d) {
+                        d.xKey = +d.xKey
+                        d.yKey = +d.yKey
+                        d.val = +d.val});
+                    console.log("hello start")
+                    renderHeatmap(data)
+                    console.log("hello")
                 });
 
             }
-
-
-            if ($.fn.dataTable.isDataTable('#dtTable2')) {
-                table2 = $('#dtTable2').DataTable();
-                table2.clear().rows.add(mydata2).draw();
-            } else {
-                table2 = $('#dtTable2').DataTable({
-                    //bFilter: false,
-                    "lengthChange": false,
-                    searching: false,
-                    //"scrollY":        "200px",
-                    //"scrollCollapse": true,
-                    "paging": true,
-                    //dom: 't',
-                    "data": mydata2,
-                    "columns": [
-                        {
-                            title: "Class Name",
-                            data: "ClassName"
-                        },
-                        {
-                            title: "Prob",
-                            data: "Prob"
-                        },
-		              ]
-                });
-            }
-
-            // Sort by column 1 and then re-draw
-            table
-                .order([1, 'desc'])
-                .draw();
-
-            table2
-                .order([1, 'desc'])
-                .draw();
-
-
-            // ************************  Datatable Handler (end) ************************************************  
-            
-            
-
-            d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
-                data.forEach(function(d) {
-                    d.xKey = +d.xKey
-                    d.yKey = +d.yKey
-                    d.val = +d.val});
-                console.log("hello start")
-                renderHeatmap(data)
-                console.log("hello")
-            });
-
         }
     }
-
+    
     // callback for when the mouse moves across the overlay
     function mouseMoveHandler() {
         // get the current mouse position
@@ -312,7 +315,23 @@ function initChart(data) {
         const site = voronoiDiagram.find(mx, my);
 
         // highlight the point if we found one, otherwise hide the highlight circle
-        highlight(site && site.data);
+        highlight(site && site.data, false);
+
+    }
+    
+
+    // callback for when the mouse moves across the overlay
+    function mouseClickHandler() {
+        // get the current mouse position
+        const [mx, my] = d3.mouse(this);
+
+        // use the new diagram.find() function to find the voronoi site closest to
+        // the mouse, limited by max distance defined by voronoiRadius
+        //const site = voronoiDiagram.find(mx, my, voronoiRadius);
+        const site = voronoiDiagram.find(mx, my);
+
+        // highlight the point if we found one, otherwise hide the highlight circle
+        highlight(site && site.data, true);
 
 
         let sdata = []
