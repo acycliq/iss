@@ -102,8 +102,16 @@ function initChart(data) {
     var dotsGroup;
     var voronoiDiagram;
     renderPlot(data);
-
+    
     function renderPlot(data){
+        console.log('Doing Scatter plot')
+        renderScatter(data);
+        
+        console.log('Doing DAPI')
+        dapi(data);
+    }
+
+    function renderScatter(data){
         updateScales(data, scale);
         
         svg.select('.y.axis')
@@ -166,6 +174,9 @@ function initChart(data) {
                 console.log('mouse leave');
                 highlight(null);
         });
+        
+        // Manually dispach a mouse click event. That will kick-off rendering of the other charts on the dashboard.
+        d3.select('#my-rect').dispatch('click')
     
     }; //end renderPlot
 

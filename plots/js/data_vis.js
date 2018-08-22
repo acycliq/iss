@@ -6,9 +6,9 @@
           d.x = +d.X
           console.log(d.Prob)
           });
-        console.log("Starting DAPI")
-        dapi(data);
-        console.log("Starting Scatter")
+//        console.log("Starting DAPI")
+//        dapi(data);
+//        console.log("Starting Scatter")
         mydata = initChart(data);
 //        console.log("Starting heatmap")
 //        heatmap()
