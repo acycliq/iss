@@ -200,21 +200,7 @@ function initChart(data) {
         highlight(site && site.data, true);
 
 
-        let sdata = []
-        for (let i = 0; i < site.data.Prob.length; i++) {
-            sdata.push({
-                Prob: site.data.Prob[i],
-                labels: site.data.ClassName[i]
-            })
-        }
-        document.getElementById("xValue").value = site.data.X
-        document.getElementById("yValue").value = site.data.Y
-        var evtx = new CustomEvent('change');
-        document.getElementById('xValue').dispatchEvent(evtx);
-        var evty = new CustomEvent('change');
-        document.getElementById('yValue').dispatchEvent(evty);
-        barchart(sdata)
-        piechart(sdata)
+
         //map(sdata)
     }
 
@@ -247,10 +233,11 @@ function initChart(data) {
             
             if (flag === true) {
                 
-                // If true do the dataTable and the heatmap
+                // If true do the dataTable 
                 renderDataTable(d)
 
 
+                // Do the heatmap as well
                 d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
                     data.forEach(function(d) {
                         d.xKey = +d.xKey
@@ -260,6 +247,23 @@ function initChart(data) {
                     renderHeatmap(data)
                     console.log("Heatmap end")
                 });
+                
+                // And the barchart, piechart too!
+                let sdata = []
+                for (let i = 0; i < d.Prob.length; i++) {
+                    sdata.push({
+                        Prob: d.Prob[i],
+                        labels: d.ClassName[i]
+                    })
+                }
+                document.getElementById("xValue").value = d.X
+                document.getElementById("yValue").value = d.Y
+                var evtx = new CustomEvent('change');
+                document.getElementById('xValue').dispatchEvent(evtx);
+                var evty = new CustomEvent('change');
+                document.getElementById('yValue').dispatchEvent(evty);
+                barchart(sdata)
+                piechart(sdata)    
 
             }
         }
