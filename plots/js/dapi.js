@@ -214,7 +214,7 @@ function dapi(cellData) {
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
         var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
             return {
-                weight: 0.75,
+                weight: 0.0, // Voronoi not visible, useful only for navigation purposes
                 color: 'tomato',
                 opacity: 0.5,
                 fill: false,
@@ -225,7 +225,7 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mousemove': function(e){e.target.setStyle({weight:7, color: 'red'})},
+                    'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
                     'click': function(e){map.fitBounds(e.target.getBounds());
                     this.bindPopup("<b>"+"Hello");},
