@@ -43,6 +43,7 @@ function dapi(cellData) {
         for (var i = 0; i < data.length; ++i) {
             x = data[i].x;
             y = data[i].y;
+            gene = data.Gene;
             var lp = t.transform(L.point([x, y]));
             var g = {
                 "type": "Point",
@@ -54,6 +55,7 @@ function dapi(cellData) {
                 "id": i,
                 "x": x,
                 "y": y,
+                "Gene": gene,
                 "popup": label + " " + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
@@ -68,6 +70,41 @@ function dapi(cellData) {
         }
         return dots;
     }
+    
+    
+    function makeCellFeatures(data) {
+        var dots = {
+            type: "FeatureCollection",
+            features: []
+        };
+        for (var i = 0; i < data.length; ++i) {
+            x = data[i].x;
+            y = data[i].y;
+            var lp = t.transform(L.point([x, y]));
+            var g = {
+                "type": "Point",
+                "coordinates": [lp.x, lp.y]
+            };
+
+            //create feature properties
+            var p = {
+                "id": i,
+                "x": x,
+                "y": y,
+                "popup": "Cell " + i,
+                "year": parseInt(data[i].Expt),
+                "size": 30
+            };
+
+            //create features with proper geojson structure
+            dots.features.push({
+                "geometry": g,
+                "type": "Feature",
+                "properties": p
+            });
+        }
+        return dots;
+    }    
 
 
     //////////////////////////////////////////////////////////////////////////////////////////////
@@ -106,8 +143,8 @@ function dapi(cellData) {
         return {
             radius: getRadius(feature.properties.size),
             fillColor: getColor(feature.properties.year),
-            color: "#000",
-            weight: 0,
+            color: "steelblue",
+            weight: 3,
             opacity: 1,
             fillOpacity: 0.9,
             renderer: myRenderer
@@ -157,7 +194,7 @@ function dapi(cellData) {
     }
     
     
-    d3.csv("./plots/data/myarr.csv", function (data) {
+    d3.csv("./plots/data/Dapi_overlays.csv", function (data) {
         data.forEach(function (d) {
             d.x = +d.x
             d.y = +d.y
@@ -208,7 +245,7 @@ function dapi(cellData) {
 
 
         // Voronoi
-        var cellDots = helper(cellData, "Cell");
+        var cellDots = makeCellFeatures(cellData);
         var cellFeatures = cellDots.features;
         var fc = turf.featureCollection(cellFeatures)
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
