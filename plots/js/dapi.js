@@ -17,6 +17,9 @@ function dapi(cellData) {
     b = -img[0] / (roi.x1 - roi.x0) * roi.x0
     c = img[1] / (roi.y1 - roi.y0)
     d = -img[1] / (roi.y1 - roi.y0) * roi.y0
+    
+    var glyphs = glyphAssignment();
+    var glyphMap = d3.map(glyphs, function(d) { return d.gene; });
 
     // This transformation maps a point in pixel dimensions to our user defined roi
     var t = new L.Transformation(a, b, c, d);
@@ -43,7 +46,8 @@ function dapi(cellData) {
         for (var i = 0; i < data.length; ++i) {
             x = data[i].x;
             y = data[i].y;
-            gene = data.Gene;
+            gene = data[i].Gene;
+            //console.log(gene)
             var lp = t.transform(L.point([x, y]));
             var g = {
                 "type": "Point",
@@ -56,6 +60,8 @@ function dapi(cellData) {
                 "x": x,
                 "y": y,
                 "Gene": gene,
+                "taxonomy": glyphMap.get(gene).taxonomy,
+                "glyphName": glyphMap.get(gene).glyphName,
                 "popup": label + " " + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
@@ -113,16 +119,18 @@ function dapi(cellData) {
 
     //create color ramp
     function getColor(y) {
-        return y > 90 ? '#6068F0' :
-            y > 80 ? '#6B64DC' :
-            y > 70 ? '#7660C9' :
-            y > 60 ? '#815CB6' :
-            y > 50 ? '#8C58A3' :
-            y > 40 ? '#985490' :
-            y > 30 ? '#A3507C' :
-            y > 20 ? '#AE4C69' :
-            y > 10 ? '#B94856' :
-            y > 0 ? '#C44443' :
+        return y === 'cnr1' ? '#FFC700' :
+            y === 'cxcl14' ? '#00B2FF' :
+            y === 'in_general' ? '#5C33FF' :
+            y === 'less_active' ? '#407F59' :
+            y === 'ngf' ? '#44B200' :
+            y === 'non_neuron' ? '#00FF00' :
+            y === 'pc' ? '#FFFFFF' :
+            y === 'pc2' ? '#FF00E5' :
+            y === 'pc_or_in' ? '#96B28E' :
+            y === 'pvalb' ? '#0000FF' :
+            y === 'sst' ? '#995C00' :
+            y === 'vip' ? '#FF0000' :
             '#D04030';
     }
 
@@ -142,11 +150,11 @@ function dapi(cellData) {
     function style(feature) {
         return {
             radius: getRadius(feature.properties.size),
-            fillColor: getColor(feature.properties.year),
-            color: "steelblue",
-            weight: 3,
+            //fillColor: "none",//getColor(feature.properties.taxonomy),
+            color: getColor(feature.properties.taxonomy),
+            weight: 1,
             opacity: 1,
-            fillOpacity: 0.9,
+            fillOpacity: 0.0,
             renderer: myRenderer
         };
     }
@@ -242,6 +250,16 @@ function dapi(cellData) {
             minZoom: 0,
             noWrap: true
         }).addTo(map);
+        
+        //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
+        tl = L.tileLayer("./plots/data/img/dapi/{z}/{x}/{y}.png", {
+            minZoom: 0,
+            maxZoom: 6
+        });
+        var miniMap = new L.Control.MiniMap(tl, { toggleDisplay: true }).addTo(map);
+        
+        //Add fullscreen button
+        map.addControl(new L.Control.Fullscreen());
 
 
         // Voronoi
