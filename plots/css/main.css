@@ -32,6 +32,16 @@ h1 {
     height: 100%;
     z-index: 1000;
 }
+
+#status{
+    position: absolute;
+    text-align: center;
+    width: 100%;
+    margin: 100px auto;
+    color: floralwhite;
+    font-size: 1.6em;
+    z-index: 4000;
+}
 #loader {
     display: block;
     position: relative;
