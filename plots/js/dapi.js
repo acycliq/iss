@@ -282,9 +282,12 @@ function dapi(cellData) {
                 {
                     'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
-                    'click': function(e){map.fitBounds(e.target.getBounds());
-                    this.bindPopup("<b>"+"Hello");},
-
+                    'click': function(e){
+                        map.fitBounds(e.target.getBounds());
+                        this.bindPopup("<b>"+"Hello");
+                        },
+                    'add': function(e){console.log('add pressed')},
+                    'remove': function(e){console.log('remove pressed')},
                 }
             );//close layer
             }
@@ -304,7 +307,7 @@ function dapi(cellData) {
         //var cl = L.control.layers(null, {}).addTo(map);
 
 
-        // Define an array to keep layerGroups
+        // Define an array to keep layers
         var dotlayer = [];
 
         //create marker layer and display it on the map
@@ -318,11 +321,27 @@ function dapi(cellData) {
                     return new svgMarker[i].value(latlng, style(feature));
                 },
                 onEachFeature: onEachDot
-            }).addTo(map);
+            });
         }
         
         
-
+        // Keep these layers on a single layer group and call this to add them to the map
+        var lg = new L.LayerGroup();
+        function addLayers(){
+            for (var i = 0; i < myDots.length; i += 1) {
+                lg.addLayer(dotlayer[i]);
+            };
+            lg.addTo(map);
+        }
+        
+        // Call this to clear chart from the layers grouped together on the layer group
+        function removeLayers(){
+            lg.clearLayers();
+        }
+    
+        //add now the grouped layers to the map
+        addLayers()
+        
 
         var cl = L.control.layers(null, {}).addTo(map);
         for (j = 0; j < dotlayer.length; j += 1) {
@@ -334,9 +353,53 @@ function dapi(cellData) {
         
         
 
+        // Toggle button to turn layers on and off
+        var customControl =  L.Control.extend({
+          options: {
+            position: 'topright'
+          },
+
+          onAdd: function (map) {
+            var container = L.DomUtil.create('input');
+            container.type="button";
+            container.title="Some title";
+            container.value = "Hide genes";
+
+            container.style.backgroundColor = 'white';     
+            container.style.backgroundSize = "80px 30px";
+            container.style.width = '80px';
+            container.style.height = '30px';
+              
+
+            function toggle(button) {
+                if(button.value=="Hide genes") {
+                    button.value="Show genes"
+                    button.innerHTML="Show genes"
+                    removeLayers();
+                } else if(button.value=="Show genes") {
+                    button.value="Hide genes"
+                    button.innerHTML="Hide genes"
+                    addLayers();
+                }
+            }
+
+            container.onmouseover = function(){
+              container.style.backgroundColor = 'pink'; 
+            }
+            container.onmouseout = function(){
+              container.style.backgroundColor = 'white'; 
+            }
+
+            container.onclick = function(){
+                toggle(this);
+              console.log('buttonClicked');
+            }
 
 
-
+            return container;
+          }
+        });
+        map.addControl(new customControl());
 
         ////////////////////////////////////////////////////////////////////////////
         // FlyTo
