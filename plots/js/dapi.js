@@ -416,15 +416,32 @@ function dapi(cellData) {
             var input = L.DomUtil.create('input');
             input.type = "checkbox";
             input.title = "Some title";
-            input.value = "Off";
+            input.value = "On";
             // Insert the input as child of container.
             container.appendChild(input);
 
+
+              function toggle(event) {
+                if(event.target.checked === false) {
+//                    button.value="Show genes"
+//                    button.innerHTML="Show genes"
+                    removeLayers();
+                } else if(event.target.checked === true) {
+//                    button.value="Hide genes"
+//                    button.innerHTML="Hide genes"
+                    addLayers();
+                }
+            }
+              
             jQuery(input).bootstrapSwitch({
                 size: 'mini',
+                state: true,
+                onText: 'Yes',
+                offText: 'No',
               // http://bootstrapswitch.site/options.html
               onSwitchChange: function(event) {
                 console.log('buttonClicked', event.target.checked);
+                  toggle(event);
               }
             });
 
@@ -432,6 +449,52 @@ function dapi(cellData) {
           }
         });
         map.addControl(new switchControl());
+        
+        
+        // Bootstrap toggle
+        var toggleControl = L.Control.extend({
+          options: {
+            position: 'topright'
+          },
+
+          onAdd: function(map) {
+              var container = L.DomUtil.create('div');
+
+              // Use a child input.
+              var input = L.DomUtil.create('input');
+              input.type = "checkbox";
+              input.checked = true;
+              input.setAttribute('data-style', 'slow');
+
+              
+              // Insert the input as child of container.
+              container.appendChild(input);
+              
+              container.onchange = function(event){
+                  toggle(event);
+                  console.log('buttonClicked', event.target.checked);
+              }
+            
+              function toggle(event) {
+                if(event.target.checked === false) {
+                    removeLayers();
+                } else if(event.target.checked === true) {
+                    addLayers();
+                }
+              }
+              
+              jQuery(input).bootstrapToggle({
+                  //size: 'small',
+                  on: 'Genes: On',
+                  off: 'Genes: Off',
+                  width: 100,
+                  height: null,
+              });
+
+            return container;
+          }
+        });
+        map.addControl(new toggleControl());
         
 
         
