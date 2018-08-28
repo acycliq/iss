@@ -399,7 +399,7 @@ function dapi(cellData) {
             return container;
           }
         });
-        map.addControl(new customControl());
+        //map.addControl(new customControl());
         
         
         // toggle button (again)
@@ -448,7 +448,7 @@ function dapi(cellData) {
             return container;
           }
         });
-        map.addControl(new switchControl());
+        //map.addControl(new switchControl());
         
         
         // Bootstrap toggle
