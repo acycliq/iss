@@ -362,7 +362,7 @@ function dapi(cellData) {
           onAdd: function (map) {
             var container = L.DomUtil.create('input');
             container.type="button";
-            container.title="Some title";
+            container.title="Toggle genes on/off";
             container.value = "Hide genes";
 
             container.style.backgroundColor = 'white';     
@@ -400,6 +400,41 @@ function dapi(cellData) {
           }
         });
         map.addControl(new customControl());
+        
+        
+        // toggle button (again)
+        // Toggle button to turn layers on and off
+        // you may also want to try this one: http://www.bootstraptoggle.com/
+        var switchControl = L.Control.extend({
+          options: {
+            position: 'topright'
+          },
+
+          onAdd: function(map) {
+            var container = L.DomUtil.create('div');
+            // Use a child input.
+            var input = L.DomUtil.create('input');
+            input.type = "checkbox";
+            input.title = "Some title";
+            input.value = "Off";
+            // Insert the input as child of container.
+            container.appendChild(input);
+
+            jQuery(input).bootstrapSwitch({
+                size: 'mini',
+              // http://bootstrapswitch.site/options.html
+              onSwitchChange: function(event) {
+                console.log('buttonClicked', event.target.checked);
+              }
+            });
+
+            return container;
+          }
+        });
+        map.addControl(new switchControl());
+        
+
+        
 
         ////////////////////////////////////////////////////////////////////////////
         // FlyTo
