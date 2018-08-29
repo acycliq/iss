@@ -241,20 +241,20 @@ function dapi(cellData) {
             crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
             maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
             minZoom: minZoom,
-            maxZoom: maxZoom
+            maxZoom: maxZoom,
         }).setView([img[1] / 2, img[0] / 2], 5);
 
         L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
             attribution: 'KDH',
             continuousWorld: false,
-            minZoom: 0,
+            minZoom: minZoom,
             noWrap: true
         }).addTo(map);
         
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
         tl = L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
-            minZoom: 0,
-            maxZoom: 6
+            minZoom: minZoom,
+            maxZoom: maxZoom
         });
         var miniMap = new L.Control.MiniMap(tl, { toggleDisplay: true }).addTo(map);
         
