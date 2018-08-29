@@ -244,7 +244,9 @@ function dapi(cellData) {
             maxZoom: maxZoom,
         }).setView([img[1] / 2, img[0] / 2], 5);
 
-        L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
+        var urlStr = "./plots/data/img/65536px/{z}/{x}/{y}.png"
+        
+        L.tileLayer(urlStr, {
             attribution: 'KDH',
             continuousWorld: false,
             minZoom: minZoom,
@@ -252,7 +254,7 @@ function dapi(cellData) {
         }).addTo(map);
         
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
-        tl = L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
+        tl = L.tileLayer(urlStr, {
             minZoom: minZoom,
             maxZoom: maxZoom
         });
