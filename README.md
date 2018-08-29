@@ -4,7 +4,7 @@ Dashboard link: https://acycliq.github.io/iss/
 Background image taken from:
 `\\basket.cortexlab.net\data\kenneth\iss\170315_161220KI_4-3\Output\background_boundaries.tif`
 
-## Notes (to myself)
+## Notes (to myself):
 1. Upscale the image so that the longest side is 65536px wide. That allows you to zoom 8 levels deep. (You will need these two numbers later on)
 2. Now you can break-up the image into tiles. I used gdal2tiles for this, but its a bit tricky to install its dependencies. It is easier to install OSGeo4W which has gdal2tiles as a package (There is a post on the web for this, I think it was this one https://alastaira.wordpress.com/2011/07/11/maptiler-gdal2tiles-and-raster-resampling/)
 3. gdal2tiles however will give tiles with different orientation (i think its called tms??). Download gdal2tilesG.py and put it in the same folder as gdal2tiles.py that came with OSGeo4W (Where did you get that from? Put link!)
