@@ -194,6 +194,9 @@ function dapi(cellData) {
         });
         var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup +          
             '</div></td></tr><tr class><td><div><b>Group:</b></div></td><td><div>' + feature.properties.year + 
+            '</div></td></tr><tr class><td><div><b>Name:</b></div></td><td><div>' + feature.properties.gene + 
+            '</div></td></tr><tr class><td><div><b>Taxonomy:</b></div></td><td><div>' + feature.properties.taxonomy +
+            '</div></td></tr><tr class><td><div><b>Glyph:</b></div></td><td><div>' + feature.properties.glyphName + 
             '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.properties.x + 
             '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.properties.y + 
             '</div></td></tr></tbody></table>'
