@@ -2,8 +2,8 @@ function dapi(cellData) {
 
     
     var img = [
-        16384, // original width of image
-        12288 // original height of image
+        65536, // original width of image
+        47168 // original height of image
     ];
 
     var roi = { //range of interest
@@ -224,11 +224,11 @@ function dapi(cellData) {
         };
 
         var minZoom = 0,
-            maxZoom = 6;
+            maxZoom = 8;
 
         // The transformation in this CRS maps the the bottom left corner to (0,0) and the top right to (256, 256)
         L.CRS.MySimple = L.extend({}, L.CRS.Simple, {
-            transformation: new L.Transformation(1 / 64, 0, -1 / 64, 256),
+            transformation: new L.Transformation(1 / 256, 0, -1 / 256, 256),
         });
 
         var bounds = L.latLngBounds([
@@ -244,7 +244,7 @@ function dapi(cellData) {
             maxZoom: maxZoom
         }).setView([img[1] / 2, img[0] / 2], 5);
 
-        L.tileLayer("./plots/data/img/dapi/{z}/{x}/{y}.png", {
+        L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
             attribution: 'KDH',
             continuousWorld: false,
             minZoom: 0,
@@ -252,7 +252,7 @@ function dapi(cellData) {
         }).addTo(map);
         
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
-        tl = L.tileLayer("./plots/data/img/dapi/{z}/{x}/{y}.png", {
+        tl = L.tileLayer("./plots/data/img/65536px/{z}/{x}/{y}.png", {
             minZoom: 0,
             maxZoom: 6
         });
