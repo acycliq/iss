@@ -7,7 +7,7 @@ Background image taken from:
 ## Notes (to myself):
 1. Upscale the image so that the longest side is 65536px wide. That allows you to zoom 8 levels deep. (You will need these two numbers later on)
 2. Now you can break-up the image into tiles. I used gdal2tiles for this, but its a bit tricky to install its dependencies. It is easier to install OSGeo4W which has gdal2tiles as a package (There is a post on the web for this, I think it was this one https://alastaira.wordpress.com/2011/07/11/maptiler-gdal2tiles-and-raster-resampling/)
-3. gdal2tiles however will give tiles with different orientation (i think its called tms??). Download gdal2tilesG.py and put it in the same folder as gdal2tiles.py that came with OSGeo4W (Where did you get that from? Put link!)
+3. gdal2tiles however will give tiles with different orientation (i think its called tms??). Download gdal2tilesG.py (from https://gist.github.com/jeffaudi/9da77abf254301652baa) and put it in the same folder as gdal2tiles.py that came with OSGeo4W.
 4. Open an OSGeo4W shell
 5. gdal2tiles needs explicit unit8, therefore you have to scale the bit depth. Do this with the following: (otherwise the tiles look fuzzy, blurry, messed-up). Run that in the OSGeo4W shell:  
       `gdal_translate -ot Byte -scale "imageFilename_in.tif" out.tif`
