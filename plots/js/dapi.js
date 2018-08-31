@@ -62,6 +62,7 @@ function dapi(cellData) {
                 "gene": gene,
                 "taxonomy": glyphMap.get(gene).taxonomy,
                 "glyphName": glyphMap.get(gene).glyphName,
+                "glyphColor": getColor(glyphMap.get(gene).taxonomy),
                 "popup": label + " " + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30
@@ -116,21 +117,22 @@ function dapi(cellData) {
     //////////////////////////////////////////////////////////////////////////////////////////////
     //styling and displaying the data as circle markers//
     //////////////////////////////////////////////////////////////////////////////////////////////
+    
 
     //create color ramp
     function getColor(y) {
-        return y === 'cnr1' ? '#FFC700' :
-            y === 'cxcl14' ? '#00B2FF' :
-            y === 'in_general' ? '#5C33FF' :
-            y === 'less_active' ? '#407F59' :
-            y === 'ngf' ? '#44B200' :
-            y === 'non_neuron' ? '#00FF00' :
-            y === 'pc' ? '#FFFFFF' :
-            y === 'pc2' ? '#FF00E5' :
-            y === 'pc_or_in' ? '#96B28E' :
-            y === 'pvalb' ? '#0000FF' :
-            y === 'sst' ? '#995C00' :
-            y === 'vip' ? '#FF0000' :
+        return y === 'non_neuron' ? '#FFFFFF' :
+            y === 'pc_or_in' ? '#407F59' :
+            y === 'less_active' ? '#96B38F' :
+            y === 'pc' ? '#00FF00' :
+            y === 'pc2' ? '#44B300' :
+            y === 'in_general' ? '#0000FF' :
+            y === 'sst' ? '#00B3FF' :
+            y === 'pvalb' ? '#5C33FF' :
+            y === 'ngf' ? '#FF00E6' :
+            y === 'cnr1' ? '#FF0000' :
+            y === 'vip' ? '#FFC700' :
+            y === 'cxcl14' ? '#995C00' :
             '#D04030';
     }
 
@@ -198,8 +200,9 @@ function dapi(cellData) {
             '</div></td></tr><tr class><td><div><b>Name: </b></div></td><td><div>' + feature.properties.gene + 
             '</div></td></tr><tr class><td><div><b>Taxonomy: </b></div></td><td><div>' + feature.properties.taxonomy +
             '</div></td></tr><tr class><td><div><b>Glyph: </b></div></td><td><div>' + feature.properties.glyphName + 
-            '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x + 
-            '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y + 
+            '</div></td></tr><tr><td><div><b>Color: </b></div></td><td><div>' + '<span style="background:' + feature.properties.glyphColor + ';font-weight:bold; font-style:italic;">'+ feature.properties.glyphColor + '</span>'  +
+            '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x +
+            '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y +
             '</div></td></tr></tbody></table>'
         
         layer.bindPopup(popup);
