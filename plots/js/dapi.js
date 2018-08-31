@@ -310,6 +310,12 @@ function dapi(cellData) {
 
 
         //var cl = L.control.layers(null, {}).addTo(map);
+        
+        //create panes for each of the sets of the markers
+        var panes = [];
+        for (var i = 0; i < myDots.length; i += 1) {
+            panes[i] = map.createPane('pn'+i)
+        }
 
 
         // Define an array to keep layers
