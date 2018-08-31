@@ -244,10 +244,11 @@ L.Canvas.include({
         ctx.lineTo(p.x, p.y - r);
         ctx.moveTo(p.x - r, p.y);
         ctx.lineTo(p.x + r, p.y);
-        ctx.moveTo(p.x, p.y + r);
-        ctx.lineTo(p.x, p.y - r);
-        ctx.moveTo(p.x - r, p.y);
-        ctx.lineTo(p.x + r, p.y);        
+        ctx.moveTo(p.x + 0.5*r, p.y + 0.5*r);
+        ctx.lineTo(p.x - 0.5*r, p.y - 0.5*r);
+        ctx.moveTo(p.x - 0.5*r, p.y + 0.5*r);
+        ctx.lineTo(p.x + 0.5*r, p.y - 0.5*r);
+        ctx.arc(p.x, p.y, 2, 0, Math.PI*2, true);
         ctx.closePath();
         this._fillStroke(ctx, layer);
     }
