@@ -59,7 +59,7 @@ function dapi(cellData) {
                 "id": i,
                 "x": x,
                 "y": y,
-                "Gene": gene,
+                "gene": gene,
                 "taxonomy": glyphMap.get(gene).taxonomy,
                 "glyphName": glyphMap.get(gene).glyphName,
                 "popup": label + " " + i,
@@ -150,6 +150,7 @@ function dapi(cellData) {
     function style(feature) {
         return {
             radius: getRadius(feature.properties.size),
+            shape: feature.properties.glyphName,
             //fillColor: "none",//getColor(feature.properties.taxonomy),
             color: getColor(feature.properties.taxonomy),
             weight: 1,
@@ -192,13 +193,13 @@ function dapi(cellData) {
             mouseover: highlightDot,
             mouseout: resetDotHighlight
         });
-        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker:</b></div></td><td><div>' + feature.properties.popup +          
-            '</div></td></tr><tr class><td><div><b>Group:</b></div></td><td><div>' + feature.properties.year + 
-            '</div></td></tr><tr class><td><div><b>Name:</b></div></td><td><div>' + feature.properties.gene + 
-            '</div></td></tr><tr class><td><div><b>Taxonomy:</b></div></td><td><div>' + feature.properties.taxonomy +
-            '</div></td></tr><tr class><td><div><b>Glyph:</b></div></td><td><div>' + feature.properties.glyphName + 
-            '</div></td></tr><tr><td><div><b>X:</b></div></td><td><div>' + feature.properties.x + 
-            '</div></td></tr><tr><td><div><b>Y:</b></div></td><td><div>' + feature.properties.y + 
+        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker: </b></div></td><td><div>' + feature.properties.popup +          
+            '</div></td></tr><tr class><td><div><b>Group: </b></div></td><td><div>' + feature.properties.year + 
+            '</div></td></tr><tr class><td><div><b>Name: </b></div></td><td><div>' + feature.properties.gene + 
+            '</div></td></tr><tr class><td><div><b>Taxonomy: </b></div></td><td><div>' + feature.properties.taxonomy +
+            '</div></td></tr><tr class><td><div><b>Glyph: </b></div></td><td><div>' + feature.properties.glyphName + 
+            '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x + 
+            '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y + 
             '</div></td></tr></tbody></table>'
         
         layer.bindPopup(popup);
@@ -329,7 +330,7 @@ function dapi(cellData) {
                     //return L.circleMarker(p, style(feature));
                     // return new MarkerStar(p, style(feature));
                     
-                    return new svgMarker[i].value(latlng, style(feature));
+                    return new svgGlyph(latlng, style(feature));
                 },
                 onEachFeature: onEachDot
             });
