@@ -121,18 +121,18 @@ function dapi(cellData) {
 
     //create color ramp
     function getColor(y) {
-        return y === 'non_neuron' ? '#FFFFFF' :
-            y === 'pc_or_in' ? '#407F59' :
-            y === 'less_active' ? '#96B38F' :
-            y === 'pc' ? '#00FF00' :
-            y === 'pc2' ? '#44B300' :
-            y === 'in_general' ? '#0000FF' :
-            y === 'sst' ? '#00B3FF' :
-            y === 'pvalb' ? '#5C33FF' :
-            y === 'ngf' ? '#FF00E6' :
-            y === 'cnr1' ? '#FF0000' :
-            y === 'vip' ? '#FFC700' :
-            y === 'cxcl14' ? '#995C00' :
+        return y === 'non_neuron'? '#FFFFFF': //hsv: [0 0 1]);
+            y === 'pc_or_in'? '#407F59':      //hsv: [.4 .5 .5]);
+            y === 'less_active'? '#96B38F':   //hsv: [.3 .2 .7]);
+            y === 'pc'? '#00FF00':            //hsv: [1/3 1 1]);
+            y === 'pc2'? '#44B300':           //hsv: [.27 1 .7]);
+            y === 'in_general'? '#0000FF':    //hsv: [2/3 1 1]);
+            y === 'sst'? '#00B3FF':           //hsv: [.55 1 1]);
+            y === 'pvalb'? '#5C33FF':         //hsv: [.7 .8 1]);
+            y === 'ngf'? '#FF00E6':           //hsv: [.85 1 1]);
+            y === 'cnr1'? '#FF0000':          //hsv: [ 1 1 1]);
+            y === 'vip'? '#FFC700':           //hsv: [.13 1 1]);
+            y === 'cxcl14'? '#995C00':        //hsv: [.1 1 .6]);
             '#D04030';
     }
 
@@ -200,7 +200,7 @@ function dapi(cellData) {
             '</div></td></tr><tr class><td><div><b>Name: </b></div></td><td><div>' + feature.properties.gene + 
             '</div></td></tr><tr class><td><div><b>Taxonomy: </b></div></td><td><div>' + feature.properties.taxonomy +
             '</div></td></tr><tr class><td><div><b>Glyph: </b></div></td><td><div>' + feature.properties.glyphName + 
-            '</div></td></tr><tr><td><div><b>Color: </b></div></td><td><div>' + '<span style="background:' + feature.properties.glyphColor + ';font-weight:bold; font-style:italic;">'+ feature.properties.glyphColor + '</span>'  +
+            '</div></td></tr><tr><td><div><b>Color: </b></div></td><td><div>' + '<span style="border:1px black solid; background:' + feature.properties.glyphColor + ';font-weight:bold; font-style:italic;">'+ feature.properties.glyphColor + '</span>'  +
             '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x +
             '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y +
             '</div></td></tr></tbody></table>'
