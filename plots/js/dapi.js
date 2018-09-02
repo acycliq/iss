@@ -65,7 +65,8 @@ function dapi(cellData) {
                 "glyphColor": getColor(glyphMap.get(gene).taxonomy),
                 "popup": label + " " + i,
                 "year": parseInt(data[i].Expt),
-                "size": 30
+                "size": 30,
+                "type": 'gene',
             };
 
             //create features with proper geojson structure
@@ -100,7 +101,8 @@ function dapi(cellData) {
                 "y": y,
                 "popup": "Cell " + i,
                 "year": parseInt(data[i].Expt),
-                "size": 30
+                "size": 30,
+                "type": 'cell',
             };
 
             //create features with proper geojson structure
@@ -145,8 +147,26 @@ function dapi(cellData) {
     // This is very important! Use a canvas otherwise the chart is too heavy for the browser when
     // the number of points is too high, as in this case where we have around 300K points to plot
     var myRenderer = L.canvas({
-        padding: 0.5
+        padding: 0.5,
+        pane: 'myPane',
     });
+    
+    var cellRenderer = L.canvas({
+        padding: 0.5,
+        pane: 'cellPane',
+    });
+    
+    var geneRenderer = L.canvas({
+        padding: 0.5,
+        pane: 'genePane',
+    });
+
+    var panes = {};
+    
+    function getRenderer(type){
+        return type==='cell'? cellRenderer:
+            geneRenderer;
+    }
 
     //create style, with fillColor picked from color ramp
     function style(feature) {
@@ -158,7 +178,7 @@ function dapi(cellData) {
             weight: 1,
             opacity: 1,
             fillOpacity: 0.0,
-            renderer: myRenderer
+            renderer: getRenderer(feature.properties.type),
         };
     }
 
@@ -220,6 +240,8 @@ function dapi(cellData) {
 
 
     function renderChart(data, cellData) {
+        var genes = d3.map(data, function (d) {return d.Gene;}).keys();
+        
         var myDots = make_dots(data);
         var yx = L.latLng;
 
@@ -250,6 +272,10 @@ function dapi(cellData) {
             minZoom: minZoom,
             maxZoom: maxZoom,
         }).setView([img[1] / 2, img[0] / 2], 5);
+        
+        map.createPane('myPane');
+        map.createPane('cellPane');
+        map.createPane('genePane');
 
         var urlStr = "./plots/data/img/65536px/{z}/{x}/{y}.png"
         
@@ -307,20 +333,13 @@ function dapi(cellData) {
         var cellLayer = L.geoJSON(fc, {
             pointToLayer: function (feature, latlng){
                 console.log("hello")
-                return L.circleMarker(latlng, style(feature));
+                return L.circleMarker(latlng, style(feature, 'cell'));
             },
             onEachFeature: onEachDot
         }).addTo(map);
 
 
         //var cl = L.control.layers(null, {}).addTo(map);
-        
-        //create panes for each of the sets of the markers
-        var panes = [];
-        for (var i = 0; i < myDots.length; i += 1) {
-            panes[i] = map.createPane('pn'+i)
-        }
-
 
         // Define an array to keep layers
         var dotlayer = [];
@@ -332,13 +351,13 @@ function dapi(cellData) {
                     //var p = xy(project([latlng.lng, latlng.lat], img, grid));
                     //return L.circleMarker(p, style(feature));
                     // return new MarkerStar(p, style(feature));
-                    
-                    return new svgGlyph(latlng, style(feature));
+
+                    return new svgGlyph(latlng, style(feature, 'gene'));
                 },
                 onEachFeature: onEachDot
             });
         }
-        
+
         
         // Keep these layers on a single layer group and call this to add them to the map
         var lg = new L.LayerGroup();
@@ -356,7 +375,7 @@ function dapi(cellData) {
     
         //add now the grouped layers to the map
         addLayers()
-        
+
 
         var cl = L.control.layers(null, {}).addTo(map);
         for (j = 0; j < dotlayer.length; j += 1) {
@@ -474,6 +493,7 @@ function dapi(cellData) {
 
           onAdd: function(map) {
               var container = L.DomUtil.create('div');
+              var gp = document.getElementsByClassName('leaflet-gene-pane')
 
               // Use a child input.
               var input = L.DomUtil.create('input');
@@ -492,9 +512,11 @@ function dapi(cellData) {
             
               function toggle(event) {
                 if(event.target.checked === false) {
-                    removeLayers();
+                    //removeLayers();
+                    gp[0].style.display = 'none';
                 } else if(event.target.checked === true) {
-                    addLayers();
+                    //addLayers();
+                    gp[0].style.display = ''
                 }
               }
               
