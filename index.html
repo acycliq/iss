@@ -128,7 +128,33 @@
         /* Pleasewait spinner gif */
         #pleasewait { position:absolute; top:50%; left:50%; margin-left:-30px; margin-top:-30px; padding: 5px 5px 0 5px; border-radius: 5px; background-color:white; z-index:1000000; }
 
-           
+        .leaflet-verticalcenter {
+        /********************************************/
+          /* Same as .leaflet-top and .leaflet-bottom */
+          position: absolute;
+          z-index: 1000;
+          pointer-events: none;
+          /********************************************/
+          top: 50%;
+          transform: translateY(-50%);
+          padding-top: 10px;
+        }
+
+        .leaflet-verticalcenter .leaflet-control {
+          margin-bottom: 10px;
+        }
+
+        .leaflet-horizontalcenter {
+          /********************************************/
+          /* Same as .leaflet-top and .leaflet-bottom */
+          position: absolute;
+          z-index: 1000;
+          pointer-events: none;
+          /********************************************/
+          left: 50%;
+          transform: translateX(-50%);
+          padding-left: 10px;
+        }
 
     </style>
 

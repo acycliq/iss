@@ -551,9 +551,29 @@ function dapi(cellData) {
         map.addControl(new toggleControl());
         
         
+
+        function addControlPlaceholders(map) {
+            var corners = map._controlCorners,
+                l = 'leaflet-',
+                container = map._controlContainer;
+
+            function createCorner(vSide, hSide) {
+                var className = l + vSide + ' ' + l + hSide;
+                corners[vSide + hSide] = L.DomUtil.create('div', className, container);
+            }
+
+            createCorner('verticalcenter', 'left');
+            createCorner('verticalcenter', 'right');
+            createCorner('verticalcenter', 'horizontalcenter');
+
+        }
+
+        addControlPlaceholders(map);
+
+
         // Do the spinner control
         var spinnerControl = L.Control.extend({
-           options:{position:'bottomleft'},
+           options:{position:'verticalcenterhorizontalcenter'},
             
             onAdd: function(map){
                 
