@@ -124,6 +124,10 @@
         .slow .toggle-group { transition: left 1.0s; -webkit-transition: left 1.0s; }
         .fast .toggle-group { transition: left 0.1s; -webkit-transition: left 0.1s; }
         .quick .toggle-group { transition: none; -webkit-transition: none; }    
+        
+        /* Pleasewait spinner gif */
+        #pleasewait { position:absolute; top:50%; left:50%; margin-left:-30px; margin-top:-30px; padding: 5px 5px 0 5px; border-radius: 5px; background-color:white; z-index:1000000; }
+
            
 
     </style>
@@ -262,6 +266,11 @@
                                 DAPI
                             </div>
                             <div class="chart-stage">
+<!--
+                                <div id="pleasewait" style="display: none;">
+                                    <img src="./plots/data/spinner.gif">
+                                </div>
+-->
                                 <div id="map" style="width: 100%;"></div>
                             </div>
                         </div>

@@ -308,7 +308,7 @@ function dapi(cellData) {
                 opacity: 0.5,
                 fill: false,
                 dashArray: "4 1",
-                renderer: geneRenderer
+                renderer: geneRenderer // place voronois on the same pane as the genes, otherwise they will not respond to mouse events.
             };
         },
             onEachFeature: function(feature, layer) {
@@ -328,7 +328,9 @@ function dapi(cellData) {
 
         }).addTo(map);
         
-        
+        // Plot the cells. (If these are on different pane than the genes' pane, then they
+        // not respond to mouse event. Panes sit on canvas, and afaik the topmost canvas swallows all
+        //events and nothing propagates down to panes/layers underneath)
         var cellLayer = L.geoJSON(fc, {
             pointToLayer: function (feature, latlng){
                 console.log("hello")
@@ -361,15 +363,26 @@ function dapi(cellData) {
         // Keep these layers on a single layer group and call this to add them to the map
         var lg = new L.LayerGroup();
         function addLayers(){
-            for (var i = 0; i < myDots.length; i += 1) {
-                lg.addLayer(dotlayer[i]);
-            };
-            lg.addTo(map);
+            $('#pleasewait').show();
+            setTimeout(function(){
+                $('#pleasewait').hide();
+                
+                for (var i = 0; i < myDots.length; i += 1) {
+                    lg.addLayer(dotlayer[i]);
+                };
+                lg.addTo(map);
+                
+            }, 500);
         }
         
         // Call this to clear chart from the layers grouped together on the layer group
         function removeLayers(){
-            lg.clearLayers();
+            $('#pleasewait').show();
+            setTimeout(function(){
+                $('#pleasewait').hide();
+                lg.clearLayers();
+            }, 500);
+//            $('#pleasewait').hide();
         }
     
         //add now the grouped layers to the map
@@ -481,7 +494,7 @@ function dapi(cellData) {
             return container;
           }
         });
-        //map.addControl(new switchControl());
+        map.addControl(new switchControl());
         
         
         // Bootstrap toggle
@@ -531,6 +544,28 @@ function dapi(cellData) {
           }
         });
         map.addControl(new toggleControl());
+        
+        
+        // Do the spinner control
+        var spinnerControl = L.Control.extend({
+           options:{position:'bottomleft'},
+            
+            onAdd: function(map){
+                
+                var container = L.DomUtil.create('div');
+                container.id = "pleasewait";
+                container.style = "display: none";
+                
+                var img = L.DomUtil.create('img');
+                img.src="./plots/data/spinner.gif";
+                
+                container.appendChild(img);
+                
+                return container;
+            }
+            
+        });
+        map.addControl(new spinnerControl());
         
 
         
