@@ -457,14 +457,19 @@ function dapi(cellData) {
           },
 
           onAdd: function(map) {
-            var container = L.DomUtil.create('div');
-            // Use a child input.
-            var input = L.DomUtil.create('input');
-            input.type = "checkbox";
-            input.title = "Some title";
-            input.value = "On";
-            // Insert the input as child of container.
-            container.appendChild(input);
+              var container = L.DomUtil.create('div');
+              container.setAttribute('rel', 'tooltip');
+              container.setAttribute('data-placement', 'bottom');
+              container.title = "Show genes?";
+              //container.style = "width: 100px";
+              
+              // Use a child input.
+              var input = L.DomUtil.create('input');
+              input.type = "checkbox";
+              input.title = "Some title";
+              input.value = "On";
+              // Insert the input as child of container.
+              container.appendChild(input);
 
 
               function toggle(event) {
