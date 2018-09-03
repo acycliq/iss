@@ -557,7 +557,7 @@ function dapi(cellData) {
                 container.style = "display: none";
                 
                 var img = L.DomUtil.create('img');
-                img.src="./plots/data/spinner.gif";
+                img.src="./plots/data/img/spinner.gif";
                 
                 container.appendChild(img);
                 
