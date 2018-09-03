@@ -148,24 +148,23 @@ function dapi(cellData) {
     // the number of points is too high, as in this case where we have around 300K points to plot
     var myRenderer = L.canvas({
         padding: 0.5,
-        pane: 'myPane',
     });
     
-    var cellRenderer = L.canvas({
-        padding: 0.5,
-        pane: 'cellPane',
-    });
-    
+//    var cellRenderer = L.canvas({
+//        padding: 0.5,
+//        pane: 'cellPane',
+//    });
+//    
     var geneRenderer = L.canvas({
         padding: 0.5,
         pane: 'genePane',
     });
 
-    var panes = {};
+//    var panes = {};
     
     function getRenderer(type){
-        return type==='cell'? cellRenderer:
-            geneRenderer;
+        return type==='gene'? geneRenderer:
+            myRenderer;
     }
 
     //create style, with fillColor picked from color ramp
@@ -273,8 +272,8 @@ function dapi(cellData) {
             maxZoom: maxZoom,
         }).setView([img[1] / 2, img[0] / 2], 5);
         
-        map.createPane('myPane');
-        map.createPane('cellPane');
+//        map.createPane('myPane');
+//        map.createPane('cellPane');
         map.createPane('genePane');
 
         var urlStr = "./plots/data/img/65536px/{z}/{x}/{y}.png"
@@ -309,7 +308,7 @@ function dapi(cellData) {
                 opacity: 0.5,
                 fill: false,
                 dashArray: "4 1",
-                renderer: myRenderer
+                renderer: geneRenderer
             };
         },
             onEachFeature: function(feature, layer) {
