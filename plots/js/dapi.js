@@ -23,6 +23,29 @@ function dapi(cellData) {
 
     // This transformation maps a point in pixel dimensions to our user defined roi
     var t = new L.Transformation(a, b, c, d);
+    
+    // control that shows state info on hover
+    var info = L.control({
+        position: 'bottomleft'
+    });
+
+    info.onAdd = function (map) {
+        this._div = L.DomUtil.create('div', 'info'); // create a div with a class "info"
+        this.update();
+        return this._div;
+    };
+
+    // method that we will use to update the control based on feature properties passed
+    info.update = function (cellFeatures) {
+        this._div.innerHTML = '<h4>Cell Info</h4>' + (cellFeatures ?
+            '<b>Cell: ' + cellFeatures.Cell_Num + '</b> ' + 
+            '<br /> ' + cellFeatures.ClassName[0] + ': ' + cellFeatures.Prob[0] + 
+            '<br /> ' + cellFeatures.ClassName[1] + ': ' + cellFeatures.Prob[1] +
+            '<br /> ' + cellFeatures.ClassName[2] + ': ' + cellFeatures.Prob[2] +
+            '<br />2000 Population: ' + cellFeatures.POP2000 + 
+            '<br />2010 Population: ' + cellFeatures.POP2010 :
+            '<b>Hover over a cell</b>');
+    };
 
     function make_dots(data) {
         var arr = [];
@@ -97,6 +120,11 @@ function dapi(cellData) {
             //create feature properties
             var p = {
                 "id": i,
+                "Cell_Num": data[i].Cell_Num,
+                "Genenames": data[i].Genenames,
+                "CellGeneCount": data[i].CellGeneCount,
+                "ClassName": data[i].ClassName,
+                "Prob": data[i].Prob,
                 "x": x,
                 "y": y,
                 "popup": "Cell " + i,
@@ -177,7 +205,7 @@ function dapi(cellData) {
             weight: 1,
             opacity: 1,
             fillOpacity: 0.0,
-            renderer: getRenderer(feature.properties.type),
+            renderer: myRenderer,//getRenderer(feature.properties.type),
         };
     }
 
@@ -201,12 +229,20 @@ function dapi(cellData) {
         if (!L.Browser.ie && !L.Browser.opera) {
             layer.bringToFront();
         }
+        
+        layer.feature.properties.type === "cell"?
+            info.update(layer.feature.properties):
+            console.log("I am not hovering over a cell");
     }
 
     function resetDotHighlight(e) {
         var layer = e.target;
         dotStyleDefault = style(layer.feature);
         layer.setStyle(dotStyleDefault);
+        
+        layer.feature.properties.type === "cell"?
+            info.update():
+            console.log("I am not hovering over a cell");
     }
 
     function onEachDot(feature, layer) {
@@ -308,7 +344,8 @@ function dapi(cellData) {
                 opacity: 0.5,
                 fill: false,
                 dashArray: "4 1",
-                renderer: geneRenderer // place voronois on the same pane as the genes, otherwise they will not respond to mouse events.
+                renderer: myRenderer,
+                //renderer: geneRenderer // place voronois on the same pane as the genes, otherwise they will not respond to mouse events.
             };
         },
             onEachFeature: function(feature, layer) {
@@ -374,6 +411,10 @@ function dapi(cellData) {
                 
             }, 500);
         }
+        
+        
+        //Now add info to map
+		info.addTo(map);
         
         // Call this to clear chart from the layers grouped together on the layer group
         function removeLayers(){
