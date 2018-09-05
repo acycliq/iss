@@ -35,16 +35,38 @@ function dapi(cellData) {
         return this._div;
     };
 
+    
+    function infoMsg(cellFeatures)
+    {
+        var str1 = '</div></td></tr><tr class><td><div><b>';
+        var str2 = '&nbsp </b></div></td><td><div>';
+        var out = '';
+        if (cellFeatures){
+            for (var i=0; i<cellFeatures.Prob.length; i++){
+                out += str1 + cellFeatures.ClassName[i] + str2 + Math.floor(cellFeatures.Prob[i] * 10000)/100 + '%'
+            }
+        }
+        else{
+             // do nothing
+        };
+        
+        return out;
+        
+    };
+    
+    
     // method that we will use to update the control based on feature properties passed
     info.update = function (cellFeatures) {
+        var msg = infoMsg(cellFeatures);
         this._div.innerHTML = '<h4>Cell Info</h4>' + (cellFeatures ?
-            '<b>Cell: ' + cellFeatures.Cell_Num + '</b> ' + 
-            '<br /> ' + cellFeatures.ClassName[0] + ': ' + cellFeatures.Prob[0] + 
-            '<br /> ' + cellFeatures.ClassName[1] + ': ' + cellFeatures.Prob[1] +
-            '<br /> ' + cellFeatures.ClassName[2] + ': ' + cellFeatures.Prob[2] +
-            '<br />2000 Population: ' + cellFeatures.POP2000 + 
-            '<br />2010 Population: ' + cellFeatures.POP2010 :
-            '<b>Hover over a cell</b>');
+            '<table style="width:110px;">' + 
+            '<tbody><tr style="width:110px; border-bottom:1px solid Black; font-weight: bold"><td><div><b>Class </b></div></td><td><div> Prob'  +  
+            msg +
+            '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Marker: </b></div></td><td><div>' + cellFeatures.Cell_Num + 
+            '</div></td></tr></tbody></table>' :
+            '<b>Hover over a cell</b>'
+            
+            );
     };
 
     function make_dots(data) {
