@@ -246,6 +246,8 @@ function dapi(cellData) {
     //attach styles and popups to the marker layer
     function highlightDot(e) {
         var layer = e.target;
+        var evtx = new CustomEvent('changeOnMap');
+        var evty = new CustomEvent('changeOnMap');
         dotStyleHighlight = highlightStyle(layer.feature);
         layer.setStyle(dotStyleHighlight);
         if (!L.Browser.ie && !L.Browser.opera) {
@@ -253,7 +255,16 @@ function dapi(cellData) {
         }
         
         layer.feature.properties.type === "cell"?
-            info.update(layer.feature.properties):
+            (
+                console.log('updating info...'),
+                info.update(layer.feature.properties),
+            
+                //Thats a temp solution to make the dapi chart responsive. There must be a better way
+                document.getElementById("xValue").value = layer.feature.properties.x,
+                document.getElementById("yValue").value = layer.feature.properties.y,
+                document.getElementById('xValue').dispatchEvent(evtx),
+                document.getElementById('yValue').dispatchEvent(evty)
+            ):
             console.log("I am not hovering over a cell");
     }
 
@@ -263,7 +274,10 @@ function dapi(cellData) {
         layer.setStyle(dotStyleDefault);
         
         layer.feature.properties.type === "cell"?
-            info.update():
+            (   
+                console.log('resetting info...'),
+                info.update()
+            ):
             console.log("I am not hovering over a cell");
     }
 
