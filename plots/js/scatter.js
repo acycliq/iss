@@ -106,7 +106,17 @@ function initChart(data) {
     function renderPlot(data){
         console.log('Doing Scatter plot')
         renderScatter(data);
-        
+
+        var nodes = d3.selectAll('circle').nodes(),
+            scatterNodes = [];
+        for (var i=0; i<nodes.length; i++){
+            if(nodes[i].getAttribute('class') === 'dotOnScatter') (
+                    scatterNodes.push({
+                        cx: nodes[i].getAttribute('cx'),
+                        cy: nodes[i].getAttribute('cy')
+                    })
+            )
+        }
         console.log('Doing DAPI')
         dapi(data);
     }
@@ -141,6 +151,7 @@ function initChart(data) {
         update
             .enter()
             .append('circle')
+            .attr('class', 'dotOnScatter')
             .attr('r', pointRadius)
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
