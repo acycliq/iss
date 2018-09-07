@@ -227,7 +227,7 @@ function initChart(data) {
 
     }
     
-    moveX.addEventListener("changeOnMap", function (event) {
+    moveX.addEventListener("moveMouse", function (event) {
         event.preventDefault();
         x = +document.getElementById("xxValue").value
         y = +document.getElementById("yyValue").value        
@@ -235,7 +235,7 @@ function initChart(data) {
         highlight(site && site.data, false);        
     });
     
-    moveY.addEventListener("changeOnMap", function (event) {
+    moveY.addEventListener("moveMouse", function (event) {
         event.preventDefault();
         x = +document.getElementById("xxValue").value
         y = +document.getElementById("yyValue").value        

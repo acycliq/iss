@@ -248,8 +248,8 @@ function dapi(cellData) {
     //attach styles and popups to the marker layer
     function highlightDot(e) {
         var layer = e.target;
-        var evtxx = new CustomEvent('changeOnMap');
-        var evtyy = new CustomEvent('changeOnMap');
+        var evtxx = new CustomEvent('moveMouse');
+        var evtyy = new CustomEvent('moveMouse');
         dotStyleHighlight = highlightStyle(layer.feature);
         layer.setStyle(dotStyleHighlight);
         if (!L.Browser.ie && !L.Browser.opera) {
