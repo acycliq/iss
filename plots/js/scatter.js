@@ -111,10 +111,12 @@ function initChart(data) {
             scatterNodes = [];
         for (var i=0; i<nodes.length; i++){
             if(nodes[i].getAttribute('class') === 'dotOnScatter') (
-                    scatterNodes.push({
-                        cx: nodes[i].getAttribute('cx'),
-                        cy: nodes[i].getAttribute('cy')
-                    })
+                data[i].cx = +nodes[i].getAttribute('cx'),
+                data[i].cy = +nodes[i].getAttribute('cy')
+                    // data[i].push({
+                    //     cx: nodes[i].getAttribute('cx'),
+                    //     cy: nodes[i].getAttribute('cy')
+                    // })
             )
         }
         console.log('Doing DAPI')
