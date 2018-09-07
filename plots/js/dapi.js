@@ -149,6 +149,8 @@ function dapi(cellData) {
                 "Prob": data[i].Prob,
                 "x": x,
                 "y": y,
+                "cx": data[i].cx,
+                "cy": data[i].cy,
                 "popup": "Cell " + i,
                 "year": parseInt(data[i].Expt),
                 "size": 30,
@@ -259,9 +261,9 @@ function dapi(cellData) {
                 console.log('updating info...'),
                 info.update(layer.feature.properties),
             
-                //Thats a temp solution to make the dapi chart responsive. There must be a better way
-                document.getElementById("xxValue").value = layer.feature.properties.x,
-                document.getElementById("yyValue").value = layer.feature.properties.y,
+                //Thats a temp solution to make the scatter chart responsive. 
+                document.getElementById("xxValue").value = layer.feature.properties.cx,
+                document.getElementById("yyValue").value = layer.feature.properties.cy,
                 document.getElementById('xxValue').dispatchEvent(evtxx),
                 document.getElementById('yyValue').dispatchEvent(evtyy)
             ):

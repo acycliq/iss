@@ -98,6 +98,9 @@ function initChart(data) {
 
         dotsGroup.attr("transform", d3.event.transform);
     }
+    
+    var moveX = document.getElementById("xxValue");
+    var moveY = document.getElementById("yyValue");
 
     var dotsGroup;
     var voronoiDiagram;
@@ -107,8 +110,7 @@ function initChart(data) {
         console.log('Doing Scatter plot')
         renderScatter(data);
 
-        var nodes = d3.selectAll('circle').nodes(),
-            scatterNodes = [];
+        var nodes = d3.selectAll('circle').nodes();
         for (var i=0; i<nodes.length; i++){
             if(nodes[i].getAttribute('class') === 'dotOnScatter') (
                 data[i].cx = +nodes[i].getAttribute('cx'),
@@ -224,6 +226,22 @@ function initChart(data) {
         highlight(site && site.data, true);
 
     }
+    
+    moveX.addEventListener("changeOnMap", function (event) {
+        event.preventDefault();
+        x = +document.getElementById("xxValue").value
+        y = +document.getElementById("yyValue").value        
+        const site = voronoiDiagram.find(x, y);
+        highlight(site && site.data, false);        
+    });
+    
+    moveY.addEventListener("changeOnMap", function (event) {
+        event.preventDefault();
+        x = +document.getElementById("xxValue").value
+        y = +document.getElementById("yyValue").value        
+        const site = voronoiDiagram.find(x, y);
+        highlight(site && site.data, false);        
+    });
 
 
     var prevHighlightDotNum = null;
@@ -242,13 +260,19 @@ function initChart(data) {
                   .style('stroke', colorScale(d.y))
                   .attr('cx', scale.x(d.x))
                   .attr('cy', scale.y(d.y));
-                  tooltip.transition()
+                
+                // If event has be triggered from the scatter chart, so a tooltip
+                if (d3.event && d3.event.pageX){
+                    tooltip.transition()
                     .duration(200)
-                tooltip
+                    
+                    tooltip
                     .style("opacity", .9)
                     .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
                     .style("left", (d3.event.pageX + 35) + "px")
                     .style("top", (d3.event.pageY + 10) + "px");
+                    
+                }
                 prevHighlightDotNum = d.Cell_Num;                
             }
             
