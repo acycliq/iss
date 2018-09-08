@@ -246,6 +246,8 @@ function dapi(cellData) {
     }
 
     function clickDot(e){
+        //make sure zValue is empty
+        document.getElementById("zValue").value = ''
         if (e.sourceTarget.feature.properties.type === 'cell'){
 
             console.log('You clicked a ' + e.sourceTarget.feature.properties.type)
