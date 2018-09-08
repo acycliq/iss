@@ -223,7 +223,8 @@ function initChart(data) {
         const site = voronoiDiagram.find(mx, my);
 
         // highlight the point if we found one, otherwise hide the highlight circle
-        highlight(site && site.data, true);
+        highlight(site && site.data);
+        refreshDashboard(site && site.data)
 
     }
     
@@ -232,7 +233,7 @@ function initChart(data) {
         x = +document.getElementById("xxValue").value
         y = +document.getElementById("yyValue").value        
         const site = voronoiDiagram.find(x, y);
-        highlight(site && site.data, false);        
+        highlight(site && site.data);
     });
     
     moveY.addEventListener("moveMouse", function (event) {
@@ -240,13 +241,13 @@ function initChart(data) {
         x = +document.getElementById("xxValue").value
         y = +document.getElementById("yyValue").value        
         const site = voronoiDiagram.find(x, y);
-        highlight(site && site.data, false);        
+        highlight(site && site.data);
     });
 
 
     var prevHighlightDotNum = null;
     // callback to highlight a point
-    function highlight(d, flag) {
+    function highlight(d) {
         // no point to highlight - hide the circle and clear the text
         if (!d) {
             d3.select('.highlight-circle').style('display', 'none');
@@ -275,46 +276,52 @@ function initChart(data) {
                 }
                 prevHighlightDotNum = d.Cell_Num;                
             }
-            
-            if (flag === true) {
-                
-                // If true do the dataTable 
-                renderDataTable(d)
-
-                // Do the heatmap as well
-                d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
-                    data.forEach(function(d) {
-                        d.xKey = +d.xKey
-                        d.yKey = +d.yKey
-                        d.val = +d.val});
-                    console.log("Heatmap start")
-                    renderHeatmap(data)
-                    console.log("Heatmap end")
-                });
-                
-                // And the barchart, piechart too!
-                let sdata = []
-                for (let i = 0; i < d.Prob.length; i++) {
-                    sdata.push({
-                        Prob: d.Prob[i],
-                        labels: d.ClassName[i]
-                    })
-                }
-
-                barchart(sdata)
-                piechart(sdata)
-                
-                //Thats a temp solution to make the dapi chart responsive. There must be a better way
-                document.getElementById("xValue").value = d.X
-                document.getElementById("yValue").value = d.Y
-                var evtx = new CustomEvent('change');
-                document.getElementById('xValue').dispatchEvent(evtx);
-                var evty = new CustomEvent('change');
-                document.getElementById('yValue').dispatchEvent(evty);
-
-            }
         }
     }
-    
+
+    function refreshDashboard(d) {
+        // no point to highlight - hide the circle and clear the text
+        if (!d) {
+            d3.select('.highlight-circle').style('display', 'none');
+            prevHighlightDotNum = null;
+            tooltip.style("opacity", 0);
+            // otherwise, show the highlight circle at the correct position
+        } else {
+            renderDataTable(d)
+            // Do the heatmap as well
+            d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
+                data.forEach(function (d) {
+                    d.xKey = +d.xKey
+                    d.yKey = +d.yKey
+                    d.val = +d.val
+                });
+                console.log("Heatmap start")
+                renderHeatmap(data)
+                console.log("Heatmap end")
+            });
+
+            // And the barchart, piechart too!
+            let sdata = []
+            for (let i = 0; i < d.Prob.length; i++) {
+                sdata.push({
+                    Prob: d.Prob[i],
+                    labels: d.ClassName[i]
+                })
+            }
+
+            barchart(sdata)
+            piechart(sdata)
+
+            //Thats a temp solution to make the dapi chart responsive. There must be a better way
+            document.getElementById("xValue").value = d.X
+            document.getElementById("yValue").value = d.Y
+            var evtx = new CustomEvent('change');
+            document.getElementById('xValue').dispatchEvent(evtx);
+            var evty = new CustomEvent('change');
+            document.getElementById('yValue').dispatchEvent(evty);
+
+        }
+    }
+
 
 }
