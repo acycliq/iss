@@ -245,6 +245,26 @@ function dapi(cellData) {
         };
     }
 
+    function clickDot(e){
+        if (e.sourceTarget.feature.properties.type === 'cell'){
+
+            console.log('You clicked a ' + e.sourceTarget.feature.properties.type)
+            var layer = e.target;
+            var evtxClick = new CustomEvent('clickMouse');
+            var evtyClick = new CustomEvent('clickMouse');
+            dotStyleHighlight = highlightStyle(layer.feature);
+            layer.setStyle(dotStyleHighlight);
+            if (!L.Browser.ie && !L.Browser.opera) {
+                layer.bringToFront();
+            }
+            document.getElementById("xxValue").value = layer.feature.properties.cx,
+                document.getElementById("yyValue").value = layer.feature.properties.cy,
+                document.getElementById('xxValue').dispatchEvent(evtxClick),
+                document.getElementById('yyValue').dispatchEvent(evtxClick)
+
+        }
+    }
+
     //attach styles and popups to the marker layer
     function highlightDot(e) {
         var layer = e.target;
@@ -286,7 +306,8 @@ function dapi(cellData) {
     function onEachDot(feature, layer) {
         layer.on({
             mouseover: highlightDot,
-            mouseout: resetDotHighlight
+            mouseout: resetDotHighlight,
+            click: clickDot,
         });
         var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker: </b></div></td><td><div>' + feature.properties.popup +          
             '</div></td></tr><tr class><td><div><b>Group: </b></div></td><td><div>' + feature.properties.year + 
@@ -686,18 +707,25 @@ function dapi(cellData) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
+            z = +document.getElementById("zValue").value
             p = t.transform(L.point([x, y]));
             //p = xy(project([x, y], img, grid))
-            map.flyTo([p.y, p.x], 5);
+
+            if (z){
+                map.flyTo([p.y, p.x], 5);
+            }
         });
 
         fly2.addEventListener("change", function (event) {
             event.preventDefault();
             x = +document.getElementById("xValue").value
             y = +document.getElementById("yValue").value
+            z = +document.getElementById("zValue").value
             p = t.transform(L.point([x, y]));
             //p = xy(project([x, y], img, grid))
-            map.flyTo([p.y, p.x], 5);
+            if (z){
+                map.flyTo([p.y, p.x], 5);
+            }
         });
 
 

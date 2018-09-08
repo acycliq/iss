@@ -235,10 +235,20 @@ function initChart(data) {
         y = +document.getElementById("yyValue").value
         var site = voronoiDiagram.find(x, y);
         highlight(site && site.data);
+
+        return site
         //refreshDashboard(site && site.data)
     }
+
+    myFun2 = function(event){
+        var site = myFun(event);
+        refreshDashboard(site && site.data);
+    }
+
     moveX.addEventListener("moveMouse", myFun);
     moveY.addEventListener("moveMouse", myFun);
+    moveX.addEventListener("clickMouse", myFun2);
+    moveY.addEventListener("clickMouse", myFun2);
 
 
     var prevHighlightDotNum = null;
