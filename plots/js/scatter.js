@@ -207,7 +207,7 @@ function initChart(data) {
         const site = voronoiDiagram.find(mx, my);
 
         // highlight the point if we found one, otherwise hide the highlight circle
-        highlight(site && site.data, false);
+        highlight(site && site.data);
 
     }
     
@@ -227,22 +227,18 @@ function initChart(data) {
         refreshDashboard(site && site.data)
 
     }
-    
-    moveX.addEventListener("moveMouse", function (event) {
+
+
+    myFun = function (event) {
         event.preventDefault();
         x = +document.getElementById("xxValue").value
-        y = +document.getElementById("yyValue").value        
-        const site = voronoiDiagram.find(x, y);
+        y = +document.getElementById("yyValue").value
+        var site = voronoiDiagram.find(x, y);
         highlight(site && site.data);
-    });
-    
-    moveY.addEventListener("moveMouse", function (event) {
-        event.preventDefault();
-        x = +document.getElementById("xxValue").value
-        y = +document.getElementById("yyValue").value        
-        const site = voronoiDiagram.find(x, y);
-        highlight(site && site.data);
-    });
+        //refreshDashboard(site && site.data)
+    }
+    moveX.addEventListener("moveMouse", myFun);
+    moveY.addEventListener("moveMouse", myFun);
 
 
     var prevHighlightDotNum = null;
