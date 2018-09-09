@@ -604,56 +604,56 @@ function dapi(cellData) {
         map.addControl(new switchControl());
         
         
-        // Bootstrap toggle
-        var toggleControl = L.Control.extend({
-          options: {
-            position: 'topright'
-          },
-
-          onAdd: function(map) {
-              var container = L.DomUtil.create('div');
-              var gp = document.getElementsByClassName('leaflet-gene-pane')
-
-              // Use a child input.
-              var input = L.DomUtil.create('input');
-              input.type = "checkbox";
-              input.checked = true;
-              input.setAttribute('data-style', 'slow');
-
-              
-              // Insert the input as child of container.
-              container.appendChild(input);
-              
-              container.onchange = function(event){
-                  toggle(event);
-                  console.log('buttonClicked', event.target.checked);
-              }
-            
-              function toggle(event) {
-                if(event.target.checked === false) {
-                    //removeLayers();
-                    gp[0].style.display = 'none';
-                } else if(event.target.checked === true) {
-                    //addLayers();
-                    gp[0].style.display = ''
-                }
-              }
-              
-              jQuery(input).bootstrapToggle({
-                  //size: 'small',
-                  on: 'Genes: On',
-                  off: 'Genes: Off',
-                  width: 100,
-                  height: null,
-              });
-
-            return container;
-          }
-        });
-        map.addControl(new toggleControl());
+        // // Bootstrap toggle
+        // var toggleControl = L.Control.extend({
+        //   options: {
+        //     position: 'topright'
+        //   },
+        //
+        //   onAdd: function(map) {
+        //       var container = L.DomUtil.create('div');
+        //       var gp = document.getElementsByClassName('leaflet-gene-pane')
+        //
+        //       // Use a child input.
+        //       var input = L.DomUtil.create('input');
+        //       input.type = "checkbox";
+        //       input.checked = true;
+        //       input.setAttribute('data-style', 'slow');
+        //
+        //
+        //       // Insert the input as child of container.
+        //       container.appendChild(input);
+        //
+        //       container.onchange = function(event){
+        //           toggle(event);
+        //           console.log('buttonClicked', event.target.checked);
+        //       }
+        //
+        //       function toggle(event) {
+        //         if(event.target.checked === false) {
+        //             //removeLayers();
+        //             gp[0].style.display = 'none';
+        //         } else if(event.target.checked === true) {
+        //             //addLayers();
+        //             gp[0].style.display = ''
+        //         }
+        //       }
+        //
+        //       jQuery(input).bootstrapToggle({
+        //           //size: 'small',
+        //           on: 'Genes: On',
+        //           off: 'Genes: Off',
+        //           width: 100,
+        //           height: null,
+        //       });
+        //
+        //     return container;
+        //   }
+        // });
+        // map.addControl(new toggleControl());
+        //
         
-        
-
+        // make placeholder for the spinner gif
         function addControlPlaceholders(map) {
             var corners = map._controlCorners,
                 l = 'leaflet-',
@@ -669,7 +669,6 @@ function dapi(cellData) {
             createCorner('verticalcenter', 'horizontalcenter');
 
         }
-
         addControlPlaceholders(map);
 
 
@@ -690,17 +689,13 @@ function dapi(cellData) {
                 
                 return container;
             }
-            
         });
         map.addControl(new spinnerControl());
-        
 
-        
 
         ////////////////////////////////////////////////////////////////////////////
         // FlyTo
         ////////////////////////////////////////////////////////////////////////////
-
         var fly1 = document.getElementById("xValue");
         var fly2 = document.getElementById("yValue");
         //var container = document.getElementById("container");
