@@ -311,7 +311,7 @@ function dapi(cellData) {
             mouseout: resetDotHighlight,
             click: clickDot,
         });
-        var popup = '<table style="width:110px"><tbody><tr><td><div><b>Marker: </b></div></td><td><div>' + feature.properties.popup +          
+        var genePopup = '<table style="width:110px"><tbody><tr><td><div><b>Marker: </b></div></td><td><div>' + feature.properties.popup +
             '</div></td></tr><tr class><td><div><b>Group: </b></div></td><td><div>' + feature.properties.year + 
             '</div></td></tr><tr class><td><div><b>Name: </b></div></td><td><div>' + feature.properties.gene + 
             '</div></td></tr><tr class><td><div><b>Taxonomy: </b></div></td><td><div>' + feature.properties.taxonomy +
@@ -320,6 +320,15 @@ function dapi(cellData) {
             '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x +
             '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y +
             '</div></td></tr></tbody></table>'
+
+        var cellPopup = 'Working on it...'
+
+        if (feature.properties.type === 'gene'){
+            popup = genePopup;
+        }
+        if (feature.properties.type === 'cell'){
+            popup = cellPopup;
+        }
         
         layer.bindPopup(popup);
     }
