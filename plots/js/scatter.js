@@ -313,6 +313,8 @@ function initChart(data) {
             let sdata = []
             for (let i = 0; i < d.Prob.length; i++) {
                 sdata.push({
+                    value: d.Prob[i],
+                    label: d.ClassName[i],
                     Prob: d.Prob[i],
                     labels: d.ClassName[i]
                 })

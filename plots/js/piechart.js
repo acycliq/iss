@@ -2,7 +2,15 @@ function piechart(data)
 {
     //var data = [{"letter":"A","presses":2},{"letter":"B","presses":2},{"letter":"C","presses":1}];
     console.log(data);
-
+    
+    var pieData = []
+    for (var i=0; i < data.length; i++) {
+        pieData.push({
+            value: Math.floor(data[i].Prob*10000)/100,
+            label: data[i].label,
+        })
+    }
+    
     var width = 250,
         height = 250,
         radius = Math.min(width, height) / 2;
@@ -18,93 +26,39 @@ function piechart(data)
         .outerRadius(radius - 40)
         .innerRadius(radius - 40);
 
-    var pie = d3.pie()
-        .value(function(d) { return d.Prob; })(data);
+    var pie
 
     var svg = d3.select("#pie")
         .select("svg")
+        .attr("id", "mysvg")
         .attr("width", width)
         .attr("height", height)
-            .append("g")
-            .attr("transform", "translate(" + width/2 + "," + height/2 +")"); // Moving the center point
-
-    svg.call(renderPlot, pie)
-    
-    function renderPlot(selection, data){
-        selection.call(renderChart, data);
-    }
-
-    function renderChart(selection, data)
-    {
-        var points = selection.selectAll("arc")
-            .data(data);
-        
-        var newPoints = points.enter()
-            .append("path")
-            .attr("d", arc)
-            .style("fill", function(d) { return color(d.data.labels);})
-        
-        points.merge(newPoints)
-            .attr("d", arc)
-            .style("fill", function(d) { return color(d.data.labels);})
-        
-         points.exit()
-            .select("path")
-            .remove();
-        
-
-            
-
-//        g.append("text")
-//            .attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; })
-//            .text(function(d) { return d.data.labels;})
-//            .style("fill", "#fff")
-
-    }
+//            .append("g")
+//            .attr("transform", "translate(" + width/2 + "," + height/2 +")"); // Moving the center point
 
 
-    function change() {
-        var pie = d3.pie()
-            .value(function(d) { return d.Prob; })(data);
-        path = d3.select("#pie").selectAll("path").data(pie);
-        //path.attr("d", arc);
-        //d3.selectAll("text").data(pie).attr("transform", function(d) { return "translate(" + labelArc.centroid(d) + ")"; });
-        d3.selectAll("text").data(pie).transition().duration(500).attrTween("transform", labelarcTween); // Smooth transition with labelarcTween
-        path.transition().duration(500).attrTween("d", arcTween); // Smooth transition with arcTween
-    }
 
-    function arcTween(a) {
-      var i = d3.interpolate(this._current, a);
-      this._current = i(0);
-      return function(t) {
-        return arc(i(t));
-      };
-    }
+        pie = new d3pie("#mysvg", {
+              size: {
+                    canvasHeight: +svg.attr("height"),
+                    canvasWidth: +svg.attr("width")
+                  },
+            data: {
+                content: pieData
+            },
 
-    function labelarcTween(a) {
-      var i = d3.interpolate(this._current, a);
-      this._current = i(0);
-      return function(t) {
-        return "translate(" + labelArc.centroid(i(t)) + ")";
-      };
-    }
+            //Here further operations/animations can be added like click event, cut out the clicked pie section.
+            callbacks: {
+                onMouseoverSegment: function (info) {
+                    console.log("mouse in", info);
+                },
+                onMouseoutSegment: function (info) {
+                    console.log("mouseout:", info);
+                }
+            }
+
+        });
 
 
-    //d3.select("button#a")
-    //	.on("click", function() {
-    //		data[0].presses++;
-    //		change();
-    //	})
-    //
-    //d3.select("button#b")
-    //	.on("click", function() {
-    //		data[1].presses++;
-    //		change();
-    //	})
-    //d3.select("button#c")
-    //	.on("click", function() {
-    //		data[2].presses++;
-    //		change();
-    //	})
 
 }
