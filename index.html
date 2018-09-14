@@ -66,7 +66,7 @@
     <script src='./plots/js/data_vis.js'></script>
     <script src='./plots/js/scatter.js'></script>
     <script src='./plots/js/barchart.js'></script>
-    <script src='./plots/js/piechart.js'></script>
+    <script src='./plots/js/donut.js'></script>
     <script src='./plots/js/heatmap.js'></script>
     <script src='./plots/js/dt.js'></script>
     <script src='./plots/js/dapi.js'></script>
@@ -165,9 +165,24 @@
     		border-radius: 5px;
 		}
 		.info h4 {
-    		font-family: Verdana, Geneva, sans-serif;
-    		margin: 0 0 5px;
-    		color: #065581;
+            font-family: Verdana, Geneva, sans-serif;
+            margin: 0 0 5px;
+            color: #065581;
+        }
+
+
+        path.slice {
+            stroke-width: 2px;
+        }
+
+        polyline {
+            opacity: .3;
+            stroke: black;
+            stroke-width: 2px;
+            fill: none;
+        }
+
+
 
     </style>
 

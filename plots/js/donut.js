@@ -1,72 +1,79 @@
-var width = 350,
-    height = 250,
-	radius = Math.min(width, height) / 2;
+function donut(){
 
-var svg = d3.select("#pie")
-    .select("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .append("g")
-    .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")"); // Moving the center point
+	var width = 350,
+		height = 250,
+		radius = Math.min(width, height) / 2;
 
-svg.append("g")
-	.attr("class", "slices");
-svg.append("g")
-	.attr("class", "labels");
-svg.append("g")
-	.attr("class", "lines");
+	var svg = d3.select("#pie")
+		.select("svg")
+		.attr("width", width)
+		.attr("height", height)
+		.append("g")
+		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")"); // Moving the center point
 
-var pie = d3.pie()
-	.sort(null)
-	.value(function(d) {
-		return d.value;
-	});
+	svg.append("g")
+		.attr("class", "slices");
+	svg.append("g")
+		.attr("class", "labels");
+	svg.append("g")
+		.attr("class", "lines");
 
-var arc = d3.arc()
-	.outerRadius(radius * 0.8)
-	.innerRadius(radius * 0.4);
+	var pie = d3.pie()
+		.sort(null)
+		.value(function(d) {
+			return d.value;
+		});
 
-var outerArc = d3.arc()
-	.innerRadius(radius * 0.9)
-	.outerRadius(radius * 0.9);
+	var arc = d3.arc()
+		.outerRadius(radius * 0.8)
+		.innerRadius(radius * 0.4);
 
-//svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
+	var outerArc = d3.arc()
+		.innerRadius(radius * 0.9)
+		.outerRadius(radius * 0.9);
 
-var key = function(d){ return d.data.label; };
-var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+	//svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
-//var color = d3.scaleOrdinal()
-//	.domain(labels)
-//	.range(colors);
+	var key = function(d){ return d.data.label; };
+	var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
 
+	var donutData = {};
+    donutData.radius = radius;
+	donutData.pie = pie;
+    donutData.arc = arc;
+    donutData.outerArc = outerArc;
+    donutData.key = key;
+    donutData.colors = colors;
 
-//var data = [];
-//data.push({"label": "ABC", "value": 16});
-//data.push({"label": "XYZ", "value": 8});
-//data.push({"label": "PRQ", "value": 4});
+    return donutData;
 
-//renderChart(data);
+}
 
 
 function donutchart(dataset) {
     var data = []
     for (var i=0; i < dataset.length; i++) {
         data.push({
-            value: Math.floor(dataset[i].value*10000)/100,
-            label: dataset[i].label,
-            // value: Math.floor(dataset[i].Prob*10000)/100,
-            // label: dataset[i].labels,
+            // value: Math.floor(dataset[i].value*10000)/100,
+            // label: dataset[i].label,
+            value: Math.floor(dataset[i].Prob*10000)/100,
+            label: dataset[i].labels,
         })
     }
+    var svg = d3.select("#pie").select("svg")
+    if (svg.select('.slices').empty()) {
+    	donutData = donut();
+    }
+
     var labels = d3.map(data, function (d) {return d.label;}).keys();
     
     var color = d3.scaleOrdinal()
 	.domain(labels)
-	.range(colors);
+	.range(donutData.colors);
   
 	/* ------- PIE SLICES -------*/
 	var slice = svg.select(".slices").selectAll("path.slice")
-		.data(pie(data), key);
+		.data(donutData.pie(data), donutData.key);
 
 	slice.enter()
 		.insert("path")
@@ -79,7 +86,7 @@ function donutchart(dataset) {
 			var interpolate = d3.interpolate(this._current, d);
 			this._current = interpolate(0);
 			return function(t) {
-				return arc(interpolate(t));
+				return donutData.arc(interpolate(t));
 			};
 		});
 
@@ -89,7 +96,7 @@ function donutchart(dataset) {
 	/* ------- TEXT LABELS -------*/
 
 	var text = svg.select(".labels").selectAll("text")
-		.data(pie(data), key);
+		.data(donutData.pie(data), donutData.key);
 		
 	function midAngle(d){
 		return d.startAngle + (d.endAngle - d.startAngle)/2;
@@ -109,8 +116,8 @@ function donutchart(dataset) {
 			this._current = interpolate(0);
 			return function(t) {
 				var d2 = interpolate(t);
-				var pos = outerArc.centroid(d2);
-				pos[0] = radius * (midAngle(d2) < Math.PI ? 1 : -1);
+				var pos = donutData.outerArc.centroid(d2);
+				pos[0] = donutData.radius * (midAngle(d2) < Math.PI ? 1 : -1);
 				return "translate("+ pos +")";
 			};
 		})
@@ -130,7 +137,7 @@ function donutchart(dataset) {
 	/* ------- SLICE TO TEXT POLYLINES -------*/
 
 	var polyline = svg.select(".lines").selectAll("polyline")
-		.data(pie(data), key);
+		.data(donutData.pie(data), donutData.key);
 	
 	polyline.enter()
 		.append("polyline")
@@ -142,9 +149,9 @@ function donutchart(dataset) {
 			this._current = interpolate(0);
 			return function(t) {
 				var d2 = interpolate(t);
-				var pos = outerArc.centroid(d2);
-				pos[0] = radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
-				return [arc.centroid(d2), outerArc.centroid(d2), pos];
+				var pos = donutData.outerArc.centroid(d2);
+				pos[0] = donutData.radius * 0.95 * (midAngle(d2) < Math.PI ? 1 : -1);
+				return [donutData.arc.centroid(d2), donutData.outerArc.centroid(d2), pos];
 			};			
 		});
 	

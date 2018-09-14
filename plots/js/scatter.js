@@ -319,7 +319,7 @@ function initChart(data) {
             }
 
             barchart(sdata)
-            piechart(sdata)
+            donutchart(sdata)
 
             //Thats a temp solution to make the dapi chart responsive. There must be a better way
             document.getElementById("xValue").value = d.X
