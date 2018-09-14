@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <!--		<link rel="stylesheet" href="style.css">    -->
+</head>
+<style>
+    body {
+        font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+        width: 960px;
+        height: 500px;
+        position: relative;
+    }
+
+    svg {
+        width: 100%;
+        height: 100%;
+    }
+
+    path.slice {
+        stroke-width: 2px;
+    }
+
+    polyline {
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+    }
+</style>
+
+<body>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <input id="clickMe" type="button" value="click me to push new data" onclick="run();" />
+    <div id="pie">
+        <svg></svg>
+    </div>
+    
+    <script src="donut.js"></script>
+    
+
+    
+<script>
+    function makeid() {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        for (var i = 0; i < 5; i++)
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+        return text;
+    }
+
+    
+    function run() {
+        var data = [];
+        data.push({label:"ABC", value: Math.random()*25}) 
+        data.push({label:"XYZ", value: Math.random()*25}) 
+        data.push({label:"PQR", value: Math.random()*25})
+//        for (i = 1; i < 7; i++) {
+//            data.push({
+//                label: "Text " + i,
+//                value: Math.random() * 25,
+//            })
+//        }
+
+        donutchart(data)
+    }
+</script>
+
+
+    
+</body>
+
+</html>
