@@ -1,7 +1,7 @@
 function donut(){
 
-	var width = 350,
-		height = 250,
+	var width = 450,
+		height = 300,
 		radius = Math.min(width, height) / 2;
 
 	var svg = d3.select("#pie")
@@ -44,6 +44,8 @@ function donut(){
     donutData.outerArc = outerArc;
     donutData.key = key;
     donutData.colors = colors;
+    donutData.svg = svg;
+
 
     return donutData;
 
@@ -54,8 +56,8 @@ function donutchart(dataset) {
     var data = []
     for (var i=0; i < dataset.length; i++) {
         data.push({
-            // value: Math.floor(dataset[i].value*10000)/100,
-            // label: dataset[i].label,
+//             value: Math.floor(dataset[i].value*10000)/100,
+//             label: dataset[i].label,
             value: Math.floor(dataset[i].Prob*10000)/100,
             label: dataset[i].labels,
         })
@@ -157,4 +159,38 @@ function donutchart(dataset) {
 	
 	polyline.exit()
 		.remove();
+    
+    
+    // Toolip
+    
+    // function that creates and adds the tool tip to a selected element
+    function tooltip(selection) {
+
+        // add tooltip (svg circle element) when mouse enters label or slice
+        selection.on('mouseenter', function (d) {
+
+            donutData.svg.append('text')
+                .attr('class', 'toolCircle')
+                .attr('dy', -15) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
+                .html('dsfa') // add text to the circle.
+                .style('font-size', '.7em')
+                .style('text-anchor', 'middle'); // centres text in tooltip
+
+            donutData.svg.append('circle')
+                .attr('class', 'toolCircle')
+                .attr('r', donutData.radius * 0.38) // radius of tooltip circle
+                .style('fill', color(d.data.label)) // colour based on category mouse is over
+                .style('fill-opacity', 0.35);
+
+        });
+
+        // color(d.data.label)
+        // remove the tooltip when mouse leaves the slice/label
+        selection.on('mouseout', function () {
+            d3.selectAll('.toolCircle').remove();
+        });
+    }
+
+    d3.selectAll('path.slice').call(tooltip);
+    
 };
