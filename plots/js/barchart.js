@@ -91,6 +91,14 @@ function barchart(data) {
 
 
     function renderPoints(selection, data) {
+        function colorPicker(d, i) {
+            return d3.schemeCategory20[i]
+            // if (d.labels === 'Some Name') {
+            //     return "#666666";
+            // } else if (d.labels === 'Some other name') {
+            //     return "#FF0033";
+            // }
+        }
         
         var points = selection.select('.focus')
           	.selectAll('.bar').data(data);
@@ -107,6 +115,9 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height - scale.y(d.Prob)
+            })
+            .attr('fill', function(d, i) {
+                return colorPicker(d, i); // call the color picker to get the fill.
             })
             .attr("clip-path","url(#my-clip-path)");
 
@@ -140,6 +151,9 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height2 - scale.y2(d.Prob)
+            })
+            .attr('fill', function(d, i) {
+                return colorPicker(d, i); // call the color picker to get the fill.
             })
 
         sPoints.merge(newsPoints)

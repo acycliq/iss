@@ -1,7 +1,7 @@
 function donut(){
 
-	var width = 450,
-		height = 300,
+	var width = 360,
+		height = 250,
 		radius = Math.min(width, height) / 2;
 
 	var cornerRadius = 3, // sets how rounded the corners are on each slice
@@ -90,13 +90,13 @@ function donutchart(dataset) {
 
 	slice.enter()
 		.insert("path")
-		.style("fill", function(d) { return color(d.data.label); })
 		.attr("class", "slice")
 		.on("mousemove", mousemoveHandler)
         .on("mouseout", function (d) {
             donutData.div.style("display", "none");
         })
     .merge(slice)
+        .style("fill", function(d) { return color(d.data.label); })
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
 			this._current = this._current || d;
@@ -292,5 +292,6 @@ function donutchart(dataset) {
     //relax();
 
 
+	return svg
 
 };

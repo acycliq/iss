@@ -1,8 +1,8 @@
 function initChart(data) {
 
 
-  var totalWidth = 920,
-        totalHeight = 480;
+  var totalWidth = 900,
+        totalHeight = 400;
 
     var margin = {
             top: 10,
@@ -310,13 +310,33 @@ function initChart(data) {
             });
 
             // And the barchart, piechart too!
-            let sdata = []
-            for (let i = 0; i < d.Prob.length; i++) {
+            // For small values assign it to a separate class labeled 'Other'
+            var sdata = [];
+            var ClassName;
+            for (var i = 0; i < d.Prob.length; i++) {
+                d.Prob[i] < 0.02? ClassName = 'Other': ClassName = d.ClassName[i]
                 sdata.push({
                     Prob: d.Prob[i],
-                    labels: d.ClassName[i]
+                    labels: ClassName,
                 })
             }
+
+            // group by class name. This will eventually sum all the values that fall in the same class.
+            //Hence if there is a class 'Other' then is will be assigned with the grand total
+            sdata =  d3.nest().key(function(d){
+                return d.labels; })
+                .rollup(function(leaves){
+                    return d3.sum(leaves, function(d){
+                        return d.Prob;})
+                }).entries(sdata)
+                .map(function(d){
+                    return { labels: d.key, Prob: d.value};
+                });
+
+            // sort in decreasing order
+            sdata.sort(function(x, y){
+                return d3.ascending(y.Prob, x.Prob);
+            })
 
             barchart(sdata)
             donutchart(sdata)

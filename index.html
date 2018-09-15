@@ -83,13 +83,18 @@
             min-height: 100%;
         }
 
-        .bar {
-            fill: steelblue;
+        html {
+            overflow-y:scroll;
         }
+
+         /*Bar colors. Overiders bar colors in the barchart*/
+        /*.bar {*/
+            /*fill: steelblue;*/
+        /*}*/
 
         #map {
             position: relative;
-            height: 485px;
+            height: 455px;
         }
         
 
@@ -155,7 +160,8 @@
           transform: translateX(-50%);
           padding-left: 10px;
         }
-        
+
+         /*Info popup settings*/
         .info {
             padding: 6px 8px;
     		font: 14px/16px Verdana, Geneva, sans-serif;
@@ -169,8 +175,9 @@
             margin: 0 0 5px;
             color: #065581;
         }
+        /*Info popup settings*/
 
-
+        /*Donut chart settings*/
         path.slice {
             stroke-width: 2px;
         }
@@ -181,6 +188,28 @@
             stroke-width: 2px;
             fill: none;
         }
+
+        .text {
+            font-size: 16pt;
+            font-family: Arial;
+        }
+
+        .toolTip {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            position: absolute;
+            display: none;
+            width: auto;
+            height: auto;
+            background: none repeat scroll 0 0 white;
+            border: 0 none;
+            border-radius: 8px 8px 8px 8px;
+            box-shadow: -3px 3px 15px #888888;
+            color: black;
+            font: 12px sans-serif;
+            padding: 5px;
+            text-align: center;
+        }
+        /*Donut chart settings*/
 
 
 
@@ -243,13 +272,13 @@
                     <!-- Scatter Plot -->
 
                     <!-- Bar Chart -->
-                    <div class="col-sm-8">
+                    <div class="col-sm-7">
                         <div class="chart-wrapper">
                             <div class="chart-title">
                                 Bar Chart
                             </div>
                             <div class="chart-stage" id="bar-chart">
-                                <svg width="550" height="300">
+                                <svg width="500" height="250">
                                     <!-- Add a clip path -->
                                  <defs>
                                    <clipPath id="my-clip-path">
@@ -271,11 +300,11 @@
                     <!-- Bar Chart -->
 
 
-                    <div class="col-sm-4">
+                    <div class="col-sm-5">
 
                         <div class="row">
                             <!-- Pie Chart -->
-                            <div class="col-sm-12" style="background-color:lavender">
+                            <div class="col-sm-12">
                                 <div class="chart-wrapper">
                                     <div class="chart-title">
                                         Some title
