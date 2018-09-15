@@ -62,15 +62,15 @@ function donut(){
 
 
 function donutchart(dataset) {
-    var percentFormat = d3.format(',.2%');
+    var percentFormat = d3.format('.2%');
 
     var data = []
     for (var i=0; i < dataset.length; i++) {
         data.push({
-            value: Math.floor(dataset[i].value*10000)/100,
-            label: dataset[i].label,
-//             value: Math.floor(dataset[i].Prob*10000)/100,
-//             label: dataset[i].labels,
+            // value: Math.floor(dataset[i].value*10000)/100,
+            // label: dataset[i].label,
+            value: dataset[i].Prob,
+            label: dataset[i].labels,
         })
     }
     var svg = d3.select("#pie").select("svg")
@@ -114,7 +114,7 @@ function donutchart(dataset) {
             donutData.div.style("left", d3.event.pageX + 10 + "px");
             donutData.div.style("top", d3.event.pageY - 25 + "px");
             donutData.div.style("display", "inline-block");
-            donutData.div.html((this.__data__.data.label) + "<br>" + (this.__data__.data.value) + "%");
+            donutData.div.html((this.__data__.data.label) + "<br>" + percentFormat(this.__data__.data.value) );
 
     }
 
@@ -239,5 +239,58 @@ function donutchart(dataset) {
     }
 
     d3.selectAll('path.slice').call(tooltip);
-    
+
+
+
+	// relax the label! Taken from https://codepen.io/anon/pen/jvpdeP. Similar to https://jsfiddle.net/thudfactor/HdwTH/
+	// Needs more work,
+    var alpha = 0.5,
+        spacing = 15;
+
+    function relax() {
+        var again = false;
+        text.each(function(d, i) {
+            var a = this,
+                da = d3.select(a),
+                y1 = da.attr('y');
+            text.each(function(d, j) {
+                var b = this;
+                if (a === b) {
+                    return ;
+                }
+
+                db = d3.select(b);
+                if (da.attr('text-anchor') !== db.attr('text-anchor')) {
+                    return ;
+                }
+
+                var y2 = db.attr('y');
+                deltaY = y1 - y2;
+
+                if (Math.abs(deltaY) > spacing) {
+                    return ;
+                }
+
+                again = true;
+                sign = deltaY > 0? 1: -1;
+                var adjust = sign * alpha;
+                da.attr('y', +y1 + adjust);
+                db.attr('y', +y2 - adjust);
+            });
+        });
+
+        if (again) {
+            var labelElements = text[0];
+            polyline.attr('y2', function(d, i) {
+                var labelForLine = d3.select(labelElements[i]);
+                return labelForLine.attr('y');
+            });
+            setTimeout(relax, 20);
+        }
+    }
+
+    //relax();
+
+
+
 };
