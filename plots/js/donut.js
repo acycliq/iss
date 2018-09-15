@@ -4,6 +4,9 @@ function donut(){
 		height = 300,
 		radius = Math.min(width, height) / 2;
 
+	var cornerRadius = 3, // sets how rounded the corners are on each slice
+        padAngle = 0.015; // effectively dictates the gap between slices
+
 	var svg = d3.select("#pie")
 		.select("svg")
 		.attr("width", width)
@@ -26,7 +29,9 @@ function donut(){
 
 	var arc = d3.arc()
 		.outerRadius(radius * 0.8)
-		.innerRadius(radius * 0.4);
+		.innerRadius(radius * 0.4)
+		.cornerRadius(cornerRadius)
+        .padAngle(padAngle);
 
 	var outerArc = d3.arc()
 		.innerRadius(radius * 0.9)
@@ -35,7 +40,10 @@ function donut(){
 	//svg.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")");
 
 	var key = function(d){ return d.data.label; };
-	var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+	// var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+    var colors = d3.schemeCategory20;
+
+    var div = d3.select("body").append("div").attr("class", "toolTip");
 
 	var donutData = {};
     donutData.radius = radius;
@@ -44,6 +52,7 @@ function donut(){
     donutData.outerArc = outerArc;
     donutData.key = key;
     donutData.colors = colors;
+    donutData.div = div;
     donutData.svg = svg;
 
 
@@ -53,13 +62,15 @@ function donut(){
 
 
 function donutchart(dataset) {
+    var percentFormat = d3.format(',.2%');
+
     var data = []
     for (var i=0; i < dataset.length; i++) {
         data.push({
-//             value: Math.floor(dataset[i].value*10000)/100,
-//             label: dataset[i].label,
-            value: Math.floor(dataset[i].Prob*10000)/100,
-            label: dataset[i].labels,
+            value: Math.floor(dataset[i].value*10000)/100,
+            label: dataset[i].label,
+//             value: Math.floor(dataset[i].Prob*10000)/100,
+//             label: dataset[i].labels,
         })
     }
     var svg = d3.select("#pie").select("svg")
@@ -81,6 +92,10 @@ function donutchart(dataset) {
 		.insert("path")
 		.style("fill", function(d) { return color(d.data.label); })
 		.attr("class", "slice")
+		.on("mousemove", mousemoveHandler)
+        .on("mouseout", function (d) {
+            donutData.div.style("display", "none");
+        })
     .merge(slice)
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
@@ -92,8 +107,19 @@ function donutchart(dataset) {
 			};
 		});
 
-	slice.exit()
-		.remove();
+    slice.exit()
+        .remove();
+
+	function mousemoveHandler() {
+            donutData.div.style("left", d3.event.pageX + 10 + "px");
+            donutData.div.style("top", d3.event.pageY - 25 + "px");
+            donutData.div.style("display", "inline-block");
+            donutData.div.html((this.__data__.data.label) + "<br>" + (this.__data__.data.value) + "%");
+
+    }
+
+
+
 
 	/* ------- TEXT LABELS -------*/
 
@@ -171,8 +197,8 @@ function donutchart(dataset) {
 
             donutData.svg.append('text')
                 .attr('class', 'toolCircle')
-                .attr('dy', -15) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
-                .html('dsfa') // add text to the circle.
+                .attr('dy', -5) // hard-coded. can adjust this to adjust text vertical alignment in tooltip
+                .html(toolTipHTML(d)) // add text to the circle.
                 .style('font-size', '.7em')
                 .style('text-anchor', 'middle'); // centres text in tooltip
 
@@ -184,10 +210,31 @@ function donutchart(dataset) {
 
         });
 
+        function toolTipHTML(d) {
+
+            var tip = '',
+                i   = 0;
+
+            for (var key in d.data) {
+
+                // if value is a number, format it as a percentage
+                var value = (!isNaN(parseFloat(d.data[key]))) ? percentFormat(d.data[key]) : d.data[key];
+
+                // leave off 'dy' attr for first tspan so the 'dy' attr on text element works. The 'dy' attr on
+                // tspan effectively imitates a line break.
+                if (i === 0) tip += '<tspan x="0">' + key + ': ' + value + '</tspan>';
+                else tip += '<tspan x="0" dy="1.2em">' + key + ': ' + value + '</tspan>';
+                i++;
+            }
+
+            return tip;
+        }
+
         // color(d.data.label)
         // remove the tooltip when mouse leaves the slice/label
         selection.on('mouseout', function () {
             d3.selectAll('.toolCircle').remove();
+            donutData.div.style("display", "none");
         });
     }
 
