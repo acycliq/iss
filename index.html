@@ -5,60 +5,60 @@
     <meta charset='utf-8'>
 
     <title>Dashboard</title>
-    
+
     <!--jquery -->
     <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
 
     <!-- bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="./lib/js/bootstrap.min.js"></script>
-    
+
     <!-- bootstrap switch -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/css/bootstrap3/bootstrap-switch.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-switch/3.3.2/js/bootstrap-switch.js"></script>
-    
+
     <!-- bootstrap toggle-->
     <link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
     <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 
-    
+
     <!-- keen.io -->
     <link rel="stylesheet" href="./lib/css/keen-dashboards.css">
     <script src="./lib/js/keen.min.js"></script>
-    
+
     <!--d3 -->
     <script src='https://d3js.org/d3.v4.min.js'></script>
 
-<!--    <link rel="stylesheet" href="./lib/css/custom.css">-->
-<!--    <script src="./lib/js/underscore-min.js"></script>--> 
-<!--    <script src="./lib/js/queue.js"></script>-->
-    
+    <!--    <link rel="stylesheet" href="./lib/css/custom.css">-->
+    <!--    <script src="./lib/js/underscore-min.js"></script>-->
+    <!--    <script src="./lib/js/queue.js"></script>-->
+
     <!-- leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"></script>
-    
+
     <!-- leaflet Fullscreen -->
     <link href='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet'/>
     <script src='https://api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
-    
+
     <!-- minimap -->
     <link href='https://rawgit.com/Norkart/Leaflet-MiniMap/master/dist/Control.MiniMap.min.css' rel='stylesheet'/>
     <script src='https://rawgit.com/Norkart/Leaflet-MiniMap/master/dist/Control.MiniMap.min.js'></script>
-    
+
     <!-- leaflet Coordinates -->
     <link rel="stylesheet" href="https://mrmufflon.github.io/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.3.css" />
     <script src="https://mrmufflon.github.io/Leaflet.Coordinates/dist/Leaflet.Coordinates-0.1.3.src.js"></script>
-    
+
     <!-- datatables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">
     <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
-    
+
     <!-- turf -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Turf.js/5.1.5/turf.min.js"></script>
 
     <!-- Page loader -->
     <link rel="stylesheet" href="./plots/css/normalize.css">
-	<link rel="stylesheet" href="./plots/css/main.css">
+    <link rel="stylesheet" href="./plots/css/main.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
 
     <!-- User scripts  -->
@@ -87,16 +87,16 @@
             overflow-y:scroll;
         }
 
-         /*Bar colors. Overiders bar colors in the barchart*/
+        /*Bar colors. Overiders bar colors in the barchart*/
         /*.bar {*/
-            /*fill: steelblue;*/
+        /*fill: steelblue;*/
         /*}*/
 
         #map {
             position: relative;
-            height: 455px;
+            height: 800px;
         }
-        
+
 
         th {
             font-size: 12px;
@@ -108,69 +108,73 @@
 
         .dataTables_wrapper { font-size: 10px }
 
-        #tooltip {
-          position:absolute;
-          background-color: #2B292E;
-          color: white;
-          font-family: sans-serif;
-          font-size: 15px;
-          pointer-events: none; /*dont trigger events on the tooltip*/
-          padding: 15px 20px 10px 20px;
-          text-align: center;
-          opacity: 0;
-          border-radius: 4px;
+        .dataTables {
+        "pageLength": 5
         }
-        
+
+        #tooltip {
+            position:absolute;
+            background-color: #2B292E;
+            color: white;
+            font-family: sans-serif;
+            font-size: 15px;
+            pointer-events: none; /*dont trigger events on the tooltip*/
+            padding: 15px 20px 10px 20px;
+            text-align: center;
+            opacity: 0;
+            border-radius: 4px;
+        }
+
         .grid line {stroke: #ddd;}
 
         .leaflet-container {background: #000000;}
-        
+
         /* Controls transition of the toggle switch on the leaflet map */
         .slow .toggle-group { transition: left 1.0s; -webkit-transition: left 1.0s; }
         .fast .toggle-group { transition: left 0.1s; -webkit-transition: left 0.1s; }
-        .quick .toggle-group { transition: none; -webkit-transition: none; }    
-        
+        .quick .toggle-group { transition: none; -webkit-transition: none; }
+
         /* Pleasewait spinner gif */
         #pleasewait { position:absolute; top:50%; left:50%; margin-left:-30px; margin-top:-30px; padding: 5px 5px 0 5px; border-radius: 5px; background-color:white; z-index:1000000; }
 
         .leaflet-verticalcenter {
-        /********************************************/
-          /* Same as .leaflet-top and .leaflet-bottom */
-          position: absolute;
-          z-index: 1000;
-          pointer-events: none;
-          /********************************************/
-          top: 50%;
-          transform: translateY(-50%);
-          padding-top: 10px;
+            /********************************************/
+            /* Same as .leaflet-top and .leaflet-bottom */
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+            /********************************************/
+            top: 50%;
+            transform: translateY(-50%);
+            padding-top: 10px;
         }
 
         .leaflet-verticalcenter .leaflet-control {
-          margin-bottom: 10px;
+            margin-bottom: 10px;
         }
 
         .leaflet-horizontalcenter {
-          /********************************************/
-          /* Same as .leaflet-top and .leaflet-bottom */
-          position: absolute;
-          z-index: 1000;
-          pointer-events: none;
-          /********************************************/
-          left: 50%;
-          transform: translateX(-50%);
-          padding-left: 10px;
+            /********************************************/
+            /* Same as .leaflet-top and .leaflet-bottom */
+            position: absolute;
+            z-index: 1000;
+            pointer-events: none;
+            /********************************************/
+            left: 50%;
+            transform: translateX(-50%);
+            padding-left: 10px;
         }
 
-         /*Info popup settings*/
+        /*Info popup settings*/
         .info {
             padding: 6px 8px;
-    		font: 14px/16px Verdana, Geneva, sans-serif;
-    		background: white;
-    		background: rgba(255,255,255,0.8);
-    		box-shadow: 0 0 15px rgba(0,0,0,0.2);
-    		border-radius: 5px;
-		}
-		.info h4 {
+            font: 14px/16px Verdana, Geneva, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
             font-family: Verdana, Geneva, sans-serif;
             margin: 0 0 5px;
             color: #065581;
@@ -187,6 +191,13 @@
             stroke: black;
             stroke-width: 2px;
             fill: none;
+        }
+
+        .sliceLabels {
+            font-family: sans-serif;
+            font-size: 10px;
+            opacity: 1;
+
         }
 
         .text {
@@ -219,192 +230,150 @@
 
 <body class="application", id="body">
 
-    <div id="loader-wrapper">
-        <div id="loader"></div>
+<div id="loader-wrapper">
+    <div id="loader"></div>
 
-		<div class="loader-section section-left"></div>
-        <div class="loader-section section-right"></div>
-<!--        <p id='status'>Loading...</p>-->
+    <div class="loader-section section-left"></div>
+    <div class="loader-section section-right"></div>
+    <!--        <p id='status'>Loading...</p>-->
 
-    </div>
-    
+</div>
+
 <!--    <label><div><input type="checkbox" class="leaflet-control-layers-selector" checked=""><span>Toggle all</span></div></label>-->
 
-    <form id="mapCenterForm">
-        <input type="hidden" id="xValue" />
-        <input type="hidden" id="yValue" />
-        <input type="hidden" id="zValue" />
-    </form>
+<form id="mapCenterForm">
+    <input type="hidden" id="xValue" />
+    <input type="hidden" id="yValue" />
+    <input type="hidden" id="zValue" />
+</form>
 
-    <form id="scatterCenterForm">
-        <input type="hidden" id="xxValue" />
-        <input type="hidden" id="yyValue" />
-    </form>
+<form id="scatterCenterForm">
+    <input type="hidden" id="xxValue" />
+    <input type="hidden" id="yyValue" />
+</form>
 
-    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-        <div class="container-fluid">
-            <div class="navbar-header" >
-                <a class="navbar-brand" href="./">Cell Mapping Visualization</a>
-            </div>
+<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+    <div class="container-fluid">
+        <div class="navbar-header" >
+            <a class="navbar-brand" href="./">Cell Mapping Visualization</a>
         </div>
     </div>
+</div>
 
-    <div class="container-fluid">
+<div class="container-fluid">
 
-        <div class="row">
+    <!--//top row-->
+    <div class="row">
+        <div class="col-sm-12">
+            <!-- Map -->
+            <div class="col-sm-7">
+                <div class="chart-wrapper">
+                    <div class="chart-title">
+                        Gene Map
+                    </div>
+                    <div class="chart-stage">
+                        <div id="map" style="width: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <!-- Map -->
 
-            <div class="col-sm-6">
+
+            <div class="col-sm-5">
                 <div class="row">
-
                     <!-- Scatter Plot -->
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                Some title
+                    <div class="chart-wrapper">
+                        <div class="chart-title">
+                            Section Overview
+                        </div>
+                        <div class="chart-stage">
+                            <div id="scatter-plot" class="display compact custom" ; width=100%>
+                                <svg></svg>
                             </div>
-                            <div class="chart-stage">
-                                <div id="scatter-plot" class="display compact custom" ; width=100%>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <!-- Bar and Pie Chart -->
+                    <div class="chart-wrapper">
+                        <div class="chart-title">
+                            Cell Type Probabilities
+                        </div>
+                        <div class="chart-stage">
+                            <div class="col-sm-7">
+                                <div class="chart-stage" id="bar-chart">
+                                    <svg width="400" height="200">
+                                        <!-- Add a clip path -->
+                                        <defs>
+                                            <clipPath id="my-clip-path">
+                                                <rect></rect>
+                                            </clipPath>
+                                        </defs>
+                                        <g class="focus">
+                                            <g class="axis"></g>
+                                            <g class="axis axis--y"></g>
+                                        </g>
+                                        <g class="context">
+                                            <g class="axis2"></g>
+                                            <g class="brush"></g>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-5">
+                                <div class="chart-stage" id="pie">
                                     <svg></svg>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Scatter Plot -->
-
-                    <!-- Bar Chart -->
-                    <div class="col-sm-7">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                Bar Chart
-                            </div>
-                            <div class="chart-stage" id="bar-chart">
-                                <svg width="500" height="250">
-                                    <!-- Add a clip path -->
-                                 <defs>
-                                   <clipPath id="my-clip-path">
-                                       <rect></rect>
-                                   </clipPath>
-                                 </defs>
-                                <g class="focus">
-                                    <g class="axis"></g>
-                                    <g class="axis axis--y"></g>
-                                </g>
-                                <g class="context">
-                                    <g class="axis2"></g>
-                                    <g class="brush"></g>
-                                </g>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Bar Chart -->
-
-
-                    <div class="col-sm-5">
-
-                        <div class="row">
-                            <!-- Pie Chart -->
-                            <div class="col-sm-12">
-                                <div class="chart-wrapper">
-                                    <div class="chart-title">
-                                        Some title
-                                    </div>
-                                    <div class="chart-stage" id="pie">
-                                        <svg></svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Pie Chart -->
-                    </div>
-
-
-                </div>
-            </div>
-
-
-            <div class="col-sm-2">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                Heatmap
-                            </div>
-                            <div class="chart-stage">
-                                <div id="heat-chart">
-                                    <svg width="330" height="780">
-                                      <g class="focus">
-                                        <g class="xaxis"></g>
-                                        <g class="yaxis"></g>
-                                      </g>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-sm-4">
-                <div class="row">
-                    <!-- Map -->
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                DAPI
-                            </div>
-                            <div class="chart-stage">
-<!--
-                                <div id="pleasewait" style="display: none;">
-                                    <img src="./plots/data/spinner.gif">
-                                </div>
--->
-                                <div id="map" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Map -->
                 </div>
 
                 <div class="row">
-                    <!-- Datatable -->
                     <div class="col-sm-12">
                         <div class="chart-wrapper">
                             <div class="chart-title" id="dtTitle">
                                 Title
                             </div>
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable" class="display compact custom" ; width=100%></table>
+                            <div class="chart-stage">
+                                <div class="col-sm-6">
+                                    <div class="chart-stage">
+                                        <table id="dtTable" class="display compact custom" data-page-length='5' width=100%></table>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable2" class="display compact custom" ; width=100%></table>
+                                <div class="col-sm-6">
+                                    <div class="chart-stage">
+                                        <table id="dtTable2" class="display compact custom" data-page-length='5' width=100%></table>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Datatable -->
                 </div>
+
             </div>
 
         </div>
-
     </div>
 
-    <hr>
-    <p class="small text-muted">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
 
-    <!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
-    <script>
+
+</div>
+
+
+<hr>
+<p class="small text-muted">University College London - <a href="http://www.ucl.ac.uk/cortexlab">Cortexlab</a></p>
+
+<!--this will stop the preloader after 3sec. (can get rid off the time-out and make it show the webpage when all charts are rendered??)-->
+<script>
     setTimeout(function(){
         $('body').addClass('loaded');
         $('h1').css('color','#222222');
     }, 3000);
-    </script>
+</script>
 
 </body>
 

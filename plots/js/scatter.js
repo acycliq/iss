@@ -1,8 +1,8 @@
 function initChart(data) {
 
 
-  var totalWidth = 900,
-        totalHeight = 400;
+  var totalWidth = 700,
+        totalHeight = 275;
 
     var margin = {
             top: 10,
