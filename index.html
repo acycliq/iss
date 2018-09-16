@@ -108,6 +108,10 @@
 
         .dataTables_wrapper { font-size: 10px }
 
+        .dataTables {
+        "pageLength": 5
+        }
+
         #tooltip {
           position:absolute;
           background-color: #2B292E;
@@ -251,16 +255,28 @@
 
     <div class="container-fluid">
 
+        <!--//top row-->
         <div class="row">
 
-            <div class="col-sm-6">
-                <div class="row">
-
-                    <!-- Scatter Plot -->
-                    <div class="col-sm-12">
+            <div class="col-sm-12">
+                    <!-- Map -->
+                    <div class="col-sm-7">
                         <div class="chart-wrapper">
                             <div class="chart-title">
-                                Some title
+                                Gene Map
+                            </div>
+                            <div class="chart-stage">
+                                <div id="map" style="width: 100%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Map -->
+
+                    <!-- Scatter Plot -->
+                    <div class="col-sm-5">
+                        <div class="chart-wrapper">
+                            <div class="chart-title">
+                                Section Overview
                             </div>
                             <div class="chart-stage">
                                 <div id="scatter-plot" class="display compact custom" ; width=100%>
@@ -271,125 +287,76 @@
                     </div>
                     <!-- Scatter Plot -->
 
-                    <!-- Bar Chart -->
+                </div>
+            </div>
+
+        </div>
+
+
+        <!--bottom row-->
+        <div class="row">
+
+                    <!-- Bar and Pie Chart -->
                     <div class="col-sm-7">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                Bar Chart
-                            </div>
-                            <div class="chart-stage" id="bar-chart">
-                                <svg width="500" height="250">
-                                    <!-- Add a clip path -->
-                                 <defs>
-                                   <clipPath id="my-clip-path">
-                                       <rect></rect>
-                                   </clipPath>
-                                 </defs>
-                                <g class="focus">
-                                    <g class="axis"></g>
-                                    <g class="axis axis--y"></g>
-                                </g>
-                                <g class="context">
-                                    <g class="axis2"></g>
-                                    <g class="brush"></g>
-                                </g>
-                                </svg>
+                        <div class="col-sm-12">
+                            <div class="chart-wrapper">
+                                <div class="chart-title">
+                                    Cell Type Probabilities
+                                </div>
+                                <div class="chart-stage">
+                                    <div class="col-sm-7">
+                                        <div class="chart-stage" id="bar-chart">
+                                            <svg width="585" height="250">
+                                                <!-- Add a clip path -->
+                                                <defs>
+                                                    <clipPath id="my-clip-path">
+                                                        <rect></rect>
+                                                    </clipPath>
+                                                </defs>
+                                                <g class="focus">
+                                                    <g class="axis"></g>
+                                                    <g class="axis axis--y"></g>
+                                                </g>
+                                                <g class="context">
+                                                    <g class="axis2"></g>
+                                                    <g class="brush"></g>
+                                                </g>
+                                            </svg>
+                                        </div>
+                                    </div>
+
+                                    <div class="col-sm-5">
+                                        <div class="chart-stage" id="pie">
+                                            <svg></svg>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- Bar Chart -->
 
-
+                    <!-- Datatable -->
                     <div class="col-sm-5">
-
-                        <div class="row">
-                            <!-- Pie Chart -->
-                            <div class="col-sm-12">
-                                <div class="chart-wrapper">
-                                    <div class="chart-title">
-                                        Some title
-                                    </div>
-                                    <div class="chart-stage" id="pie">
-                                        <svg></svg>
+                            <div class="chart-wrapper">
+                                <div class="chart-title" id="dtTitle">
+                                    Title
+                                </div>
+                                <div class="chart-stage">
+                                <div class="col-sm-6">
+                                    <div class="chart-stage">
+                                        <table id="dtTable" class="display compact custom" data-page-length='8' width=100%></table>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                        <!-- Pie Chart -->
-                    </div>
-
-
-                </div>
-            </div>
-
-
-            <div class="col-sm-2">
-                <div class="row">
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                Heatmap
-                            </div>
-                            <div class="chart-stage">
-                                <div id="heat-chart">
-                                    <svg width="330" height="780">
-                                      <g class="focus">
-                                        <g class="xaxis"></g>
-                                        <g class="yaxis"></g>
-                                      </g>
-                                    </svg>
+                                <div class="col-sm-6">
+                                    <div class="chart-stage">
+                                        <table id="dtTable2" class="display compact custom" data-page-length='8' width=100%></table>
+                                    </div>
+                                </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                </div>
-            </div>
-
-
-            <div class="col-sm-4">
-                <div class="row">
-                    <!-- Map -->
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title">
-                                DAPI
-                            </div>
-                            <div class="chart-stage">
-<!--
-                                <div id="pleasewait" style="display: none;">
-                                    <img src="./plots/data/spinner.gif">
-                                </div>
--->
-                                <div id="map" style="width: 100%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Map -->
-                </div>
-
-                <div class="row">
                     <!-- Datatable -->
-                    <div class="col-sm-12">
-                        <div class="chart-wrapper">
-                            <div class="chart-title" id="dtTitle">
-                                Title
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable" class="display compact custom" ; width=100%></table>
-                                </div>
-                            </div>
-                            <div class="col-sm-6">
-                                <div class="chart-stage">
-                                    <table id="dtTable2" class="display compact custom" ; width=100%></table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Datatable -->
-                </div>
-            </div>
 
         </div>
 

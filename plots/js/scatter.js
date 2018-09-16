@@ -1,8 +1,8 @@
 function initChart(data) {
 
 
-  var totalWidth = 900,
-        totalHeight = 400;
+  var totalWidth = 700,
+        totalHeight = 455;
 
     var margin = {
             top: 10,
@@ -297,17 +297,17 @@ function initChart(data) {
             // otherwise, show the highlight circle at the correct position
         } else {
             renderDataTable(d)
-            // Do the heatmap as well
-            d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
-                data.forEach(function (d) {
-                    d.xKey = +d.xKey
-                    d.yKey = +d.yKey
-                    d.val = +d.val
-                });
-                console.log("Heatmap start")
-                renderHeatmap(data)
-                console.log("Heatmap end")
-            });
+            // // Do the heatmap as well
+            // d3.json("./plots/data/weightedMap/json/wm_" + d.Cell_Num + ".json", function (data) {
+            //     data.forEach(function (d) {
+            //         d.xKey = +d.xKey
+            //         d.yKey = +d.yKey
+            //         d.val = +d.val
+            //     });
+            //     console.log("Heatmap start")
+            //     renderHeatmap(data)
+            //     console.log("Heatmap end")
+            // });
 
             // And the barchart, piechart too!
             // For small values assign it to a separate class labeled 'Other'

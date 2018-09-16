@@ -1,6 +1,6 @@
 function donut(){
 
-	var width = 360,
+	var width = 390,
 		height = 250,
 		radius = Math.min(width, height) / 2;
 
