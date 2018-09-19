@@ -10,6 +10,21 @@ function barchart(data) {
 
     var svg = d3.select("#bar-chart").select("svg");
 
+    // just for future use in case I want to have patterns
+    // on the bars. Not getting used anywhere for now.
+    // To have the pattern rendered you need also to set the
+    // fill attribute with 'url('myPattern')
+    svg.append("defs").append("pattern")
+    .attr('id','myPattern')
+    .attr("width", 4)
+    .attr("height", 4)
+    .attr('patternUnits',"userSpaceOnUse")
+    .append('path')
+    .attr('fill','yellow')
+    .attr('stroke','#335553')
+    .attr('stroke-width','1')
+    .attr('d','M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' );
+
     var margin = {
             top: 20,
             right: 20,
@@ -91,6 +106,12 @@ function barchart(data) {
 
 
     function renderPoints(selection, data) {
+
+        // ***** For future use. Not getting used for now ****
+        var colorRamp = classColors()
+        var colorMap = d3.map(colorRamp, function(d) { return d.className; });
+        // **************
+
         function colorPicker(d, i) {
             return d3.schemeCategory20[i]
             // if (d.labels === 'Some Name') {
@@ -133,6 +154,9 @@ function barchart(data) {
             .attr('height', d => {
                 return height - scale.y(d.Prob)
             })
+            .attr('fill', function(d, i) {
+                return colorPicker(d, i); // call the color picker to get the fill.
+            })
             
 
         points.exit()
@@ -165,6 +189,9 @@ function barchart(data) {
             .attr('width', xBand.bandwidth() * 0.9)
             .attr('height', d => {
                 return height2 - scale.y2(d.Prob)
+            })
+            .attr('fill', function(d, i) {
+                return colorPicker(d, i); // call the color picker to get the fill.
             });
 
         sPoints.exit()

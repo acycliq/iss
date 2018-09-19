@@ -14,6 +14,17 @@ function donut(){
 		.append("g")
 		.attr("transform", "translate(" + width / 2 + "," + height / 2 + ")"); // Moving the center point
 
+    svg.append("defs").append("pattern")
+        .attr('id','myPattern')
+        .attr("width", 4)
+        .attr("height", 4)
+        .attr('patternUnits',"userSpaceOnUse")
+        .append('path')
+        .attr('fill','none')
+        .attr('stroke','#335553')
+        .attr('stroke-width','1')
+        .attr('d','M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2' );
+
 	svg.append("g")
 		.attr("class", "slices");
 	svg.append("g")
@@ -96,6 +107,7 @@ function donutchart(dataset) {
             donutData.div.style("display", "none");
         })
     .merge(slice)
+        //.style("fill", 'url(#myPattern)')
         .style("fill", function(d) { return color(d.data.label); })
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
