@@ -107,20 +107,32 @@ function barchart(data) {
 
     function renderPoints(selection, data) {
 
-        // ***** For future use. Not getting used for now ****
         var colorRamp = classColors()
         var colorMap = d3.map(colorRamp, function(d) { return d.className; });
-        // **************
 
         function colorPicker(d, i) {
+            // //Math.seedrandom('123'); // necessary to se the seed
+            // var r = colorHelper(colorMap.get(d.labels).r);
+            // var g = colorHelper(colorMap.get(d.labels).g);
+            // var b = colorHelper(colorMap.get(d.labels).b);
+            //
+            // var rgb = 'rgb('+ r + ', ' + g + ', ' + b +')'
+            // return rgb
+
             return d3.schemeCategory20[i]
-            // if (d.labels === 'Some Name') {
-            //     return "#666666";
-            // } else if (d.labels === 'Some other name') {
-            //     return "#FF0033";
-            // }
         }
-        
+
+        function colorHelper(x) {
+            var noise = 0.2;
+            var rnd = Math.random()
+            var y = x * 0.8 + noise + (rnd - 0.5) * noise * 2;
+            y > 1? 1: y;
+            y < 0? 0: y;
+
+            return Math.floor(y) * 255
+        }
+
+
         var points = selection.select('.focus')
           	.selectAll('.bar').data(data);
 
