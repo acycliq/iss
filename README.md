@@ -1,5 +1,7 @@
 Dashboard link: https://acycliq.github.io/iss/
 
+![alt text](https://github.com/acycliq/iss/blob/layout2/screenRecording.gif)
+
 ## Notes:
 Background image taken from:  
 `\\basket.cortexlab.net\data\kenneth\iss\170315_161220KI_4-3\Output\background_boundaries.tif`

@@ -1,7 +1,7 @@
 function donut(){
 
-	var width = 390,
-		height = 250,
+	var width = 280,
+		height = 200,
 		radius = Math.min(width, height) / 2;
 
 	var cornerRadius = 3, // sets how rounded the corners are on each slice
@@ -28,7 +28,7 @@ function donut(){
 	svg.append("g")
 		.attr("class", "slices");
 	svg.append("g")
-		.attr("class", "labels");
+		.attr("class", "sliceLabels");
 	svg.append("g")
 		.attr("class", "lines");
 
@@ -135,7 +135,7 @@ function donutchart(dataset) {
 
 	/* ------- TEXT LABELS -------*/
 
-	var text = svg.select(".labels").selectAll("text")
+	var text = svg.select(".sliceLabels").selectAll("text")
 		.data(donutData.pie(data), donutData.key);
 		
 	function midAngle(d){
