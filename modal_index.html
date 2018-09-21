@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head profile="http://gmpg.org/xfn/11">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+
+    <!-- TO DO: Check leaflet recommended viewport settings here -->
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0"> -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Image Viewer</title>
+
+    <!-- for sitewide URL encoding -->
+    <script type="text/javascript">
+        var SITE_URL = "https:\/\/websites.greeninfo.org\/coal_swarm\/coal_tracker\/";
+    </script>
+
+    <!-- the favicon -->
+    <link rel="shortcut icon" href="https://websites.greeninfo.org/coal_swarm/coal_tracker/application/views/common/favicon.ico" type="image/x-icon" />
+
+    <!-- jQuery, jQuery UI, and a Google-hosted jQueryUI theme -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/themes/smoothness/jquery-ui.css" />
+    <script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.11.1/jquery-ui.min.js"></script>
+
+    <!-- Twitter Bootstrap: jQuery plugins and a responsive grid -->
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+
+
+
+</head>
+<body>
+<div class="modal" id="map-modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Choose data:</h4>
+            </div>
+            <div class="modal-body">
+                <form id="map-form" role="form">
+                    <!-- option to select a region -->
+                    <!-- stub here, options populated in initMapForm(); -->
+                    <div class="form-group">
+                        <label for="region-select-map">Select a dataset:</label>
+                        <select id="region-select-map" class="form-control select-region" data-select="region" data-type="map">
+                            <option selected disabled value="placeholder">Select a dataset...</option>
+                        </select>
+                    </div>
+
+                    <!-- button to launch the selection. See initDialogSearch() -->
+                    <button type="submit" class="btn btn-primary btn-search-place" data-dismiss="modal" data-type="map" disabled>GO</button>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <!-- <p class="pull-left"><a href="#" class="back-link" data-dismiss="modal" data-back="startup-modal">Back</a></p> -->
+                <p>Published by <a href="http://www.ucl.ac.uk/cortexlab" target="_blank">Cortexlab</a>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
+<script>
+    function initState() {
+        var modal = true;
+
+        if (modal) {
+            // open the startup modal
+            $('#map-modal').modal({
+                backdrop: 'static',
+                keyboard: false
+            });
+        }
+    }
+
+
+    // modal form with map options, second step in getting to the map(s)
+    function initMapForm() {
+
+        var REGION_COUNTRIES = {
+            'Dataset 1':'Africa and Middle East - All countries;Botswana;Democratic Republic of Congo;Egypt;Ghana;Guinea;Iran;Israel;Jordan;Kenya;Madagascar;Malawi;Mauritius;Morocco;Mozambique;Namibia;Nigeria;Oman;Reunion;Senegal;South Africa;Sudan;Swaziland;Syria;Tanzania;United Arab Emirates;Zambia;Zimbabwe',
+            'Dataset 2'          :'Australia/NZ - All countries;Australia;New Zealand',
+            'Dataset 3'             :'East Asia - All countries;Japan;Mongolia;North Korea;South Korea;Taiwan, China;Hong Kong, China;China;;;China - Anhui;China - Chongqing;China - Fujian;China - Gansu;China - Guangdong;China - Guangxi;China - Guizhou;China - Hainan;China - Hebei;China - Heilongjiang;China - Henan;China - Hubei;China - Hunan;China - Inner Mongolia;China - Jiangsu;China - Jiangxi;China - Jilin;China - Liaoning;China - Ningxia;China - Qinghai;China - Shaanxi;China - Shandong;China - Shanghai;China - Shanxi;China - Sichuan;China - Tianjin;China - Xinjiang;China - Yunnan;China - Zhejiang',
+            'Dataset 4'               :'Eurasia - All countries;Belarus;Georgia;Kazakhstan;Kyrgyzstan;Russia;Tajikistan;Uzbekistan',
+            'Dataset 5'                  :'EU28 - All countries;Austria;Belgium;Bulgaria;Croatia;Czech Republic;Denmark;Finland;France;Germany;Greece;Hungary;Ireland;Italy;Latvia;Netherlands;Poland;Portugal;Romania;Slovakia;Slovenia;Spain;Sweden;United Kingdom',
+            'Dataset 6'         :'non-EU Europe - All countries;Balkans - All countries;Albania;Bosnia & Herzegovina;FYROM;Kosovo;Moldova;Montenegro;Serbia;Turkey;Ukraine',
+            'Dataset 7'         :'Latin America - All countries;Argentina;Brazil;Chile;Colombia;Dominican Republic;El Salvador;Guatemala;Jamaica;Mexico;Panama;Peru;Venezuela',
+            'Dataset 8'             :'Canada/US - All countries;Canada;United States',
+            'Dataset 9'            :'South Asia - All countries;Bangladesh;India;Pakistan;Sri Lanka',
+            'Dataset 10'               :'SE Asia - All countries;Cambodia;Indonesia;Laos;Malaysia;Myanmar;Philippines;Thailand;Vietnam',
+        }
+
+        // get the target for country select (.select-country is a class because initially we had this select on two forms)
+        var regionselect = $('.select-region');
+
+        // populate the region select from the keys of REGION_COUNTRIES:
+        // get the keys of REGION_COUNTRIES - the region selections - and add each to the list as an option
+        $.each(Object.keys(REGION_COUNTRIES), function(i, key) {
+            $('.select-region').append('<option>' + key + '</option>');
+        })
+
+
+        // listen for a select on on the country select, and enable the "GO" button
+        // initially we had two go buttons on two similar forms; hence the setting of 'type'
+        // see initDialogSearch()
+        regionselect.change(function() {
+            var type = $(this).data().type;
+            $('form#' + type + '-form .btn').prop('disabled', false);
+        });
+
+    }
+
+    function initDialogSearch() {
+        // handle the place search from the introductory dialogs where user selects "map" from select options
+        // Click the go button after making a map or table selection (cannot get this to work on submit... :()
+        $('.btn-search-place').click(function() {
+            // the selected place may be a region, or a single country, or a province
+            var countryselect = $('.select-country option:selected');
+            var type          = countryselect.val();
+            var place         = countryselect.text();
+
+            // hand off to the dispatcher
+            dispatchSearch(type, place);
+        });
+    }
+
+    initDialogSearch();
+    initMapForm();
+    initState();
+</script>
+
+</body>
+
