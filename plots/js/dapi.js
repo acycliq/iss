@@ -321,7 +321,7 @@ function dapi(cellData) {
             '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y +
             '</div></td></tr></tbody></table>'
 
-        var cellPopup = 'Working on it...'
+        var cellPopup = donutPopup
 
         if (feature.properties.type === 'gene'){
             popup = genePopup;

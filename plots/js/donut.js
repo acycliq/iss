@@ -71,6 +71,137 @@ function donut(){
 
 }
 
+// Donut chart for the popup on the cells
+function donutPopup(d){
+    var feature = d.feature;
+    var data = []
+    for (var i=0; i < d.feature.properties.ClassName.length; i++) {
+        data.push({
+            value: d.feature.properties.Prob[i],
+            label: d.feature.properties.ClassName[i],
+        })
+    }
+
+    // Sort now descreasing order. Maybe encapsulate since the same 
+    // piece of code is used in scatter.js before the call to barchart and
+    // donutchart.
+    // For small values assign it to a separate class labeled 'Other'
+    var sdata = [];
+    var ClassName;
+    for (var i = 0; i < d.feature.properties.ClassName.length; i++) {
+        d.feature.properties.Prob[i] < 0.02? ClassName = 'Other': ClassName = d.feature.properties.ClassName[i]
+        sdata.push({
+            Prob: d.feature.properties.Prob[i],
+            labels: ClassName,
+        })
+    }
+
+    // group by class name. This will eventually sum all the values that fall in the same class.
+    //Hence if there is a class 'Other' then is will be assigned with the grand total
+    sdata =  d3.nest().key(function(d){
+        return d.labels; })
+        .rollup(function(leaves){
+            return d3.sum(leaves, function(d){
+                return d.Prob;})
+        }).entries(sdata)
+        .map(function(d){
+            return { label: d.key, value: d.value};
+        });
+
+    // sort in decreasing order
+    sdata.sort(function(x, y){
+        return d3.ascending(y.value, x.value);
+    })
+
+    //overwrite data
+    data = sdata
+
+    var width = 60;
+    var height = 60;
+    var radius = Math.min(width, height) / 2;
+
+    var cornerRadius = 3, // sets how rounded the corners are on each slice
+        padAngle = 0.015; // effectively dictates the gap between slices
+
+    var div = d3.create("div")
+    var svg = div.append("svg")
+        .attr("width", width)
+        .attr("height", height)
+        .append("g")
+        .attr("transform", "translate(" + width / 2 + "," + height / 2 + ")"); // Moving the center point
+
+    svg.append("g")
+        .attr("class", "slices");
+    svg.append("g")
+        .attr("class", "sliceLabels");
+    svg.append("g")
+        .attr("class", "lines");
+
+    var pie = d3.pie()
+        .sort(null)
+        .value(function(d) {
+            return d.value;
+        });
+
+    var arc = d3.arc()
+        .outerRadius(radius * 1.0)
+        .innerRadius(radius * 0.0)
+        .cornerRadius(cornerRadius)
+        .padAngle(padAngle);
+
+    var outerArc = d3.arc()
+        .innerRadius(radius * 0.9)
+        .outerRadius(radius * 0.9);
+
+    var key = function(d){ return d.data.label; };
+    // var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
+    var colors = d3.schemeCategory20;
+
+    var divTooltip = d3.select("body").append("div").attr("class", "toolTip");
+
+    var percentFormat = d3.format('.2%');
+
+
+    var labels = d3.map(data, function (d) {return d.label;}).keys();
+
+    var color = d3.scaleOrdinal()
+        .domain(labels)
+        .range(colors);
+
+    /* ------- PIE SLICES -------*/
+    var slice = svg.select(".slices").selectAll("path.slice")
+        .data(pie(data), key);
+
+    slice.enter()
+        .insert("path")
+        .attr("class", "slice")
+        .on("mousemove", mousemoveHandler)
+        .on("mouseout", function (d) {
+            divTooltip.style("display", "none");
+        })
+        .merge(slice)
+        .style("fill", function(d) { return color(d.data.label); })
+        .transition().duration(1000)
+        .attrTween("d", function(d) {
+            this._current = this._current || d;
+            var interpolate = d3.interpolate(this._current, d);
+            this._current = interpolate(0);
+            return function(t) {
+                return arc(interpolate(t));
+            };
+        });
+
+
+    function mousemoveHandler() {
+        divTooltip.style("left", d3.event.pageX + 10 + "px");
+        divTooltip.style("top", d3.event.pageY - 25 + "px");
+        divTooltip.style("display", "inline-block");
+        divTooltip.html((this.__data__.data.label) + "<br>" + percentFormat(this.__data__.data.value) );
+    }
+        
+
+return div.node();
+}
 
 function donutchart(dataset) {
     var percentFormat = d3.format('.2%');
