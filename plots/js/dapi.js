@@ -409,6 +409,11 @@ function dapi(cellData) {
         var cellFeatures = cellDots.features;
         var fc = turf.featureCollection(cellFeatures)
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
+
+        //push the features of the cells to polygons
+        for (i=0; i < cellFeatures.length; ++i){
+            voronoiPolygons.features[i].properties = cellFeatures[i].properties
+        }
         var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
             return {
                 weight: 0.0, // Voronoi not visible, useful only for navigation purposes
@@ -425,14 +430,15 @@ function dapi(cellData) {
                 {
                     'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
-                    'click': function(e){
-                        map.fitBounds(e.target.getBounds());
-                        this.bindPopup("<b>"+"Hello");
-                        },
+                    // 'click': function(e){
+                    //     map.fitBounds(e.target.getBounds());
+                    //     this.bindPopup("<b>"+"Hello");
+                    //     },
                     'add': function(e){console.log('add pressed')},
                     'remove': function(e){console.log('remove pressed')},
                 }
             );//close layer
+                layer.bindPopup(donutPopup);
             }
 
         }).addTo(map);
