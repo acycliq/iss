@@ -157,8 +157,31 @@ function donutPopup(d){
     // var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
     var colors = d3.schemeCategory20;
 
-    var divTooltip = d3.select("body").append("div").attr("class", "toolTip");
+    if (d3.select("body").select(".popupToolTip").empty()) {
+        var map = d3.select('#map')
+        var divTooltip = L.DomUtil.create('div', 'popupToolTip', map.node());
 
+        var popupToolTipStyle = "position: absolute; " +
+            "z-index: 1000; " +
+            "display: none; " +
+            "width: auto; " +
+            "height: auto; " +
+            "background: none repeat scroll 0 0 white; " +
+            "border: 0 none; " +
+            "border-radius: 8px 8px 8px 8px; " +
+            "box-shadow: -3px 3px 15px #888888;  " +
+            "color: red; " +
+            "font: 12px sans-serif; " +
+            "padding: 5px; " +
+            "text-align: center;"
+
+        divTooltip.setAttribute("style", popupToolTipStyle);
+
+        //var divTooltip = d3.select("body").append("div").attr("class", "popupToolTip");
+    }
+    divTooltip = d3.select(".popupToolTip");
+    // divTooltip.node().setAttribute("style", "position: absolute; z-index: 1000; display: none; width: auto; height: auto; background: none repeat scroll 0 0 white; border: 0 none; border-radius: 8px 8px 8px 8px; box-shadow: -3px 3px 15px #888888;  color: red; font: 12px sans-serif; padding: 5px; text-align: center;")
+    // divTooltip.node().setAttribute("style", popupToolTipStyle);
     var percentFormat = d3.format('.2%');
 
 
