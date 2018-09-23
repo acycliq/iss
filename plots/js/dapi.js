@@ -281,7 +281,9 @@ function dapi(cellData) {
         layer.feature.properties.type === "cell"?
             (
                 console.log('updating info...'),
+
                 info.update(layer.feature.properties),
+                this.openPopup(),
             
                 //Thats a temp solution to make the scatter chart responsive. 
                 document.getElementById("xxValue").value = layer.feature.properties.cx,
