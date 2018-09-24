@@ -436,7 +436,7 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mousemove': function(e){e.target.setStyle({weight:3.0, color: 'red'})},
+                    'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
                     'mouseover': function(e){
                         console.log('Voronoi clicked')

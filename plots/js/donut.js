@@ -116,8 +116,8 @@ function donutPopup(d){
     //overwrite data
     data = sdata
 
-    var width = 60;
-    var height = 60;
+    var width = 40;
+    var height = 40;
     var radius = Math.min(width, height) / 2;
 
     var cornerRadius = 3, // sets how rounded the corners are on each slice
