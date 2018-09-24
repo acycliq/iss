@@ -124,6 +124,7 @@ function donutPopup(d){
         padAngle = 0.015; // effectively dictates the gap between slices
 
     var div = d3.create("div")
+        .attr("class", "popupCustom")
     var svg = div.append("svg")
         .attr("width", width)
         .attr("height", height)

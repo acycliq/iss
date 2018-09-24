@@ -412,8 +412,16 @@ function dapi(cellData) {
 
         //push the features of the cells to polygons
         for (i=0; i < cellFeatures.length; ++i){
-            voronoiPolygons.features[i].properties = cellFeatures[i].properties
+            voronoiPolygons.features[i].properties = fc.features[i].properties;
+            voronoiPolygons.features[i].properties.generator = fc.features[i].geometry.coordinates;
         }
+
+        // specify popup options
+        var customOptions =
+            {
+               'className' : 'popupCustom'
+            }
+
         var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
             return {
                 weight: 0.0, // Voronoi not visible, useful only for navigation purposes
@@ -428,17 +436,21 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
+                    'mousemove': function(e){e.target.setStyle({weight:3.0, color: 'red'})},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
-                    // 'click': function(e){
-                    //     map.fitBounds(e.target.getBounds());
-                    //     this.bindPopup("<b>"+"Hello");
-                    //     },
+                    'mouseover': function(e){
+                        console.log('Voronoi clicked')
+                        //map.fitBounds(e.target.getBounds());
+                        console.log("opening popup")
+                        var voronoiGenerator = e.target.feature.properties.generator;
+                        var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]])
+                        this.openPopup(targetPoint);
+                        },
                     'add': function(e){console.log('add pressed')},
                     'remove': function(e){console.log('remove pressed')},
                 }
             );//close layer
-                layer.bindPopup(donutPopup);
+                layer.bindPopup(donutPopup, customOptions);
             }
 
         }).addTo(map);
