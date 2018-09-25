@@ -43,7 +43,8 @@ function dapi(cellData) {
         var out = '';
         if (cellFeatures){
             for (var i=0; i<cellFeatures.Prob.length; i++){
-                out += str1 + cellFeatures.ClassName[i] + str2 + Math.floor(cellFeatures.Prob[i] * 10000)/100 + '%'
+                out += str1 + cellFeatures.ClassName[i] + str2 +
+                        Math.floor(cellFeatures.Prob[i] * 10000)/100 + '%'
             }
         }
         else{
@@ -283,7 +284,7 @@ function dapi(cellData) {
                 console.log('updating info...'),
 
                 info.update(layer.feature.properties),
-                this.openPopup(),
+                //this.openPopup(),
             
                 //Thats a temp solution to make the scatter chart responsive. 
                 document.getElementById("xxValue").value = layer.feature.properties.cx,
@@ -332,7 +333,7 @@ function dapi(cellData) {
             popup = cellPopup;
         }
         
-        layer.bindPopup(popup);
+        //layer.bindPopup(popup);
     }
     
     
@@ -436,25 +437,64 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mousemove': function(e){e.target.setStyle({weight:0.0, color: 'red'})},
+                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e)},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
-                    'mouseover': function(e){
-                        console.log('Voronoi clicked')
-                        //map.fitBounds(e.target.getBounds());
-                        console.log("opening popup")
-                        var voronoiGenerator = e.target.feature.properties.generator;
-                        var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]])
-                        this.openPopup(targetPoint);
-                        },
+                    // 'mouseover': function(e){
+                    //     console.log('Voronoi clicked')
+                    //     //map.fitBounds(e.target.getBounds());
+                    //     console.log("opening popup")
+                    //     var voronoiGenerator = e.target.feature.properties.generator;
+                    //     var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]])
+                    //     this.openPopup(targetPoint);
+                    //     },
+                    'click': clickHandler,
                     'add': function(e){console.log('add pressed')},
                     'remove': function(e){console.log('remove pressed')},
                 }
-            );//close layer
-                layer.bindPopup(donutPopup, customOptions);
+            );//close bracket
+
+                // thats one way to bind a popup. This however will make the popup show on mouseclicks.
+                // If this is not desired then do it the way described as few lines below
+                // layer.bindPopup(donutPopup, customOptions);
             }
 
         }).addTo(map);
-        
+
+        // Bind popups
+        var cellCounter;
+        var popup = L.popup(customOptions);
+        function mouseoverHandler(e){
+            if ((!cellCounter) || e.target.feature.properties.id !== cellCounter){
+                console.log('firing event in mousemoveHandler');
+                handlerHelper(e)
+
+                // update the cellCounter
+                cellCounter = e.target.feature.properties.id;
+            }
+            else{
+                console.log("mouseover in the same cell. Ignore");
+            }
+        }
+
+        function clickHandler(e){
+            console.log('firing event in clickHandler');
+            handlerHelper(e);
+            map.fitBounds(e.target.getBounds());
+        }
+
+        function handlerHelper(e){
+            var content = donutPopup(e.target);
+            var voronoiGenerator = e.target.feature.properties.generator;
+            var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]]);
+            popup.setContent(content);
+            popup.setLatLng(targetPoint);
+            map.openPopup(popup);
+        }
+
+
+
+
+
         // Plot the cells. (If these are on different pane than the genes' pane, then they
         // not respond to mouse event. Panes sit on canvas, and afaik the topmost canvas swallows all
         //events and nothing propagates down to panes/layers underneath)
