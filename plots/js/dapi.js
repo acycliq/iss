@@ -498,7 +498,7 @@ function dapi(cellData) {
         }
 
         function clickVoronoi(e){
-            console.log('firing event in clickHandler');
+            console.log('Voronoi was clicked');
             map.fitBounds(e.target.getBounds());
             var layer = e.target;
             var voronoiStyle = {
