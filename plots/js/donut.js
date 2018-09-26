@@ -171,7 +171,7 @@ function donutPopup(d){
             "border: 0 none; " +
             "border-radius: 8px 8px 8px 8px; " +
             "box-shadow: -3px 3px 15px #888888;  " +
-            "color: red; " +
+            "color: black; " +
             "font: 12px sans-serif; " +
             "padding: 5px; " +
             "text-align: center;"
