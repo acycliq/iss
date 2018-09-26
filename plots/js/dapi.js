@@ -451,8 +451,8 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e)},
-                    'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup()},
+                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e); info.update(e.target.feature.properties);},
+                    'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup(); info.update()},
                     // 'mouseover': function(e){
                     //     console.log('Voronoi clicked')
                     //     //map.fitBounds(e.target.getBounds());
