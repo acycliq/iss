@@ -253,19 +253,26 @@ function dapi(cellData) {
 
             console.log('You clicked a ' + e.sourceTarget.feature.properties.type)
             var layer = e.target;
-            var evtxClick = new CustomEvent('clickMouse');
-            var evtyClick = new CustomEvent('clickMouse');
             dotStyleHighlight = highlightStyle(layer.feature);
             layer.setStyle(dotStyleHighlight);
             if (!L.Browser.ie && !L.Browser.opera) {
                 layer.bringToFront();
             }
-            document.getElementById("xxValue").value = layer.feature.properties.cx,
-                document.getElementById("yyValue").value = layer.feature.properties.cy,
-                document.getElementById('xxValue').dispatchEvent(evtxClick),
-                document.getElementById('yyValue').dispatchEvent(evtxClick)
-
+            dispachClick(layer)
         }
+    }
+
+    function dispachClick(layer){
+        var evtxClick = new CustomEvent('clickMouse');
+        var evtyClick = new CustomEvent('clickMouse');
+
+        document.getElementById("xxValue").value = layer.feature.properties.cx,
+            document.getElementById("yyValue").value = layer.feature.properties.cy,
+            document.getElementById('xxValue').dispatchEvent(evtxClick),
+            document.getElementById('yyValue').dispatchEvent(evtxClick)
+        // I think there is a reason in the line above I used evtxClick and NOT evtyClick
+        // Something with convenience but there is a potential bug here
+        // Why did you do that?? Remember and fix!
     }
 
     //attach styles and popups to the marker layer
@@ -279,20 +286,26 @@ function dapi(cellData) {
             layer.bringToFront();
         }
         
-        layer.feature.properties.type === "cell"?
-            (
-                console.log('updating info...'),
-
-                info.update(layer.feature.properties),
-                //this.openPopup(),
-            
-                //Thats a temp solution to make the scatter chart responsive. 
-                document.getElementById("xxValue").value = layer.feature.properties.cx,
-                document.getElementById("yyValue").value = layer.feature.properties.cy,
-                document.getElementById('xxValue').dispatchEvent(evtxx),
-                document.getElementById('yyValue').dispatchEvent(evtyy)
-            ):
+        if(layer.feature.properties.type === "cell") {
+            console.log('updating info...');
+            info.update(layer.feature.properties);
+            dispachCustomEvent(layer);
+        }
+        else{
             console.log("I am not hovering over a cell");
+        }
+    }
+
+    function dispachCustomEvent(layer){
+        var evtxx = new CustomEvent('moveMouse');
+        var evtyy = new CustomEvent('moveMouse');
+
+        //Thats a temp solution to make the scatter chart responsive.
+        document.getElementById("xxValue").value = layer.feature.properties.cx,
+            document.getElementById("yyValue").value = layer.feature.properties.cy,
+            document.getElementById('xxValue').dispatchEvent(evtxx),
+            document.getElementById('yyValue').dispatchEvent(evtyy)
+
     }
 
     function resetDotHighlight(e) {
@@ -330,10 +343,11 @@ function dapi(cellData) {
             popup = genePopup;
         }
         if (feature.properties.type === 'cell'){
-            popup = cellPopup;
+            // popup = cellPopup;
+            popup = genePopup;
         }
         
-        //layer.bindPopup(popup);
+        layer.bindPopup(popup);
     }
     
     
@@ -464,6 +478,8 @@ function dapi(cellData) {
         var cellCounter;
         var popup = L.popup(customOptions);
         function mouseoverHandler(e){
+            //reset the style first
+            e.target.setStyle();
             if ((!cellCounter) || e.target.feature.properties.id !== cellCounter){
                 console.log('firing event in mousemoveHandler');
                 handlerHelper(e)
@@ -477,9 +493,27 @@ function dapi(cellData) {
         }
 
         function clickHandler(e){
-            console.log('firing event in clickHandler');
+            clickVoronoi(e)
             handlerHelper(e);
+        }
+
+        function clickVoronoi(e){
+            console.log('firing event in clickHandler');
             map.fitBounds(e.target.getBounds());
+            var layer = e.target;
+            var voronoiStyle = {
+                fillColor: "#FFCE00",
+                color: "#FFCE00",
+                weight: 5,
+                opacity: 1,
+                fillOpacity: 0.9
+            }
+            //layer.setStyle(voronoiStyle)
+
+            //make sure zValue is empty
+            document.getElementById("zValue").value = ''
+            dispachClick(layer)
+
         }
 
         function handlerHelper(e){
