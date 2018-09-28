@@ -28,6 +28,7 @@
 
     <!--d3 -->
     <script src='https://d3js.org/d3.v4.min.js'></script>
+    <script src="./lib/js/d3-delaunay.min.js"></script>
 
     <!--    <link rel="stylesheet" href="./lib/css/custom.css">-->
     <!--    <script src="./lib/js/underscore-min.js"></script>-->
@@ -94,7 +95,7 @@
         /*fill: steelblue;*/
         /*}*/
 
-        #map {
+        #mymap {
             position: relative;
             height: 800px;
         }
@@ -266,6 +267,28 @@
             /*color: #234c5e;*/
 
 
+        .myCSSClass {
+            font-size: 15px;
+            font-weight:bold;
+            padding: 20px !important;
+            background: none;
+            border: none;
+            color: #FFCE00;
+            text-shadow: 0px 0px 10px black;
+            box-shadow: #888888;
+            outline: none;
+        }
+        .leaflet-tooltip-left.myCSSClass::before {
+            border-left-color: cyan;
+        }
+        .leaflet-tooltip-right.myCSSClass::before {
+            border-right-color: cyan;
+        }
+
+        .leaflet-tooltip-left.myCSSClass::before {border-left-color: transparent;}
+        .leaflet-tooltip-right.myCSSClass::before {border-right-color: transparent;}
+
+
     </style>
 
 </head>
@@ -314,7 +337,7 @@
                         Gene Map
                     </div>
                     <div class="chart-stage">
-                        <div id="map" style="width: 100%;"></div>
+                        <div id="mymap" style="width: 100%;"></div>
                     </div>
                 </div>
             </div>

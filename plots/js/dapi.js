@@ -59,13 +59,13 @@ function dapi(cellData) {
     // method that we will use to update the control based on feature properties passed
     info.update = function (cellFeatures) {
         var msg = infoMsg(cellFeatures);
-        this._div.innerHTML = '<h4>Cell Info</h4>' + (cellFeatures ?
+        this._div.innerHTML = '<h4>Nearest Cell Info</h4>' + (cellFeatures ?
             '<table style="width:110px;">' + 
             '<tbody><tr style="width:110px; border-bottom:1px solid Black; font-weight: bold"><td><div><b>Class </b></div></td><td><div> Prob'  +  
             msg +
             '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Marker: </b></div></td><td><div>' + cellFeatures.Cell_Num + 
             '</div></td></tr></tbody></table>' :
-            '<b>Hover over a cell</b>'
+            '<b>Hover around  a cell</b>'
             
             );
     };
@@ -327,15 +327,7 @@ function dapi(cellData) {
             mouseout: resetDotHighlight,
             click: clickDot,
         });
-        var genePopup = '<table style="width:110px"><tbody><tr><td><div><b>Marker: </b></div></td><td><div>' + feature.properties.popup +
-            '</div></td></tr><tr class><td><div><b>Group: </b></div></td><td><div>' + feature.properties.year + 
-            '</div></td></tr><tr class><td><div><b>Name: </b></div></td><td><div>' + feature.properties.gene + 
-            '</div></td></tr><tr class><td><div><b>Taxonomy: </b></div></td><td><div>' + feature.properties.taxonomy +
-            '</div></td></tr><tr class><td><div><b>Glyph: </b></div></td><td><div>' + feature.properties.glyphName + 
-            '</div></td></tr><tr><td><div><b>Color: </b></div></td><td><div>' + '<span style="border:1px black solid; background:' + feature.properties.glyphColor + ';font-weight:bold; font-style:italic;">'+ feature.properties.glyphColor + '</span>'  +
-            '</div></td></tr><tr><td><div><b>X: </b></div></td><td><div>' + feature.properties.x +
-            '</div></td></tr><tr><td><div><b>Y: </b></div></td><td><div>' + feature.properties.y +
-            '</div></td></tr></tbody></table>'
+        var genePopup = '<table style="width:30px"><tbody><tr><td><div>' + feature.properties.gene + '</div></td></tr></tbody></table>'
 
         var cellPopup = donutPopup
 
@@ -349,8 +341,8 @@ function dapi(cellData) {
         
         layer.bindPopup(popup);
     }
-    
-    
+
+
     d3.csv("./plots/data/Dapi_overlays.csv", function (data) {
         data.forEach(function (d) {
             d.x = +d.x
@@ -374,7 +366,7 @@ function dapi(cellData) {
             return yx(y, x); // When doing xy(x, y);
         };
 
-        var minZoom = 0,
+        var minZoom = 4,
             maxZoom = 8;
 
         // The transformation in this CRS maps the the bottom left corner to (0,0) and the top right to (256, 256)
@@ -388,12 +380,12 @@ function dapi(cellData) {
         ]);
 
 
-        var map = L.map('map', {
+        var map = L.map('mymap', {
             crs: L.CRS.MySimple, // http://leafletjs.com/reference-1.0.3.html#map-crs
             maxBounds: bounds.pad(.5), // http://leafletjs.com/reference-1.0.3.html#map-maxbounds
             minZoom: minZoom,
             maxZoom: maxZoom,
-        }).setView([img[1] / 2, img[0] / 2], 5);
+        }).setView([img[1] / 2, img[0] / 5], 5);
         
 //        map.createPane('myPane');
 //        map.createPane('cellPane');
@@ -401,7 +393,7 @@ function dapi(cellData) {
 
         var urlStr = "./plots/data/img/65536px/{z}/{x}/{y}.png"
         
-        L.tileLayer(urlStr, {
+        tl = L.tileLayer(urlStr, {
             attribution: 'KDH',
             continuousWorld: false,
             minZoom: minZoom,
@@ -409,11 +401,11 @@ function dapi(cellData) {
         }).addTo(map);
         
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
-        tl = L.tileLayer(urlStr, {
+        tlMinimap = L.tileLayer(urlStr, {
             minZoom: minZoom,
             maxZoom: maxZoom
         });
-        var miniMap = new L.Control.MiniMap(tl, { toggleDisplay: true }).addTo(map);
+        var miniMap = new L.Control.MiniMap(tlMinimap, { toggleDisplay: true }).addTo(map);
         
         //Add fullscreen button
         map.addControl(new L.Control.Fullscreen());
@@ -424,6 +416,16 @@ function dapi(cellData) {
         var cellFeatures = cellDots.features;
         var fc = turf.featureCollection(cellFeatures)
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
+
+        //  **** Code for use in future revisions. Alternative way to calc voronois ****
+        var myDelaunayPoints = []
+        for(i=0; i<cellFeatures.length; ++i){
+            myDelaunayPoints[i] = cellFeatures[i].geometry.coordinates
+        }
+        var delaunay = d3.Delaunay.from(myDelaunayPoints);
+        var voronoi = delaunay.voronoi([0, 0, img[0], img[1]]);
+        var vorPolygon = voronoi.cellPolygon(0)
+        // *** *** *** *** *** *** *** *** *** *** *** ***
 
         //push the features of the cells to polygons
         for (i=0; i < cellFeatures.length; ++i){
@@ -437,6 +439,7 @@ function dapi(cellData) {
                'className' : 'popupCustom'
             }
 
+        var cm ;
         var voronoiLayer = L.geoJSON(voronoiPolygons, {style: function(feature) {
             return {
                 weight: 0.0, // Voronoi not visible, useful only for navigation purposes
@@ -451,8 +454,8 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e); info.update(e.target.feature.properties);},
-                    'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup(); info.update()},
+                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e, delaunay); info.update(e.target.feature.properties);},
+                    'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup(); info.update(); map.removeLayer(cm)},
                     // 'mouseover': function(e){
                     //     console.log('Voronoi clicked')
                     //     //map.fitBounds(e.target.getBounds());
@@ -477,24 +480,16 @@ function dapi(cellData) {
         // Bind popups
         var cellCounter;
         var popup = L.popup(customOptions);
-        function mouseoverHandler(e){
+        function mouseoverHandler(e, delaunay){
             //reset the style first
             e.target.setStyle();
-            if ((!cellCounter) || e.target.feature.properties.id !== cellCounter){
-                console.log('firing event in mousemoveHandler');
-                handlerHelper(e)
-
-                // update the cellCounter
-                cellCounter = e.target.feature.properties.id;
-            }
-            else{
-                console.log("mouseover in the same cell. Ignore");
-            }
+            handlerHelper(e, delaunay)
         }
 
         function clickHandler(e){
+            map.removeLayer(cm)
             clickVoronoi(e)
-            handlerHelper(e);
+            handlerHelper(e, delaunay);
         }
 
         function clickVoronoi(e){
@@ -516,13 +511,22 @@ function dapi(cellData) {
 
         }
 
-        function handlerHelper(e){
+        function handlerHelper(e, delaunay){
             var content = donutPopup(e.target);
             var voronoiGenerator = e.target.feature.properties.generator;
             var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]]);
             popup.setContent(content);
             popup.setLatLng(targetPoint);
-            map.openPopup(popup);
+
+            cm = L.circleMarker(targetPoint, {
+                radius: 8,
+                fillColor: "#FFCE00",
+                color: "red",
+                weight: 1,
+                opacity: 1,
+                fillOpacity: 0.9
+            }).addTo(map);
+            //map.openPopup(popup);
         }
 
 
@@ -554,7 +558,7 @@ function dapi(cellData) {
                     //return L.circleMarker(p, style(feature));
                     // return new MarkerStar(p, style(feature));
 
-                    return new svgGlyph(latlng, style(feature, 'gene'));
+                    return new svgGlyph(latlng, style(feature, 'gene')).bindTooltip(feature.properties.gene, {className: 'myCSSClass'});
                 },
                 onEachFeature: onEachDot
             });
