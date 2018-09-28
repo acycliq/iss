@@ -488,7 +488,7 @@ function dapi(cellData) {
             onEachFeature: function(feature, layer) {
             layer.on(
                 {
-                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e, delaunay); info.update(e.target.feature.properties);},
+                    'mouseover': function(e){e.target.setStyle({weight:0.0, color: 'red'}); mouseoverHandler(e); info.update(e.target.feature.properties);},
                     'mouseout': function(e){voronoiLayer.resetStyle(e.target); this.closePopup(); info.update(); map.removeLayer(cm)},
                     // 'mouseover': function(e){
                     //     console.log('Voronoi clicked')
@@ -514,16 +514,16 @@ function dapi(cellData) {
         // Bind popups
         var cellCounter;
         var popup = L.popup(customOptions);
-        function mouseoverHandler(e, delaunay){
+        function mouseoverHandler(e){
             //reset the style first
             e.target.setStyle();
-            handlerHelper(e, delaunay)
+            handlerHelper(e)
         }
 
         function clickHandler(e){
             map.removeLayer(cm)
             clickVoronoi(e)
-            handlerHelper(e, delaunay);
+            handlerHelper(e);
         }
 
         function clickVoronoi(e){
@@ -545,7 +545,7 @@ function dapi(cellData) {
 
         }
 
-        function handlerHelper(e, delaunay){
+        function handlerHelper(e){
             var content = donutPopup(e.target);
             var voronoiGenerator = e.target.feature.properties.generator;
             var targetPoint = L.latLng([voronoiGenerator[1], voronoiGenerator[0]]);
