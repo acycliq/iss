@@ -73,7 +73,7 @@ function classColorsCodes()
         {className: 'Sst.Pnoc.Calb1.Pvalb', NickName: 'OLM', colorGroup: 'sst', color: '#00B2FF'},
         {className: 'Sst.Pnoc.Pvalb', NickName: 'OLM', colorGroup: 'sst', color: '#00B2FF'},
         {className: 'Vip.Crh.C1ql1', NickName: 'IS2', colorGroup: 'vip', color: '#FFE600'},
-        {className: 'Vip.Crh.Pcp4', NickName: 'CckCxcl14Vip', colorGroup: 'vip', color: '#FFE600'},
+        {className: 'Vip.Crh.Pcp4', NickName: 'Cck Cxcl14 Vip', colorGroup: 'vip', color: '#FFE600'},
         {className: 'Vsmc', NickName: 'Non Neuron', colorGroup: 'non_neuron', color: '#FFFFFF'},
         {className: 'Zero', NickName: 'Zero', colorGroup: 'Zero', color: '#000000'},
 
