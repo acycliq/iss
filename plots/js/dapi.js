@@ -21,6 +21,10 @@ function dapi(cellData) {
     var glyphs = glyphAssignment();
     var glyphMap = d3.map(glyphs, function(d) { return d.gene; });
 
+    //get the class colors
+    var classColors = classColorsCodes();
+    var classColorsMap = d3.map(classColors, function(d) { return d.className; });
+
     // This transformation maps a point in pixel dimensions to our user defined roi
     var t = new L.Transformation(a, b, c, d);
     
@@ -41,11 +45,41 @@ function dapi(cellData) {
         var str1 = '</div></td></tr><tr class><td><div><b>';
         var str2 = '&nbsp </b></div></td><td><div>';
         var out = '';
+        var temp = [];
+        var sdata = [];
         if (cellFeatures){
-            for (var i=0; i<cellFeatures.Prob.length; i++){
-                out += str1 + cellFeatures.ClassName[i] + str2 +
-                        Math.floor(cellFeatures.Prob[i] * 10000)/100 + '%'
+            for (var i=0; i<cellFeatures.ClassName.length; ++i){
+                temp.push({
+                    ClassName: cellFeatures.ClassName[i],
+                    NickName: classColorsMap.get(cellFeatures.ClassName[i]).NickName,
+                    Prob: cellFeatures.Prob[i],
+                })
             }
+
+            temp =  d3.nest()
+                .key(function(d){return d.NickName; })
+                .rollup(function(leaves){
+                    return d3.sum(leaves, function(d){return d.Prob;})
+                }).entries(temp)
+                .map(function(d){
+                    return { NickName: d.key, Prob: d.value};
+                });
+
+            // sort in decreasing order
+            temp.sort(function(x, y){
+                return d3.ascending(y.Prob, x.Prob);
+            })
+
+            for (var i=0; i<temp.length; i++){
+                out += str1 + temp[i].NickName + str2 +
+                    Math.floor(temp[i].Prob * 10000)/100 + '%'
+            }
+
+            //
+            // for (var i=0; i<cellFeatures.Prob.length; i++){
+            //     out += str1 + cellFeatures.ClassName[i] + str2 +
+            //             Math.floor(cellFeatures.Prob[i] * 10000)/100 + '%'
+            // }
         }
         else{
              // do nothing

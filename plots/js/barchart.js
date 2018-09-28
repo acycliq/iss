@@ -107,7 +107,7 @@ function barchart(data) {
 
     function renderPoints(selection, data) {
 
-        var colorRamp = classColors()
+        var colorRamp = classColorsCodes()
         var colorMap = d3.map(colorRamp, function(d) { return d.className; });
 
         function colorPicker(d, i) {
@@ -119,7 +119,10 @@ function barchart(data) {
             // var rgb = 'rgb('+ r + ', ' + g + ', ' + b +')'
             // return rgb
 
-            return d3.schemeCategory20[i]
+            // return d3.schemeCategory20[i]
+            console.log("getting color for "+ d.labels)
+            console.log("found it! " + colorMap.get(d.labels).color)
+            return colorMap.get(d.labels).color;
         }
 
         function colorHelper(x) {
@@ -152,6 +155,10 @@ function barchart(data) {
             .attr('fill', function(d, i) {
                 return colorPicker(d, i); // call the color picker to get the fill.
             })
+            .attr('stroke', '#3d4a57')
+            .attr('stroke-dasharray', '10,5')
+            .attr('stroke-linecap', 'butt')
+            .attr('stroke-width', '1')
             .attr("clip-path","url(#my-clip-path)");
 
         points.merge(newPoints)
@@ -188,6 +195,10 @@ function barchart(data) {
             .attr('height', d => {
                 return height2 - scale.y2(d.Prob)
             })
+            .attr('stroke', '#3d4a57')
+            .attr('stroke-dasharray', '10,5')
+            .attr('stroke-linecap', 'butt')
+            .attr('stroke-width', '1')
             .attr('fill', function(d, i) {
                 return colorPicker(d, i); // call the color picker to get the fill.
             })

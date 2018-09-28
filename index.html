@@ -64,6 +64,7 @@
 
     <!-- User scripts  -->
     <script src="plots/js/glyphs.js"></script>
+    <script src='./plots/js/classColors.js'></script>
     <script src='./plots/js/data_vis.js'></script>
     <script src='./plots/js/scatter.js'></script>
     <script src='./plots/js/barchart.js'></script>
@@ -72,7 +73,6 @@
     <script src='./plots/js/dt.js'></script>
     <script src='./plots/js/dapi.js'></script>
     <script src='./plots/js/glyphAssignment.js'></script>
-    <script src='./plots/js/classColors.js'></script>
     <!--<script src='./plots/js/seedrandom.js'></script>-->
 
     <style type="text/css">
@@ -186,7 +186,10 @@
 
         /*Donut chart settings*/
         path.slice {
-            stroke-width: 2px;
+            stroke: #3d4a57;
+            /*stroke-dasharray: 10,5;*/
+            /*stroke-linecap: butt;*/
+            stroke-width: 1px;
         }
 
         polyline {

@@ -52,7 +52,9 @@ function donut(){
 
 	var key = function(d){ return d.data.label; };
 	// var colors = ["#98abc5", "#8a89a6", "#7b6888", "#6b486b", "#a05d56", "#d0743c", "#ff8c00"];
-    var colors = d3.schemeCategory20;
+    // var colors = d3.schemeCategory20
+    var colorRamp = classColorsCodes()
+    var colorMap = d3.map(colorRamp, function(d) { return d.className; });
 
     var div = d3.select("body").append("div").attr("class", "toolTip");
 
@@ -62,7 +64,7 @@ function donut(){
     donutData.arc = arc;
     donutData.outerArc = outerArc;
     donutData.key = key;
-    donutData.colors = colors;
+    donutData.colorMap = colorMap;
     donutData.div = div;
     donutData.svg = svg;
 
@@ -192,6 +194,9 @@ function donutPopup(d){
         .domain(labels)
         .range(colors);
 
+    var colorRamp = classColorsCodes()
+    var colorMap = d3.map(colorRamp, function(d) { return d.className; });
+
     /* ------- PIE SLICES -------*/
     var slice = svg.select(".slices").selectAll("path.slice")
         .data(pie(data), key);
@@ -204,7 +209,7 @@ function donutPopup(d){
             divTooltip.style("display", "none");
         })
         .merge(slice)
-        .style("fill", function(d) { return color(d.data.label); })
+        .style("fill", function(d) { return colorMap.get(d.data.label).color; })
         .transition().duration(1000)
         .attrTween("d", function(d) {
             this._current = this._current || d;
@@ -246,9 +251,9 @@ function donutchart(dataset) {
 
     var labels = d3.map(data, function (d) {return d.label;}).keys();
     
-    var color = d3.scaleOrdinal()
-	.domain(labels)
-	.range(donutData.colors);
+    // var color = d3.scaleOrdinal()
+	// .domain(labels)
+	// .range(donutData.colors);
   
 	/* ------- PIE SLICES -------*/
 	var slice = svg.select(".slices").selectAll("path.slice")
@@ -263,7 +268,7 @@ function donutchart(dataset) {
         })
     .merge(slice)
         //.style("fill", 'url(#myPattern)')
-        .style("fill", function(d) { return color(d.data.label); })
+        .style("fill", function(d) { return donutData.colorMap.get(d.data.label).color; })
 		.transition().duration(1000)
 		.attrTween("d", function(d) {
 			this._current = this._current || d;
@@ -372,8 +377,8 @@ function donutchart(dataset) {
             donutData.svg.append('circle')
                 .attr('class', 'toolCircle')
                 .attr('r', donutData.radius * 0.38) // radius of tooltip circle
-                .style('fill', color(d.data.label)) // colour based on category mouse is over
-                .style('fill-opacity', 0.35);
+                .style('fill', donutData.colorMap.get(d.data.label).color) // colour based on category mouse is over
+                .style('fill-opacity', 0.65);
 
         });
 
