@@ -95,7 +95,14 @@ function barchart(data) {
             .call(brush.move, scale.x.range())
 
         selection.select(".axis2")
-            .attr("transform", "translate(0," + height2 +")");
+            .attr("transform", "translate(0," + height2 +")")
+            .append("text")
+            .attr("x", (width / 2))
+            .attr("y", height2*0.60) //set your y attribute here
+            .style("text-anchor", "middle")
+            .style("font-size", "10px")
+            .style('fill', '#707070')
+            .text("Select an area by dragging across the lower chart from its edges");
 
         selection.select(".focus").select(".axis").transition(t).call(axis.x);
         selection.select(".focus").select(".axis.axis--y").transition(t).call(axis.y);
