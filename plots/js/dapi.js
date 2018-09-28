@@ -451,15 +451,15 @@ function dapi(cellData) {
         var fc = turf.featureCollection(cellFeatures)
         var voronoiPolygons = turf.voronoi(fc, {bbox: [0, 0, img[0], img[1]]});
 
-        //  **** Code for use in future revisions. Alternative way to calc voronois ****
-        var myDelaunayPoints = []
-        for(i=0; i<cellFeatures.length; ++i){
-            myDelaunayPoints[i] = cellFeatures[i].geometry.coordinates
-        }
-        var delaunay = d3.Delaunay.from(myDelaunayPoints);
-        var voronoi = delaunay.voronoi([0, 0, img[0], img[1]]);
-        var vorPolygon = voronoi.cellPolygon(0)
-        // *** *** *** *** *** *** *** *** *** *** *** ***
+        // //  **** Code for use in future revisions. Alternative way to calc voronois ****
+        // var myDelaunayPoints = []
+        // for(i=0; i<cellFeatures.length; ++i){
+        //     myDelaunayPoints[i] = cellFeatures[i].geometry.coordinates
+        // }
+        // var delaunay = d3.Delaunay.from(myDelaunayPoints);
+        // var voronoi = delaunay.voronoi([0, 0, img[0], img[1]]);
+        // var vorPolygon = voronoi.cellPolygon(0)
+        // // *** *** *** *** *** *** *** *** *** *** *** ***
 
         //push the features of the cells to polygons
         for (i=0; i < cellFeatures.length; ++i){
