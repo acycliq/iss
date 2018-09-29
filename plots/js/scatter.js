@@ -43,7 +43,9 @@ function initChart(data) {
         y: d3.axisLeft(scale.y).tickFormat("").tickSize(-width),
     }
 
-    var colorScale = d3.scaleLinear().domain([0, 1]).range(['tomato', 'tomato']);
+    // var colorScale = d3.scaleLinear().domain([0, 1]).range(['tomato', 'tomato']);
+    var colorRamp = classColorsCodes()
+    var colorMap = d3.map(colorRamp, function(d) { return d.className; });
 
     // select the root container where the chart will be added
     var container = d3.select('#scatter-plot');
@@ -102,6 +104,69 @@ function initChart(data) {
     var moveX = document.getElementById("xxValue");
     var moveY = document.getElementById("yyValue");
 
+
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
+
+    function aggregator(data){
+        var out;
+        out =  d3.nest()
+            .key(function(d){return d.NickName; }) //group by NickName
+            .rollup(function(leaves){
+                return {
+                    Prob: d3.sum(leaves, function(d){return d.Prob;}), //sum all the values with the same NickName
+                    color: leaves[0].color                             //Get the first color code. All codes with the same NickName are the same anyway
+                }
+            }).entries(data)
+            .map(function(d){
+                return { NickName: d.key, Prob: d.value.Prob, color: d.value.color};
+            });
+
+        // sort in decreasing order
+        out.sort(function(x, y){
+            return d3.ascending(y.Prob, x.Prob);
+        })
+
+        return out
+    }
+
+    function dataManager(data){
+        var chartData = [];
+        for (var i=0; i<data.length; ++i){
+            var NickName = [];
+            var temp = [];
+            for(var j=0; j<data[i].Prob.length; ++j)
+            {
+                temp.push({
+                    NickName: colorMap.get(data[i].ClassName[j]).NickName,
+                    color: colorMap.get(data[i].ClassName[j]).color,
+                    Prob: data[i].Prob[j]
+                })
+            }
+            var agg = aggregator(temp);
+            chartData.push({
+                x: data[i].x,
+                y: data[i].y,
+                GeneCountTotal: data[i].CellGeneCount.reduce((a, b) => a + b, 0), //get the sum of all the elements in the array
+                NickName: agg[0].NickName,
+                color: agg[0].color,
+                Prob: agg[0].Prob,
+
+        })
+        }
+
+        return chartData
+    }
+
+    var managedData = dataManager(data)
+
+    //update now data with a managedData property
+    for (var i=0; i<data.length; ++i){
+        data[i].managedData = managedData[i]
+    }
+
+
     var dotsGroup;
     var voronoiDiagram;
     renderPlot(data);
@@ -125,9 +190,11 @@ function initChart(data) {
         dapi(data);
     }
 
+
+
     function renderScatter(data){
         updateScales(data, scale);
-        
+
         svg.select('.y.axis')
             .attr("transform", "translate(" + -pointRadius + " 0)" )
             .call(axis.y);
@@ -156,10 +223,15 @@ function initChart(data) {
             .enter()
             .append('circle')
             .attr('class', 'dotOnScatter')
-            .attr('r', pointRadius)
+            .style('stroke', 'grey')
+            .style('stroke-opacity', 0.2)
+            .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
-            .attr('fill', d => colorScale(d.y))
+            .attr('fill', d => d.managedData.color)
+
+        //colorScale(d.y)
+        //colorMap.get(d.managedData.NickName).color
         
         
         // create a voronoi diagram 
@@ -172,7 +244,7 @@ function initChart(data) {
         dotsGroup.append('circle')
             .attr('class', 'highlight-circle')
             .attr('r', pointRadius*2) // increase the size if highlighted
-            .style('fill', '#FFCE00')
+            //.style('fill', '#FFCE00')
             .style('display', 'none');
 
         // add the overlay on top of everything to take the mouse events
@@ -266,10 +338,12 @@ function initChart(data) {
         } else {
             if (prevHighlightDotNum !== d.Cell_Num) {
                 d3.select('.highlight-circle')
-                  .style('display', '')
-                  .style('stroke', colorScale(d.y))
-                  .attr('cx', scale.x(d.x))
-                  .attr('cy', scale.y(d.y));
+                    .style('display', '')
+                    .style('stroke', 'tomato')
+                    .attr('fill', d.managedData.color)
+                    .attr("r", 1.2*Math.sqrt(d.managedData.GeneCountTotal))
+                    .attr('cx', scale.x(d.x))
+                    .attr('cy', scale.y(d.y));
                 
                 // If event has be triggered from the scatter chart, so a tooltip
                 if (d3.event && d3.event.pageX){
@@ -278,7 +352,7 @@ function initChart(data) {
                     
                     tooltip
                     .style("opacity", .9)
-                    .html("x: " + Math.round(d.x *100)/100 + "<br/>y: " + Math.round(d.y * 100)/100 + "<br/>Cell Num: " + d.Cell_Num )
+                    .html("NickName: " + d.managedData.NickName + "<br/>Prob: " + Math.round(100*d.managedData.Prob)/100 + "<br/>Total Gene Count: " + Math.round(100*d.managedData.GeneCountTotal)/100 + "<br/>Cell Num: " + d.Cell_Num )
                     .style("left", (d3.event.pageX + 35) + "px")
                     .style("top", (d3.event.pageY + 10) + "px");
                     
