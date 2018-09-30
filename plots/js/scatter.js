@@ -112,15 +112,15 @@ function initChart(data) {
     function aggregator(data){
         var out;
         out =  d3.nest()
-            .key(function(d){return d.NickName; }) //group by NickName
+            .key(function(d){return d.IdentifiedType; }) //group by IdentifiedType
             .rollup(function(leaves){
                 return {
-                    Prob: d3.sum(leaves, function(d){return d.Prob;}), //sum all the values with the same NickName
-                    color: leaves[0].color                             //Get the first color code. All codes with the same NickName are the same anyway
+                    Prob: d3.sum(leaves, function(d){return d.Prob;}), //sum all the values with the same IdentifiedType
+                    color: leaves[0].color                             //Get the first color code. All codes with the same IdentifiedType are the same anyway
                 }
             }).entries(data)
             .map(function(d){
-                return { NickName: d.key, Prob: d.value.Prob, color: d.value.color};
+                return { IdentifiedType: d.key, Prob: d.value.Prob, color: d.value.color};
             });
 
         // sort in decreasing order
@@ -134,12 +134,12 @@ function initChart(data) {
     function dataManager(data){
         var chartData = [];
         for (var i=0; i<data.length; ++i){
-            var NickName = [];
+            var IdentifiedType = [];
             var temp = [];
             for(var j=0; j<data[i].Prob.length; ++j)
             {
                 temp.push({
-                    NickName: colorMap.get(data[i].ClassName[j]).NickName,
+                    IdentifiedType: colorMap.get(data[i].ClassName[j]).IdentifiedType,
                     color: colorMap.get(data[i].ClassName[j]).color,
                     Prob: data[i].Prob[j]
                 })
@@ -149,7 +149,7 @@ function initChart(data) {
                 x: data[i].x,
                 y: data[i].y,
                 GeneCountTotal: data[i].CellGeneCount.reduce((a, b) => a + b, 0), //get the sum of all the elements in the array
-                NickName: agg[0].NickName,
+                IdentifiedType: agg[0].IdentifiedType,
                 color: agg[0].color,
                 Prob: agg[0].Prob,
 
@@ -352,7 +352,7 @@ function initChart(data) {
                     
                     tooltip
                     .style("opacity", .9)
-                    .html("NickName: " + d.managedData.NickName + "<br/>Prob: " + Math.round(100*d.managedData.Prob)/100 + "<br/>Total Gene Count: " + Math.round(100*d.managedData.GeneCountTotal)/100 + "<br/>Cell Num: " + d.Cell_Num )
+                    .html("IdentifiedType: " + d.managedData.IdentifiedType + "<br/>Prob: " + Math.round(100*d.managedData.Prob)/100 + "<br/>Total Gene Count: " + Math.round(100*d.managedData.GeneCountTotal)/100 + "<br/>Cell Num: " + d.Cell_Num )
                     .style("left", (d3.event.pageX + 35) + "px")
                     .style("top", (d3.event.pageY + 10) + "px");
                     
