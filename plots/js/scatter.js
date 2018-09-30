@@ -223,8 +223,6 @@ function initChart(data) {
             .enter()
             .append('circle')
             .attr('class', 'dotOnScatter')
-            .style('stroke', 'grey')
-            .style('stroke-opacity', 0.2)
             .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
