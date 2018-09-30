@@ -79,7 +79,7 @@ function classColorsCodes()
 
 
         // I added this
-        {className: 'Other', NickName: 'Other', colorGroup: 'Other', color: '#C0C0C0'},
+        {className: 'Other', IdentifiedType: 'Other', colorGroup: 'Other', color: '#C0C0C0'},
 
 
     ];

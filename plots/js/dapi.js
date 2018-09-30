@@ -51,18 +51,18 @@ function dapi(cellData) {
             for (var i=0; i<cellFeatures.ClassName.length; ++i){
                 temp.push({
                     ClassName: cellFeatures.ClassName[i],
-                    NickName: classColorsMap.get(cellFeatures.ClassName[i]).NickName,
+                    IdentifiedType: classColorsMap.get(cellFeatures.ClassName[i]).IdentifiedType,
                     Prob: cellFeatures.Prob[i],
                 })
             }
 
             temp =  d3.nest()
-                .key(function(d){return d.NickName; })
+                .key(function(d){return d.IdentifiedType; })
                 .rollup(function(leaves){
                     return d3.sum(leaves, function(d){return d.Prob;})
                 }).entries(temp)
                 .map(function(d){
-                    return { NickName: d.key, Prob: d.value};
+                    return { IdentifiedType: d.key, Prob: d.value};
                 });
 
             // sort in decreasing order
@@ -71,7 +71,7 @@ function dapi(cellData) {
             })
 
             for (var i=0; i<temp.length; i++){
-                out += str1 + temp[i].NickName + str2 +
+                out += str1 + temp[i].IdentifiedType + str2 +
                     Math.floor(temp[i].Prob * 10000)/100 + '%'
             }
 
