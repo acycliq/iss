@@ -42,7 +42,7 @@ function dapi(cellData) {
     
     function infoMsg(cellFeatures)
     {
-        var str1 = '</div></td></tr><tr class><td><div><b>';
+        var str1 = '</div></td></tr><tr class><td nowrap><div><b>';
         var str2 = '&nbsp </b></div></td><td><div>';
         var out = '';
         var temp = [];
@@ -94,10 +94,10 @@ function dapi(cellData) {
     info.update = function (cellFeatures) {
         var msg = infoMsg(cellFeatures);
         this._div.innerHTML = '<h4>Nearest Cell Info</h4>' + (cellFeatures ?
-            '<table style="width:110px;">' + 
-            '<tbody><tr style="width:110px; border-bottom:1px solid Black; font-weight: bold"><td><div><b>Class </b></div></td><td><div> Prob'  +  
+            '<table style="width:110px;">' +
+            '<tbody><tr style="width:110px; border-bottom:1px solid Black; font-weight: bold"><td><div><b>Class </b></div></td><td><div> Prob'  +
             msg +
-            '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Marker: </b></div></td><td><div>' + cellFeatures.Cell_Num + 
+            '<tbody><tr style="width:110px; border-top:1px solid black;"><td><div><b>Marker: </b></div></td><td><div>' + cellFeatures.Cell_Num +
             '</div></td></tr></tbody></table>' :
             '<b>Hover around  a cell</b>'
             
@@ -866,40 +866,6 @@ function dapi(cellData) {
             }
         });
 
-
-        ////////////////////////////////////////////////////////////////////////////
-        // Using Leaflet.Coordinates plugin at https://github.com/MrMufflon/Leaflet.Coordinates
-        // As done in https://stackoverflow.com/questions/34638887/leaflet-custom-coordinates-on-image
-        ////////////////////////////////////////////////////////////////////////////
-
-        // Patch first to avoid longitude wrapping.
-        L.Control.Coordinates.include({
-            _update: function (evt) {
-                var pos = evt.latlng,
-                    opts = this.options;
-                if (pos) {
-                    //pos = pos.wrap(); // Remove that instruction.
-                    this._currentPos = pos;
-                    this._inputY.value = L.NumberFormatter.round(pos.lat, opts.decimals, opts.decimalSeperator);
-                    this._inputX.value = L.NumberFormatter.round(pos.lng, opts.decimals, opts.decimalSeperator);
-                    this._label.innerHTML = this._createCoordinateLabel(pos);
-                }
-            }
-        });
-
-
-        L.control.coordinates({
-            position: "bottomleft",
-            decimals: 0, //optional default 4
-            decimalSeperator: ".", //optional default "."
-            labelTemplateLat: "Y: {y}", //optional default "Lat: {y}"
-            labelTemplateLng: "X: {x}", //optional default "Lng: {x}"
-            enableUserInput: false, //optional default true
-            useDMS: false, //optional default false
-            useLatLngOrder: false, //ordering of labels, default false-> lng-lat
-            markerType: L.marker, //optional default L.marker
-            markerProps: {} //optional default {}
-        }).addTo(map);
 
     }
 }
