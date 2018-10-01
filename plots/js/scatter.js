@@ -369,7 +369,6 @@ function initChart(data) {
     moveX.addEventListener("clickMouse", myFun2);
     moveY.addEventListener("clickMouse", myFun2);
 
-
     var prevHighlightDotNum = null;
     // callback to highlight a point
     function highlight(d) {
@@ -391,14 +390,29 @@ function initChart(data) {
                 
                 // If event has be triggered from the scatter chart, so a tooltip
                 if (d3.event && d3.event.pageX){
+
+                    var myHtml = '<h4 style="margin-top:0px; margin-bottom:1px"><b>'+d.managedData.IdentifiedType+'</b></h4>' +
+                        '<table style="width:95px;">' +
+                        '<tbody>' +
+                        '<tr style="width:95px; border-top:1px solid White; font-weight: bold">' +
+                        '<td><div>Probability: </div></td>' +
+                        '<td><div>' + Math.round(100*d.managedData.Prob)/100 + '</div></td>' +
+                        '</tr>' +
+                        '<tr class="">' +
+                        '<td><div>Gene Count:</div>' + '</td>' +
+                        '<td><div>' + Math.round(100*d.managedData.GeneCountTotal)/100 + '</div></td>' +
+                        '</tr>' +
+                        '</tbody>' +
+                        '</table>'
+
                     tooltip.transition()
                     .duration(200)
                     
                     tooltip
-                    .style("opacity", .9)
-                    .html("IdentifiedType: " + d.managedData.IdentifiedType + "<br/>Prob: " + Math.round(100*d.managedData.Prob)/100 + "<br/>Total Gene Count: " + Math.round(100*d.managedData.GeneCountTotal)/100 + "<br/>Cell Num: " + d.Cell_Num )
-                    .style("left", (d3.event.pageX + 35) + "px")
-                    .style("top", (d3.event.pageY + 10) + "px");
+                        .style("opacity", .9)
+                        .html(myHtml)
+                        .style("left", (d3.event.pageX - 5) + "px")
+                        .style("top", (d3.event.pageY + 25) + "px");
                     
                 }
                 prevHighlightDotNum = d.Cell_Num;                
