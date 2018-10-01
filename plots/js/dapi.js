@@ -436,7 +436,7 @@ function dapi(cellData) {
         
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
         tlMinimap = L.tileLayer(urlStr, {
-            minZoom: minZoom,
+            minZoom: 0,
             maxZoom: maxZoom
         });
         var miniMap = new L.Control.MiniMap(tlMinimap, { toggleDisplay: true }).addTo(map);
@@ -632,13 +632,14 @@ function dapi(cellData) {
         addLayers()
 
 
-        var cl = L.control.layers(null, {}).addTo(map);
-        for (j = 0; j < dotlayer.length; j += 1) {
-            var name = "Group " + j + "0-" + j + "9";
-            cl.addOverlay(dotlayer[j], name);
-        }
-        cl.addOverlay(cellLayer, "Cells");
-        cl.addOverlay(voronoiLayer, "Voronoi Polygons");
+        // // Lets remove that for now, will come back later
+        // var cl = L.control.layers(null, {}).addTo(map);
+        // for (j = 0; j < dotlayer.length; j += 1) {
+        //     var name = "Group " + j + "0-" + j + "9";
+        //     cl.addOverlay(dotlayer[j], name);
+        // }
+        // cl.addOverlay(cellLayer, "Cells");
+        // cl.addOverlay(voronoiLayer, "Voronoi Polygons");
         
         
 
