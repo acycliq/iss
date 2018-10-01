@@ -131,6 +131,38 @@ function initChart(data) {
         return out
     }
 
+    function renderOrder(y) {
+        return y === 'Zero'? 1:
+            y === 'PC'? 2:
+                y === 'Non Neuron'? 3:
+                    y === 'PC Other2'? 4:
+                        y === 'PC Other1'? 5:
+                            y === 'Bistratified'? 6:
+                                y === 'Sst/Reln/NPY'? 7:
+                                    y === 'IS1'? 8:
+                                        y === 'CGE NGF'? 9:
+                                            y === 'Basket'? 10:
+                                                y === 'IS3'? 11:
+                                                    y === 'Radiatum retrohip'? 12:
+                                                        y === 'MGE NGF'? 13:
+                                                            y === 'O/LM'? 14:
+                                                                y === 'NGF/I-S transition'? 15:
+                                                                    y === 'Trilaminar'? 16:
+                                                                        y === 'Axo-axonic'? 17:
+                                                                            y === 'O-Bi'? 18:
+                                                                                y === 'Ivy'? 19:
+                                                                                    y === 'Hippocamposeptal'? 20:
+                                                                                        y === 'Cck Cxcl14+'? 21:
+                                                                                            y === 'Cck Vip Cxcl14-'? 22:
+                                                                                                y === 'Cck Cxcl14-'? 23:
+                                                                                                    y === 'Unidentified'? 24:
+                                                                                                        y === 'Cck Vip Cxcl14+'? 25:
+                                                                                                            y === 'Cck Calb1/Slc17a8*'? 26:
+                                                                                                                y === 'Backprojection'? 27:
+                                                                                                                    y === 'IS2'? 28:
+                                                                                                                        29;
+    }
+
     function dataManager(data){
         var chartData = [];
         for (var i=0; i<data.length; ++i){
@@ -152,12 +184,14 @@ function initChart(data) {
                 IdentifiedType: agg[0].IdentifiedType,
                 color: agg[0].color,
                 Prob: agg[0].Prob,
+                renderOrder: renderOrder(agg[0].IdentifiedType),
 
         })
         }
 
         return chartData
     }
+
 
     var managedData = dataManager(data)
 
@@ -166,6 +200,17 @@ function initChart(data) {
         data[i].managedData = managedData[i]
     }
 
+    // sort in ascending order
+    data.sort(function(x, y){
+        return d3.ascending(x.managedData.renderOrder, y.managedData.renderOrder);
+    })
+
+    // use that to check counts per IdentifiedType and then set the renderOrder in such a manner that
+    // names which smaller counts (ie rarer) will be rendered on top of more frequent ones
+    var countData = d3.nest()
+        .key(function(d){return d.managedData.IdentifiedType})
+        .rollup(function(leaves){return leaves.length})
+        .entries(data)
 
     var dotsGroup;
     var voronoiDiagram;
@@ -223,11 +268,12 @@ function initChart(data) {
             .enter()
             .append('circle')
             .attr('class', 'dotOnScatter')
+            .attr('id', d => d.managedData.IdentifiedType)
             .attr('r', d => Math.sqrt(d.managedData.GeneCountTotal))
             .attr('cx', d => scale.x(d.x))
             .attr('cy', d => scale.y(d.y))
             .attr('fill', d => d.managedData.color)
-
+            .attr('fill-opacity', 0.85)
         //colorScale(d.y)
         //colorMap.get(d.managedData.NickName).color
         
@@ -339,9 +385,9 @@ function initChart(data) {
                     .style('display', '')
                     .style('stroke', 'tomato')
                     .attr('fill', d.managedData.color)
-                    .attr("r", 1.2*Math.sqrt(d.managedData.GeneCountTotal))
                     .attr('cx', scale.x(d.x))
-                    .attr('cy', scale.y(d.y));
+                    .attr('cy', scale.y(d.y))
+                    .attr("r", 1.2*Math.sqrt(d.managedData.GeneCountTotal));
                 
                 // If event has be triggered from the scatter chart, so a tooltip
                 if (d3.event && d3.event.pageX){
