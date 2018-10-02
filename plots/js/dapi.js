@@ -437,7 +437,7 @@ function dapi(cellData) {
         //Minimap plugin magic goes here! Note that you cannot use the same layer object again, as that will confuse the two map controls
         tlMinimap = L.tileLayer(urlStr, {
             minZoom: 0,
-            maxZoom: maxZoom
+            maxZoom: 3
         });
         var miniMap = new L.Control.MiniMap(tlMinimap, { toggleDisplay: true }).addTo(map);
         
