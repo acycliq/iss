@@ -443,7 +443,23 @@
     setTimeout(function(){
         $('body').addClass('loaded');
         $('h1').css('color','#222222');
+
+
+        // quick hack to set the charts starting position. Under review
+        document.getElementById("xValue").value = 10666.50
+        document.getElementById("yValue").value = 18047.50
+        var evtx = new CustomEvent('change');
+        document.getElementById('xValue').dispatchEvent(evtx);
+
+
+        document.getElementById("xxValue").value = 379.153125
+        document.getElementById("yyValue").value = 34.45461538461538
+        var evtxClick = new CustomEvent('clickMouse');
+        document.getElementById('xxValue').dispatchEvent(evtxClick);
+
+        console.log("finished")
     }, 3000);
+
 </script>
 
 </body>
