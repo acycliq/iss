@@ -850,7 +850,7 @@ function dapi(cellData) {
             //p = xy(project([x, y], img, grid))
 
             if (z){
-                map.flyTo([p.y, p.x], 5);
+                map.flyTo([p.y, p.x], 7);
             }
         });
 
@@ -862,7 +862,7 @@ function dapi(cellData) {
             p = t.transform(L.point([x, y]));
             //p = xy(project([x, y], img, grid))
             if (z){
-                map.flyTo([p.y, p.x], 5);
+                map.flyTo([p.y, p.x], 7);
             }
         });
 
